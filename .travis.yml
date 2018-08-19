@@ -1,0 +1,9 @@
+language: node_js
+node_js: stable
+sudo: required
+dist: trusty
+sctipt:
+  - cd client
+  - npm install
+  - npm run test
+  - npm run build
