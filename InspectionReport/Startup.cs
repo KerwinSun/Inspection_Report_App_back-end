@@ -30,7 +30,7 @@ namespace InspectionReport
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(Options => {
-                Options.AddPolicy("", builder => builder
+                Options.AddPolicy("CorsPolicy", builder => builder
                                   .AllowAnyOrigin()
                                   .AllowAnyMethod()
                                   .AllowAnyHeader()
