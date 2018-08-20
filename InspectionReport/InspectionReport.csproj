@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.2" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Cors" Version="5.2.6" />
   </ItemGroup>
 
   <ItemGroup>
