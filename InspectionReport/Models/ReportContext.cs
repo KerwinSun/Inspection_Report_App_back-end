@@ -5,15 +5,17 @@ using System.Text;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace TodoApi.Models
+namespace InspectionReport.Models
 {
-    public class TodoContext : DbContext
+    public class ReportContext : DbContext
     {
-        public TodoContext(DbContextOptions<TodoContext> options)
+        public ReportContext(DbContextOptions<ReportContext> options)
             : base(options)
         {
         }
 
         public DbSet<TodoItem> TodoItems { get; set; }
+
+        public DbSet<User> Users { get; set; }
     }
 }

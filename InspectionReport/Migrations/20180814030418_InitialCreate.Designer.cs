@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TodoApi.Models;
+using InspectionReport.Models;
 
 namespace InspectionReport.Migrations
 {
-    [DbContext(typeof(TodoContext))]
+    [DbContext(typeof(ReportContext))]
     [Migration("20180814030418_InitialCreate")]
     partial class InitialCreate
     {
