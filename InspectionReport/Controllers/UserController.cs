@@ -37,7 +37,7 @@ namespace InspectionReport.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] User user)
+        public IActionResult CreateUser([FromBody] User user)
         {
             if (user == null)
             {
