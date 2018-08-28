@@ -26,16 +26,31 @@ namespace InspectionReport.Controllers
         [HttpPost]
         public IActionResult Create()
         {
-            User user = new User
+            Category cat = new Category
             {
                 Name = "testA"
             };
 
-            _context.Users.Add(user);
+            List<Category> catList = new List<Category>();
+            catList.Add(cat);
+
+            House house = new House
+            {
+                Address = "",
+                ConstructionType = "old",
+                InspectionDate = new DateTime(2015, 1, 1),
+                Categories = catList
+
+            };
+
+            _context.Categories.Add(cat);
+            _context.House.Add(house);
+
             _context.SaveChanges();
 
             return Ok();
         }
+
 
 
     }

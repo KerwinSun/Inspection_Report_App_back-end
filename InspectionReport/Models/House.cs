@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InspectionReport.Models
 {
@@ -17,5 +18,7 @@ namespace InspectionReport.Models
         public ICollection<HouseUser> InspectedBy { get; set; }
         public string ConstructionType { get; set; }
         public DateTime InspectionDate { get; set; }
+        [InverseProperty("House")]
+        public ICollection<Category> Categories { get; set; }
     }
 }
