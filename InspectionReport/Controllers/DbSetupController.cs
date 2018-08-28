@@ -28,8 +28,24 @@ namespace InspectionReport.Controllers
         {
             User user = new User
             {
-                Name = "testA"
+                Name = "Darius is a cat"
             };
+
+            House house = new House
+            {
+                Address = "21 Darius Road",
+                ConstructionType = "Wood",
+                InspectionDate = DateTime.Today
+            };
+
+            HouseUser hu = new HouseUser
+            {
+                House = house,
+                User = user
+            };
+
+            user.Inspected = new List<HouseUser> { hu };
+            house.InspectedBy = new List<HouseUser> { hu };
 
             _context.Users.Add(user);
             _context.SaveChanges();
