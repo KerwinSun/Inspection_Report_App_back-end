@@ -43,6 +43,16 @@ namespace InspectionReport.Controllers
 
             };
 
+            // Test Feature
+            Feature feaure = new Feature
+            {
+                Name = "a feature name",
+                Notes = "feature notes here",
+                Category = catList[0]
+
+            };
+
+
             _context.Categories.Add(cat);
             _context.House.Add(house);
 
