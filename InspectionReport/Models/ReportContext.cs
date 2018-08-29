@@ -47,7 +47,7 @@ namespace InspectionReport.Models
                 .WithMany(t => t.InspectedBy)
                 .HasForeignKey(pt => pt.HouseId);
 
-            // establishing a relationship between Category and Feature
+            // establishing a one-many relationship between Category and Feature
             modelBuilder.Entity<Feature>()
                 .HasOne(p => p.Category)
                 .WithMany(b => b.Features);

@@ -44,12 +44,21 @@ namespace InspectionReport.Controllers
             };
 
             // Test Feature
-            Feature feaure = new Feature
+            Feature feature = new Feature
             {
                 Name = "a feature name",
                 Notes = "feature notes here",
                 Category = catList[0]
 
+            };
+
+            List<Feature> featureList = new List<Feature>();
+            featureList.Add(feature);
+
+            Category cat2 = new Category
+            {
+                Name = "testA",
+                Features = featureList
             };
 
 
