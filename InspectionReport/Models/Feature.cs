@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace InspectionReport.Models
 {
-    public class Category
+    public class Feature
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public House House { get; set; }
+        public string Notes { get; set; }
+        public Category Category { get; set; }
 
-        public ICollection<Feature> Features { get; set; }
-
+        //public Media Media { get; set; }
     }
 }
