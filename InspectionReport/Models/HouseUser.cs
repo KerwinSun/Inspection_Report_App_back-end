@@ -5,6 +5,12 @@ using System.Threading.Tasks;
 
 namespace InspectionReport.Models
 {
+    /// <summary>
+    /// The HouseUser Table represents the Many-To-Many relationship
+    /// between the House and User Tables. A House can be associated with 
+    /// many users (inspectors) and one user (inspector) will be inspecting
+    /// many houses.
+    /// </summary>
     public class HouseUser
     {
         public long UserId { get; set; }

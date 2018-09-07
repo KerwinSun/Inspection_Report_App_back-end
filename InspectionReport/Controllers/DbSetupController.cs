@@ -49,7 +49,6 @@ namespace InspectionReport.Controllers
                 Name = "a feature name",
                 Notes = "feature notes here",
                 Category = catList[0]
-
             };
 
             List<Feature> featureList = new List<Feature>();
@@ -60,7 +59,6 @@ namespace InspectionReport.Controllers
                 Name = "sadmike",
                 Features = featureList
             };
-
 
             _context.Categories.Add(cat);
             _context.Categories.Add(cat2);

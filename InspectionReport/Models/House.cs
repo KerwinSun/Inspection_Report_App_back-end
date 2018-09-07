@@ -11,6 +11,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InspectionReport.Models
 {
+    /// <summary>
+    /// A House entity represents a inspection report for a particular
+    /// house.
+    /// </summary>
     public class House
     {
         public long Id { get; set; }

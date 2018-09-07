@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace InspectionReport.Models
 {
+    /// <summary>
+    /// The Cateogries represent the sections within a house
+    /// E.g. Kitchen, Rooms, Garden etc. I.e. Anything inside
+    /// or outside the house. 
+    /// </summary>
     public class Category
     {
         public long Id { get; set; }
