@@ -41,6 +41,7 @@ namespace InspectionReport.Controllers
             House house = _context.House
                             .Where(h => h.Id == id)
                             .Include(h => h.Categories)
+                                .ThenInclude(c => c.Features)
                             .SingleOrDefault();
 
 

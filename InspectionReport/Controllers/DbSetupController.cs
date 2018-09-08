@@ -135,8 +135,17 @@ namespace InspectionReport.Controllers
                 Name = "Tonald Drump"
             };
 
+            Feature feat = new Feature { Name = "Benchtop", Notes = "The benchtop looks very nice for eating and yeah" };
+            Feature feat2 = new Feature { Name = "Taps", Notes = "The taps are not working :(" };
+
+            List<Feature> featList = new List<Feature>
+            {
+                feat,
+                feat2
+            };
+
             //Test category
-            Category cat = new Category { Name = "Kitchen" };
+            Category cat = new Category { Name = "Kitchen", Features = featList };
 
             List<Category> catList = new List<Category>
             {
