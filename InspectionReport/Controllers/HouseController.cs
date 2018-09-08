@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using InspectionReport.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -36,7 +37,12 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetHouse")]
         public IActionResult GetById(long id)
         {
-            House house = _context.House.Find(id);
+            //House house = _context.House.Find(id);
+            House house = _context.House
+                            .Where(h => h.Id == id)
+                            .Include(h => h.InspectedBy)
+                            .SingleOrDefault();
+
 
             if (house == null)
             {

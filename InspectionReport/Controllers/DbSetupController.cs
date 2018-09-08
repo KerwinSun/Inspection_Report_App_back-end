@@ -60,12 +60,44 @@ namespace InspectionReport.Controllers
                 Features = featureList
             };
 
+            User user = new User
+            {
+                Name = "Pulkit Dirty Stuff",
+            };
+
+            House house2 = new House
+            {
+                Address = "",
+                ConstructionType = "old",
+                InspectionDate = new DateTime(2018, 1, 1),
+                Categories = catList
+
+            };
+
+            HouseUser hu = new HouseUser
+            {
+                User = user,
+                House = house2,
+
+            };
+
+            
+
             _context.Categories.Add(cat);
             _context.Categories.Add(cat2);
 
             _context.Feature.Add(feature);
 
             _context.House.Add(house);
+
+            _context.Users.Add(user);
+            _context.House.Add(house2);
+
+
+
+            _context.SaveChanges();
+
+            _context.HouseUser.Add(hu);
 
             _context.SaveChanges();
 
