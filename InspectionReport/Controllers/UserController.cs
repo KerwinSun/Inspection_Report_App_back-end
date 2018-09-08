@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 using Microsoft.AspNetCore.Mvc;
 using InspectionReport.Models;
@@ -28,7 +29,11 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetUser")]
         public IActionResult GetById(long id)
         {
-            User user = _context.Users.Find(id);
+            User user = _context.Users
+                            .Include(u => u.Inspected)
+                                .ThenInclude(hu => hu.House)
+                            .Where(u => u.Id == id)
+                            .SingleOrDefault();
             if (user == null)
             {
                 return NotFound();

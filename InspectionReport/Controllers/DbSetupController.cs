@@ -26,15 +26,43 @@ namespace InspectionReport.Controllers
         [HttpPost]
         public IActionResult Create()
         {
-            Category cat = new Category
+            User user = new User
+            {
+                Name = "Darius is a cat"
+            };
+
+            House house = new House
+            {
+                Address = "21 Darius Road",
+                ConstructionType = "Wood",
+                InspectionDate = DateTime.Today
+            };			
+
+            HouseUser hu = new HouseUser
+            {
+                House = house,
+                User = user
+            };
+
+            user.Inspected = new List<HouseUser> { hu };
+            house.InspectedBy = new List<HouseUser> { hu };
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+			
+			
+			//Test categroy
+			Category cat = new Category
             {
                 Name = "testA"
             };
 
-            List<Category> catList = new List<Category>();
-            catList.Add(cat);
+            List<Category> catList = new List<Category>
+            {
+                cat
+            };
 
-            House house = new House
+            House house2 = new House
             {
                 Address = "",
                 ConstructionType = "old",
@@ -51,8 +79,10 @@ namespace InspectionReport.Controllers
                 Category = catList[0]
             };
 
-            List<Feature> featureList = new List<Feature>();
-            featureList.Add(feature);
+            List<Feature> featureList = new List<Feature>
+            {
+                feature
+            };
 
             Category cat2 = new Category
             {
@@ -88,7 +118,7 @@ namespace InspectionReport.Controllers
 
             _context.Feature.Add(feature);
 
-            _context.House.Add(house);
+            _context.House.Add(house2);
 
             _context.Users.Add(user);
             _context.House.Add(house2);
@@ -103,8 +133,5 @@ namespace InspectionReport.Controllers
 
             return Ok();
         }
-
-
-
     }
 }
