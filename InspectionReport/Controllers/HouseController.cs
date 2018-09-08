@@ -90,8 +90,6 @@ namespace InspectionReport.Controllers
                 return NotFound();
             } else
             {
-                //List<Category> cat = _context.Categories.Where(u => u.House == house).ToList();
-                //_context.Categories.RemoveRange(cat);
                 _context.Remove(house);
                 _context.SaveChanges();
                 return Ok();
