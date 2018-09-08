@@ -176,6 +176,7 @@ namespace UnitTest
 
                 Assert.AreEqual(200, result.StatusCode);
                 Assert.IsNotNull(userGot);
+                Assert.AreEqual(userId, userGot.Id);
                 Assert.AreEqual("Darius is a cat", user.Name);
 
                 //Should include houseUser
