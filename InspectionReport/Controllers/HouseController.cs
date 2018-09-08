@@ -82,8 +82,21 @@ namespace InspectionReport.Controllers
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(long id)
         {
+            House house = _context.House.Find(id);
+            if (house == null)
+            {
+                return NotFound();
+            } else
+            {
+                //List<Category> cat = _context.Categories.Where(u => u.House == house).ToList();
+                //_context.Categories.RemoveRange(cat);
+                _context.Remove(house);
+                _context.SaveChanges();
+                return Ok();
+            }
+            
         }
     }
 }

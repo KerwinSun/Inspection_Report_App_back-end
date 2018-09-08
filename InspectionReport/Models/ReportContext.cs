@@ -28,10 +28,10 @@ namespace InspectionReport.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<Category>()
                 .HasOne(p => p.House)
-                .WithMany(b => b.Categories);
+                .WithMany(b => b.Categories)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // establishing a many-to-many relationship between 
             modelBuilder.Entity<HouseUser>()

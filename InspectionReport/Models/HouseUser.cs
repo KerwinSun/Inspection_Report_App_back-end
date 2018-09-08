@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,8 +15,10 @@ namespace InspectionReport.Models
     public class HouseUser
     {
         public long UserId { get; set; }
+        [Required]
         public User User { get; set; }
         public long HouseId { get; set; }
+        [Required]
         public House House { get; set; }
     }
 }
