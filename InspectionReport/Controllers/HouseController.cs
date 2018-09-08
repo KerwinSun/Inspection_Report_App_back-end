@@ -26,12 +26,6 @@ namespace InspectionReport.Controllers
             return Ok(_context.House.ToList());
         }
 
-        //// GET: api/<controller>
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}                                             
 
         // GET api/<controller>/5
         [HttpGet("{id}", Name = "GetHouse")]
@@ -57,14 +51,33 @@ namespace InspectionReport.Controllers
 
         // POST api/<controller>
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult CreateHouse([FromBody] House house)
         {
-        }
+            if (house == null)
+            {
+                return BadRequest();
+            }
 
-        // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
+            House check = _context.House.Find(house.Id);
+
+            if (check != null)
+            {
+                /*
+                 Note:
+                 https://stackoverflow.com/questions/37586659/replace-entity-in-context-with-a-different-instance-of-the-same-entity
+                 */
+                _context.Entry(check).State = EntityState.Detached;
+                _context.House.Attach(house);
+                _context.Entry(house).State = EntityState.Modified;
+            }
+            else
+            {
+                _context.House.Add(house);
+            }
+            _context.SaveChanges();
+
+            return CreatedAtRoute("GetHouse", new { id = house.Id }, house);
+
         }
 
         // DELETE api/<controller>/5
