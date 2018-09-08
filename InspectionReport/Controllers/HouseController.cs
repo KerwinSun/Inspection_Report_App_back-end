@@ -25,18 +25,27 @@ namespace InspectionReport.Controllers
             return Ok(_context.House.ToList());
         }
 
-        // GET: api/<controller>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        //// GET: api/<controller>
+        //[HttpGet]
+        //public IEnumerable<string> Get()
+        //{
+        //    return new string[] { "value1", "value2" };
+        //}                                             
 
         // GET api/<controller>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{id}", Name = "GetHouse")]
+        public IActionResult GetById(long id)
         {
-            return "value";
+            House house = _context.House.Find(id);
+
+            if (house == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(house);
+            }
         }
 
         // POST api/<controller>
