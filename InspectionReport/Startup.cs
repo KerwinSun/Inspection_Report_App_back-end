@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using TodoApi.Models;
+using InspectionReport.Models;
 
 namespace InspectionReport
 {
@@ -53,7 +53,11 @@ namespace InspectionReport
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddJsonOptions(
+                    options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
             /// TODO: Should put the connection string as an environment variable.
 
             // Use SQL Database if in Azure, otherwise, use SQLite
@@ -62,14 +66,14 @@ namespace InspectionReport
             if (_env.IsDevelopment())
             {
                 var connection = @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
-                services.AddDbContext<TodoContext>(options => options.UseSqlServer(connection));
+                services.AddDbContext<ReportContext>(options => options.UseSqlServer(connection));
             } else
             {
-                services.AddDbContext<TodoContext>(options =>
+                services.AddDbContext<ReportContext>(options =>
                    options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
             }
             // Automatically perform database migration
-            services.BuildServiceProvider().GetService<TodoContext>().Database.Migrate();
+            services.BuildServiceProvider().GetService<ReportContext>().Database.Migrate();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

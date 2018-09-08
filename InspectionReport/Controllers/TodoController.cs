@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.AspNetCore.Mvc;
-using TodoApi.Models;
+using InspectionReport.Models;
 
-namespace TodoApi.Controllers
+namespace InspectionReport.Controllers
 {
     [Route("api/Todo")]
     [ApiController]
     public class TodoController : ControllerBase
     {
-        private readonly TodoContext _context;
+        private readonly ReportContext _context;
 
-        public TodoController(TodoContext context)
+        public TodoController(ReportContext context)
         {
             _context = context;
 
