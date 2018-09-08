@@ -62,7 +62,6 @@ namespace InspectionReport.Controllers
             }
         }
 
-        // POST api/<controller>
         [HttpPost]
         public IActionResult CreateHouse([FromBody] House house)
         {
@@ -93,7 +92,6 @@ namespace InspectionReport.Controllers
 
         }
 
-        // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
