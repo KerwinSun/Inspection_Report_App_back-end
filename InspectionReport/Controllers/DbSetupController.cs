@@ -90,12 +90,12 @@ namespace InspectionReport.Controllers
                 Features = featureList
             };
 
-            User user = new User
+            User user2 = new User
             {
                 Name = "Pulkit Dirty Stuff",
             };
 
-            House house2 = new House
+            House house3 = new House
             {
                 Address = "",
                 ConstructionType = "old",
@@ -104,30 +104,23 @@ namespace InspectionReport.Controllers
 
             };
 
-            HouseUser hu = new HouseUser
+            HouseUser hu2 = new HouseUser
             {
-                User = user,
-                House = house2,
+                User = user2,
+                House = house3,
 
             };
 
-            
+            user2.Inspected = new List<HouseUser> { hu2 };
+            house3.InspectedBy = new List<HouseUser> { hu2 };
+            _context.Users.Add(user2);
+            _context.SaveChanges();
+
 
             _context.Categories.Add(cat);
             _context.Categories.Add(cat2);
 
             _context.Feature.Add(feature);
-
-            _context.House.Add(house2);
-
-            _context.Users.Add(user);
-            _context.House.Add(house2);
-
-
-
-            _context.SaveChanges();
-
-            _context.HouseUser.Add(hu);
 
             _context.SaveChanges();
 
