@@ -20,18 +20,31 @@ namespace InspectionReport.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetAll")]
         public IActionResult GetAll()
         {
-            return Ok(_context.House.ToList());
+            List<House> tempHouses = _context.House.ToList();
+            
+            List<House> resultHouses = new List<House>();
+            
+            foreach (House house in tempHouses)
+            {
+                House tempHouse = _context.House
+                    .Where(h => h.Id == house.Id)
+                    .Include(h => h.Categories)
+                    .ThenInclude(c => c.Features)
+                    .SingleOrDefault();
+                
+                resultHouses.Add(tempHouse);
+            }
+            
+            return Ok(resultHouses);
         }
 
 
-        // GET api/<controller>/5
         [HttpGet("{id}", Name = "GetHouse")]
         public IActionResult GetById(long id)
         {
-            //House house = _context.House.Find(id);
             House house = _context.House
                             .Where(h => h.Id == id)
                             .Include(h => h.Categories)
@@ -88,13 +101,14 @@ namespace InspectionReport.Controllers
             if (house == null)
             {
                 return NotFound();
-            } else
+            }
+            else
             {
                 _context.Remove(house);
                 _context.SaveChanges();
                 return Ok();
             }
-            
+
         }
     }
 }
