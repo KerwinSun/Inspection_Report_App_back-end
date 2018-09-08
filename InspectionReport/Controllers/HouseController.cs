@@ -40,7 +40,7 @@ namespace InspectionReport.Controllers
             //House house = _context.House.Find(id);
             House house = _context.House
                             .Where(h => h.Id == id)
-                            .Include(h => h.InspectedBy)
+                            .Include(h => h.Categories)
                             .SingleOrDefault();
 
 

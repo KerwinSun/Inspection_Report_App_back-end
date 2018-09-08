@@ -126,5 +126,35 @@ namespace InspectionReport.Controllers
 
             return Ok();
         }
+
+        [HttpPost("testing")]
+        public IActionResult CreateTests()
+        {
+            User user = new User
+            {
+                Name = "Tonald Drump"
+            };
+
+            //Test category
+            Category cat = new Category { Name = "Kitchen" };
+
+            List<Category> catList = new List<Category>
+            {
+                cat
+            };
+
+            House house = new House
+            {
+                Address = "21 University of Auckland Road",
+                ConstructionType = "Concrete",
+                InspectionDate = DateTime.Today,
+                Categories = catList
+            };
+
+            _context.House.Add(house);
+            _context.SaveChanges();
+            return Ok();
+        }
     }
+   
 }
