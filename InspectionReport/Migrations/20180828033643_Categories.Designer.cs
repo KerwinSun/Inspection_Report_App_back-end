@@ -4,14 +4,16 @@ using InspectionReport.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace InspectionReport.Migrations
 {
     [DbContext(typeof(ReportContext))]
-    partial class TodoContextModelSnapshot : ModelSnapshot
+    [Migration("20180828033643_Categories")]
+    partial class Categories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,25 +36,6 @@ namespace InspectionReport.Migrations
                     b.HasIndex("HouseId");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("InspectionReport.Models.Feature", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CategoryId");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("Notes");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("Feature");
                 });
 
             modelBuilder.Entity("InspectionReport.Models.House", b =>
@@ -118,13 +101,6 @@ namespace InspectionReport.Migrations
                     b.HasOne("InspectionReport.Models.House", "House")
                         .WithMany("Categories")
                         .HasForeignKey("HouseId");
-                });
-
-            modelBuilder.Entity("InspectionReport.Models.Feature", b =>
-                {
-                    b.HasOne("InspectionReport.Models.Category", "Category")
-                        .WithMany("Features")
-                        .HasForeignKey("CategoryId");
                 });
 
             modelBuilder.Entity("InspectionReport.Models.HouseUser", b =>

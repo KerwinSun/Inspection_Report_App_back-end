@@ -29,6 +29,23 @@ namespace InspectionReport
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("localhost", builder => builder
+                    .WithOrigins("http://localhost:3000")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                );
+
+                options.AddPolicy("deployment", builder => builder
+                    .WithOrigins("https://inspection-report-app.azurewebsites.net")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                );
+            });
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -65,8 +82,10 @@ namespace InspectionReport
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            } 
+            }
 
+            app.UseCors("localhost");
+            app.UseCors("deployment");
             app.UseMvc();
         }
     }

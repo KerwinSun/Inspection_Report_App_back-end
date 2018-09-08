@@ -22,8 +22,17 @@ namespace InspectionReport.Models
 
         public DbSet<HouseUser> HouseUser { get; set; }
 
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Feature> Feature { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Category>()
+                .HasOne(p => p.House)
+                .WithMany(b => b.Categories);
+
             // establishing a many-to-many relationship between 
             modelBuilder.Entity<HouseUser>()
                 .HasKey(t => new { t.UserId, t.HouseId });
@@ -37,6 +46,11 @@ namespace InspectionReport.Models
                 .HasOne(pt => pt.House)
                 .WithMany(t => t.InspectedBy)
                 .HasForeignKey(pt => pt.HouseId);
+
+            // establishing a one-many relationship between Category and Feature
+            modelBuilder.Entity<Feature>()
+                .HasOne(p => p.Category)
+                .WithMany(b => b.Features);
         }
     }
 }
