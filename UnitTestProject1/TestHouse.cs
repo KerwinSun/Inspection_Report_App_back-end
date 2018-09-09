@@ -20,6 +20,10 @@ namespace UnitTest
         public static readonly IList<string> categoryNames = new List<string> { "bedroom1", "bedroom2", "bedroom3", "bedroom4" };
         public static readonly IList<string> featureNames = new List<string> { "door1", "door2", "door3", "door4" };
         public static readonly string featureNotes = "good";
+        public static readonly DbContextOptions<ReportContext> options 
+            = new DbContextOptionsBuilder<ReportContext>()
+                .UseInMemoryDatabase(databaseName: "testWithEntity")
+                .Options;
 
         /// <summary>
         /// Class initialize method that sets up the entities in the database.
@@ -44,12 +48,9 @@ namespace UnitTest
         ///             
         /// </summary>
         /// <param name="testContext"></param>
-        [ClassInitialize]
-        public static void SetupDb(TestContext testContext)
+        [TestInitialize]
+        public void SetupDb()
         {
-            var options = new DbContextOptionsBuilder<ReportContext>()
-                .UseInMemoryDatabase(databaseName: "testWithEntity")
-                .Options;
             using (var context = new ReportContext(options))
             {
 
@@ -151,7 +152,21 @@ namespace UnitTest
                 context.Feature.Add(feature4);
                 context.SaveChanges();
             }
-            
+        }
+
+        [TestCleanup]
+        public void ClearDb()
+        {
+            using (var context = new ReportContext(options))
+            {
+                context.Feature.RemoveRange(context.Feature);
+                context.Categories.RemoveRange(context.Categories);
+                context.HouseUser.RemoveRange(context.HouseUser);
+                context.House.RemoveRange(context.House);
+                context.Users.RemoveRange(context.Users);
+
+                context.SaveChanges();
+            };
         }
         /// <summary>
         /// Test the get all method in house controller. 
