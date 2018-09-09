@@ -23,22 +23,11 @@ namespace InspectionReport.Controllers
         [HttpGet(Name = "GetAll")]
         public IActionResult GetAll()
         {
-            List<House> tempHouses = _context.House.ToList();
-            
-            List<House> resultHouses = new List<House>();
-            
-            foreach (House house in tempHouses)
-            {
-                House tempHouse = _context.House
-                    .Where(h => h.Id == house.Id)
-                    .Include(h => h.Categories)
-                    .ThenInclude(c => c.Features)
-                    .SingleOrDefault();
-                
-                resultHouses.Add(tempHouse);
-            }
-            
-            return Ok(resultHouses);
+            List<House> houses = _context.House
+                                    .Include(h => h.Categories)
+                                        .ThenInclude(c => c.Features)
+                                    .ToList();            
+            return Ok(houses);
         }
 
 
