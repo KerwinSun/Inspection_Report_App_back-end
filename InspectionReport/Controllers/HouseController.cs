@@ -23,7 +23,7 @@ namespace InspectionReport.Controllers
         [HttpGet(Name = "GetAll")]
         public IActionResult GetAll()
         {
-            List<House> houses = _context.House
+            ICollection<House> houses = _context.House
                                     .Include(h => h.Categories)
                                         .ThenInclude(c => c.Features)
                                     .ToList();            

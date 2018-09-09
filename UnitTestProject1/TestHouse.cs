@@ -174,24 +174,34 @@ namespace UnitTest
         [TestMethod]
         public void TestGetAll()
         {
-            var options = new DbContextOptionsBuilder<ReportContext>()
-                .UseInMemoryDatabase(databaseName: "testWithEntity")
-                .Options;
             //Create two users, two houses, four categories, four features.
             using (var context = new ReportContext(options))
             {
-                //HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context);
+                OkObjectResult result = houseController.GetAll() as OkObjectResult;
+                ICollection<House> housesGot = result.Value as ICollection<House>;
 
-                ////Check that the correct status code is returned.
-                //Assert.IsNotNull(returned);
-                //Assert.AreEqual(201, returned.StatusCode);
-            }
+                // Check whether houses are returned
+                Assert.AreEqual(200, result.StatusCode);
+                Assert.AreEqual(2, context.House.Count());
+                Assert.AreEqual(2, housesGot.Count);
 
-            //Inspect that single user
-            using (var context = new ReportContext(options))
-            {
-                //Assert.AreEqual(1, context.Users.Count());
-                //Assert.AreEqual("Test User", context.Users.Single().Name);
+                House house1 = housesGot.Where(x => x.Address == houseAddresses[0]).Single();
+                House house2 = housesGot.Where(x => x.Address == houseAddresses[1]).Single();
+
+                Assert.IsNotNull(house1);
+                Assert.IsNotNull(house2);
+
+                // Check categories for first house
+                ICollection<Category> categories1 = house1.Categories;
+                Assert.IsNotNull(categories1);
+                Assert.AreEqual(2, categories1.Count);
+                Assert.AreEqual(1, categories1.ElementAt(0).Features.Count);
+
+                ICollection<Category> categories2 = house2.Categories;
+                Assert.IsNotNull(categories2);
+                Assert.AreEqual(2, categories2.Count);
+                Assert.AreEqual(1, categories2.ElementAt(0).Features.Count);
             }
         }
     }
