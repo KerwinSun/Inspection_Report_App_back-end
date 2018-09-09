@@ -2,8 +2,14 @@
 
 This is the back-end API for the Inspection Report Automation Project.
 
+It stores the domain objects into the SQL database.
+
 ## Build Status
 Master branch: [![Build Status](https://travis-ci.com/Karim-C/Inspection_Report_App_back-end.svg?token=aUW8TwnwNhqKCHbwaCXT&branch=master)](https://travis-ci.com/Karim-C/Inspection_Report_App_back-end)
+
+## Quick start
+1. Clone and set up the Visual Studio project
+2. Use [Postman](https://www.getpostman.com/) to send the REST API calls.
 
 ## Prerequisites
 * [.NET Core 2.1 Web API](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-2.1)
