@@ -204,5 +204,79 @@ namespace UnitTest
                 Assert.AreEqual(1, categories2.ElementAt(0).Features.Count);
             }
         }
+
+        /// <summary>
+        /// Test the get by id method in house controller. 
+        /// </summary>
+        [TestMethod]
+        public void TestGetById()
+        {
+            //Get a house by a specified id
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+
+                // Get houses with database-specified ids
+                House selection1 = context.House.Where(x => x.Address == houseAddresses[0]).Single();
+                House selection2 = context.House.Where(x => x.Address == houseAddresses[1]).Single();
+
+                OkObjectResult result1 = houseController.GetById(selection1.Id) as OkObjectResult;
+                House retrievedHouse1 = result1.Value as House;
+                OkObjectResult result2 = houseController.GetById(selection1.Id) as OkObjectResult;
+                House retrievedHouse2 = result1.Value as House;
+
+                // Check if houses actually exist
+                Assert.IsNotNull(retrievedHouse1);
+                Assert.IsNotNull(retrievedHouse2);
+
+                // Check if sub-elements are still there
+                Assert.AreEqual(houseAddresses[0], retrievedHouse1.Address);
+                Assert.AreEqual(2, retrievedHouse1.Categories.Count);
+                Assert.AreEqual(2, retrievedHouse1.Categories.ElementAt(0).Features.Count);
+                
+
+            }
+        }
+
+        /// <summary>
+        /// Test the delete method in house controller. 
+        /// </summary>
+        [TestMethod]
+        public void TestDelete()
+        {
+            //Get a house by a specified id
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+
+                // Get houses with database-specified ids
+                House selection1 = context.House.Where(x => x.Address == houseAddresses[0]).Single();
+                House selection2 = context.House.Where(x => x.Address == houseAddresses[1]).Single();
+
+                long idToDelete = selection1.Id;
+                long idToNotDelete = selection2.Id;
+
+                OkObjectResult result1 = houseController.GetById(idToDelete) as OkObjectResult;
+                House retrievedHouse1 = result1.Value as House;
+                OkObjectResult result2 = houseController.GetById(idToNotDelete) as OkObjectResult;
+                House retrievedHouse2 = result1.Value as House;
+
+                // Check if houses actually exist
+                Assert.IsNotNull(retrievedHouse1);
+                Assert.IsNotNull(retrievedHouse2);
+
+                // Delete selected house
+                houseController.Delete(idToDelete);
+
+                NotFoundResult deletedResult1 = houseController.GetById(idToDelete) as NotFoundResult;
+                OkObjectResult notdeletedResult2 = houseController.GetById(idToNotDelete) as OkObjectResult;
+
+                // Check if right house was deleted
+                Assert.IsNotNull(deletedResult1);
+                Assert.IsNotNull(notdeletedResult2);
+
+
+            }
+        }
     }
 }
