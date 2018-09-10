@@ -62,10 +62,6 @@ namespace UnitTest
             using (var context = new ReportContext(options))
             {
                 Assert.AreEqual(2, context.Users.Count());
-                User secondUser = context.Users.Where(u => u.Id == 2).SingleOrDefault();
-
-                Assert.IsNotNull(secondUser);
-                Assert.AreEqual("Test User 2", secondUser.Name);
             }
         }
 
