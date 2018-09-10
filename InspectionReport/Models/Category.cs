@@ -15,6 +15,7 @@ namespace InspectionReport.Models
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public int Count { get; set; }
         [Required]
         public House House { get; set; }
 

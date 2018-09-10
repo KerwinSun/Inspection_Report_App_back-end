@@ -104,21 +104,25 @@ namespace UnitTest
                 Category category1 = new Category
                 {
                     Name = categoryNames[0],
+                    Count = 1,
                     House = house1,
                 };
                 Category category2 = new Category
                 {
                     Name = categoryNames[1],
+                    Count = 1,
                     House = house1,
                 };
                 Category category3 = new Category
                 {
                     Name = categoryNames[2],
+                    Count = 1,
                     House = house2,
                 };
                 Category category4 = new Category
                 {
                     Name = categoryNames[3],
+                    Count = 1,
                     House = house2
                 };
                 Feature feature1 = new Feature
@@ -245,6 +249,7 @@ namespace UnitTest
                 Category newCategory = new Category
                 {
                     Name = "random category",
+                    Count = 1,
                     Features = new List<Feature> { validFeature },
                 };
 
@@ -325,6 +330,7 @@ namespace UnitTest
                 Category newCategory = new Category
                 {
                     Name = categoryName,
+                    Count = 1,
                     Features = new List<Feature> { newFeature },
                 };
                 House newHouse = new House
@@ -360,6 +366,7 @@ namespace UnitTest
                 Assert.AreEqual(1, house.Categories.Count());
                 Category category = house.Categories.Single();
                 Assert.AreEqual(categoryName, category.Name);
+                Assert.AreEqual(1, category.Count);
 
                 Assert.AreEqual(1, category.Features.Count());
                 Feature feature = category.Features.Single();
@@ -399,6 +406,7 @@ namespace UnitTest
                 Category newCategory = new Category
                 {
                     Name = categoryName,
+                    Count = 1,
                     Features = new List<Feature> { newFeature },
                 };
                 House newHouse = new House
@@ -549,6 +557,7 @@ namespace UnitTest
                 Category changedCategory = new Category
                 {
                     Id = existingCategory1.Id,
+                    Count = existingCategory1.Count,
                     Name = changeCategoryName,
                     Features = existingCategory1.Features,
                 };
@@ -556,6 +565,7 @@ namespace UnitTest
                 Category remains = new Category
                 {
                     Id = existingCategory2.Id,
+                    Count = existingCategory2.Count,
                     Name = existingCategory2.Name,
                     Features = existingCategory2.Features
                 };
@@ -564,6 +574,7 @@ namespace UnitTest
                 Category newCategory = new Category
                 {
                     Name = newCategoryName,
+                    Count = 1,
                     Features = null,
                 };
                 List<Category> categoriesForBody 
