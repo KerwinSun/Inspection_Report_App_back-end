@@ -145,6 +145,7 @@ namespace UnitTest
                     Category = category4,
                     Notes = featureNotes,
                 };
+                
 
                 context.Feature.Add(feature1);
                 context.Feature.Add(feature2);
@@ -229,9 +230,31 @@ namespace UnitTest
                 Assert.IsNotNull(retrievedHouse1);
                 Assert.IsNotNull(retrievedHouse2);
 
+                // Check that houses contain the completed field
+                Assert.IsNotNull(retrievedHouse1.Completed);
+                Assert.IsNotNull(retrievedHouse2.Completed);
+
+                // Check that house 1 feature in category 1 has a valid grade.
+                Feature validFeature = new Feature
+                {
+                    Name = featureNames[3],
+                    Notes = featureNotes,
+                    Grade = 2,
+                };
+
+                Category newCategory = new Category
+                {
+                    Name = "random category",
+                    Features = new List<Feature> { validFeature },
+                };
+
+                retrievedHouse1.Categories.Add(newCategory);
+
+                Assert.AreEqual(2, retrievedHouse1.Categories.ElementAt(2).Features.ElementAt(0).Grade);
+
                 // Check if sub-elements are still there
                 Assert.AreEqual(houseAddresses[0], retrievedHouse1.Address);
-                Assert.AreEqual(2, retrievedHouse1.Categories.Count);
+                Assert.AreEqual(3, retrievedHouse1.Categories.Count);
                 Assert.AreEqual(1, retrievedHouse1.Categories.ElementAt(0).Features.Count);
                 
 
