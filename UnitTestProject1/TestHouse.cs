@@ -20,7 +20,7 @@ namespace UnitTest
         public static readonly IList<string> categoryNames = new List<string> { "bedroom1", "bedroom2", "bedroom3", "bedroom4" };
         public static readonly IList<string> featureNames = new List<string> { "door1", "door2", "door3", "door4" };
         public static readonly string featureNotes = "good";
-        public static readonly DbContextOptions<ReportContext> options 
+        public static readonly DbContextOptions<ReportContext> options
             = new DbContextOptionsBuilder<ReportContext>()
                 .UseInMemoryDatabase(databaseName: "testWithEntity")
                 .Options;
@@ -192,6 +192,219 @@ namespace UnitTest
             {
                 //Assert.AreEqual(1, context.Users.Count());
                 //Assert.AreEqual("Test User", context.Users.Single().Name);
+            }
+        }
+
+        /// <summary>
+        /// Test posting a new house with
+        ///     a new category
+        ///         a new feature
+        /// </summary>
+        [TestMethod]
+        public void TestCreateNewHouseWithNewCategoryAndNewFeature()
+        {
+            string featureName = "newFeature";
+            string categoryName = "newCategory";
+            string houseAddress = "newHouse";
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+
+                Feature newFeature = new Feature
+                {
+                    Name = featureName,
+                    Notes = "some notes",
+                };
+                Category newCategory = new Category
+                {
+                    Name = categoryName,
+                    Features = new List<Feature> { newFeature },
+                };
+                House newHouse = new House
+                {
+                    Address = houseAddress,
+                    ConstructionType = "Wood",
+                    Categories = new List<Category> { newCategory },
+                    InspectedBy = null,
+                };
+
+                CreatedAtRouteResult result =
+                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                //Check that the correct status code is returned.
+                Assert.IsNotNull(result);
+                Assert.AreEqual(201, result.StatusCode);
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                //Verify that a new house, a new category, a new feature is added
+                Assert.AreEqual(3, context.House.Count());
+                Assert.AreEqual(5, context.Categories.Count());
+                Assert.AreEqual(5, context.Feature.Count());
+
+                //Verify the house/cat/feat created are associated correctly;
+                House house = context.House
+                    .Where(h => h.Address == houseAddress)
+                    .Include(h => h.Categories)
+                        .ThenInclude(c => c.Features)
+                    .Single();
+                Assert.IsNotNull(house);
+
+                Assert.AreEqual(1, house.Categories.Count());
+                Category category = house.Categories.Single();
+                Assert.AreEqual(categoryName, category.Name);
+
+                Assert.AreEqual(1, category.Features.Count());
+                Feature feature = category.Features.Single();
+                Assert.AreEqual(featureName, feature.Name);
+            }
+        }
+
+        /// <summary>
+        /// Test posting an existing house (house1) with no changes
+        ///     a new category
+        ///         a new feature
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateHouseWithNewCategoryAndNewFeature()
+        {
+            string featureName = "newFeature";
+            string categoryName = "newCategory";
+            House existingHouse;
+
+            //Retrieve the existingHouse1
+            using (var context = new ReportContext(options))
+            {
+                existingHouse = context.House
+                    .Where(h => h.Address == houseAddresses[0])
+                    .Single();
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+
+                Feature newFeature = new Feature
+                {
+                    Name = featureName,
+                    Notes = "some notes",
+                };
+                Category newCategory = new Category
+                {
+                    Name = categoryName,
+                    Features = new List<Feature> { newFeature },
+                };
+                House newHouse = new House
+                {
+                    Id = existingHouse.Id,
+                    Address = existingHouse.Address,
+                    ConstructionType = existingHouse.ConstructionType,
+                    Categories = new List<Category> { newCategory },
+                    InspectedBy = null,
+                };
+
+                CreatedAtRouteResult result =
+                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                //Check that the correct status code is returned.
+                Assert.IsNotNull(result);
+                Assert.AreEqual(201, result.StatusCode);
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                //Verify that a new house, a new category, a new feature is added
+                Assert.AreEqual(2, context.House.Count());
+                Assert.AreEqual(5, context.Categories.Count());
+                Assert.AreEqual(5, context.Feature.Count());
+
+                //Verify the house/cat/feat created are associated correctly;
+                House house = context.House
+                    .Where(h => h.Id == existingHouse.Id)
+                    .Include(h => h.Categories)
+                        .ThenInclude(c => c.Features)
+                    .Single();
+                Assert.IsNotNull(house);
+
+                Assert.AreEqual(3, house.Categories.Count());
+                Category category = house.Categories
+                    .Where(c => c.Name == categoryName)
+                    .Single();
+                Assert.IsNotNull(category);
+
+                Assert.AreEqual(1, category.Features.Count());
+                Feature feature = category.Features
+                    .Where(f => f.Name == featureName)
+                    .Single();
+                Assert.IsNotNull(feature);
+            }
+        }
+
+        /// <summary>
+        /// Test posting an existing house (house1) with an address change
+        ///     a new category
+        ///         a new feature
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateHouseWithAddressChange()
+        {
+            string newAddress = "newAddress";
+            House existingHouse;
+            
+
+            //Retrieve the existingHouse1
+            using (var context = new ReportContext(options))
+            {
+                existingHouse = context.House
+                    .Where(h => h.Address == houseAddresses[0])
+                        .Include(h => h.Categories)
+                            .ThenInclude(c => c.Features)
+                    .Single();
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+
+                House newHouse = new House
+                {
+                    Id = existingHouse.Id,
+                    Address = newAddress,
+                    ConstructionType = existingHouse.ConstructionType,
+                    Categories = existingHouse.Categories,
+                    InspectedBy = null,
+                };
+
+                CreatedAtRouteResult result =
+                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                //Check that the correct status code is returned.
+                Assert.IsNotNull(result);
+                Assert.AreEqual(201, result.StatusCode);
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                //Verify that a new house, a new category, a new feature is added
+                Assert.AreEqual(2, context.House.Count());
+                Assert.AreEqual(4, context.Categories.Count());
+                Assert.AreEqual(4, context.Feature.Count());
+
+                //Verify all the categories and features are still the same
+                House house = context.House
+                    .Where(h => h.Id == existingHouse.Id)
+                    .Include(h => h.Categories)
+                        .ThenInclude(c => c.Features)
+                    .Single();
+                Assert.IsNotNull(house);
+                //Verify the address is updated
+                Assert.AreEqual(newAddress, house.Address);
+
+                Assert.AreEqual(2, house.Categories.Count());
+                ICollection<Category> categories = house.Categories.ToList();
+
+                foreach (Category category in categories)
+                {
+                    Assert.AreEqual(1, category.Features.Count());
+                }
             }
         }
     }
