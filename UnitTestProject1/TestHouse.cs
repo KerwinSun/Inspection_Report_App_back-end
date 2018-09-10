@@ -341,8 +341,6 @@ namespace UnitTest
 
         /// <summary>
         /// Test posting an existing house (house1) with an address change
-        ///     a new category
-        ///         a new feature
         /// </summary>
         [TestMethod]
         public void TestUpdateHouseWithAddressChange()
@@ -405,6 +403,111 @@ namespace UnitTest
                 {
                     Assert.AreEqual(1, category.Features.Count());
                 }
+            }
+        }
+
+        /// <summary>
+        /// Test posting an existing house (house1) with 
+        ///     change in category
+        ///         new feature for that category
+        ///     new category
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateHouseWithCategoryChangeAndNewCategory()
+        {
+            string newAddress = "newAddress";
+            House existingHouse;
+            Category existingCategory1;
+            Category existingCategory2;
+            string newCategoryName = "newCategory";
+            string changeCategoryName = "changeCategory";
+
+            //Retrieve the existingHouse1
+            using (var context = new ReportContext(options))
+            {
+                existingHouse = context.House
+                    .Where(h => h.Address == houseAddresses[0])
+                        .Include(h => h.Categories)
+                            .ThenInclude(c => c.Features)
+                    .Single();
+                existingCategory1 = existingHouse.Categories.ToList().First();
+                existingCategory2 = existingHouse.Categories.ToList().Last();
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+
+                //Change one of the default category
+                Category changedCategory = new Category
+                {
+                    Id = existingCategory1.Id,
+                    Name = changeCategoryName,
+                    Features = existingCategory1.Features,
+                };
+                //The other category remains the same
+                Category remains = new Category
+                {
+                    Id = existingCategory2.Id,
+                    Name = existingCategory2.Name,
+                    Features = existingCategory2.Features
+                };
+
+                //Add a new category to existing
+                Category newCategory = new Category
+                {
+                    Name = newCategoryName,
+                    Features = null,
+                };
+                List<Category> categoriesForBody 
+                    = new List<Category> { changedCategory, remains, newCategory };
+
+                House newHouse = new House
+                {
+                    Id = existingHouse.Id,
+                    Address = newAddress,
+                    ConstructionType = existingHouse.ConstructionType,
+                    Categories = categoriesForBody,
+                    InspectedBy = null,
+                };
+
+                //PUT A BREAK POINT HERE TO OBSERVE THE NEW HOUSE.
+                CreatedAtRouteResult result =
+                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                //Check that the correct status code is returned.
+                Assert.IsNotNull(result);
+                Assert.AreEqual(201, result.StatusCode);
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                //Verify that no new house, one new category, and no feature is added
+                Assert.AreEqual(2, context.House.Count());
+                Assert.AreEqual(5, context.Categories.Count());
+                Assert.AreEqual(4, context.Feature.Count());
+
+                House house = context.House
+                    .Where(h => h.Id == existingHouse.Id)
+                    .Include(h => h.Categories)
+                        .ThenInclude(c => c.Features)
+                    .Single();
+                Assert.IsNotNull(house);
+
+                //Verify this house has 3 categories
+                Assert.AreEqual(3, house.Categories.Count());
+                ICollection<Category> categories = house.Categories.ToList();
+
+                //Verify that there is a changed category
+                Category testChangedCategory = categories
+                    .Where(c => c.Name == changeCategoryName)
+                    .Single();
+                Assert.IsNotNull(testChangedCategory);
+
+                //Verify that there is a new category
+                Category testNewCategory = categories
+                    .Where(c => c.Name == newCategoryName)
+                    .Single();
+                Assert.IsNotNull(testNewCategory);
             }
         }
     }
