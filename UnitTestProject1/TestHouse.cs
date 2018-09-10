@@ -594,5 +594,116 @@ namespace UnitTest
                 Assert.IsNotNull(testNewCategory);
             }
         }
+
+        /// <summary>
+        /// Test posting an existing house (house1) with 
+        ///     change in feature for first category
+        ///         new feature for that category
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateHouseWithFeatureChangeAndNewFeature()
+        {
+            string newAddress = "newAddress";
+            House existingHouse;
+            Category existingCategory1;
+            Feature existingFeature1;
+            string newFeatureName = "newAddedFeature";
+            string changeFeatureName = "changeFeature";
+
+
+            //Retrieve the existingHouse1
+            using (var context = new ReportContext(options))
+            {
+                existingHouse = context.House
+                    .Where(h => h.Address == houseAddresses[0])
+                        .Include(h => h.Categories)
+                            .ThenInclude(c => c.Features)
+                    .Single();
+                existingCategory1 = existingHouse.Categories.ToList().First();
+                existingFeature1 = existingCategory1.Features.First();
+            }
+
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+
+                //Change the default feature
+                Feature changedFeature = new Feature
+                {
+                    Id = existingFeature1.Id,
+                    Name = changeFeatureName,
+                };
+
+                //Add a new feature to existing
+                Feature newFeature = new Feature
+                {
+                    Name = newFeatureName,
+                };
+
+                List<Category> existingCategories
+                    = new List<Category> { existingCategory1 };
+                List<Feature> featuresForBody
+                    = new List<Feature> { changedFeature, newFeature };
+
+                existingCategory1.Features = featuresForBody;
+
+                House newHouse = new House
+                {
+                    Id = existingHouse.Id,
+                    Address = newAddress,
+                    ConstructionType = existingHouse.ConstructionType,
+                    Categories = existingCategories,
+                    InspectedBy = null,
+                };
+
+                //PUT A BREAK POINT HERE TO OBSERVE THE NEW HOUSE.
+                CreatedAtRouteResult result =
+                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                //Check that the correct status code is returned.
+                Assert.IsNotNull(result);
+                Assert.AreEqual(201, result.StatusCode);
+                //            }
+                //
+                //            using (var context = new ReportContext(options))
+                //            {
+
+                //Verify that no new house, no new category and one new feature is added
+                Assert.AreEqual(2, context.House.Count());
+                Assert.AreEqual(4, context.Categories.Count());
+                Assert.AreEqual(5, context.Feature.Count());
+
+                House house = context.House
+                    .Where(h => h.Id == existingHouse.Id)
+                    .Include(h => h.Categories)
+                        .ThenInclude(c => c.Features)
+                    .Single();
+                Assert.IsNotNull(house);
+
+                // Verify this house has 2 categories
+                Assert.AreEqual(2, house.Categories.Count());
+                ICollection<Category> categories = house.Categories.ToList();
+
+                // Get the category that was manipulated (with changed and new features)
+                Category selectedCategory = categories
+                    .Where(c => c.Id == existingCategory1.Id)
+                    .SingleOrDefault();
+
+                // Verify that two features are in this category
+                Assert.IsNotNull(selectedCategory);
+                Assert.AreEqual(2, selectedCategory.Features.Count);
+
+                // Verify that there is a changed feature
+                Feature testChangedFeature = selectedCategory.Features
+                    .Where(f => f.Name == changeFeatureName)
+                    .SingleOrDefault();
+                Assert.IsNotNull(testChangedFeature);
+
+                // Verify that there is a new feature
+                Feature testNewFeature = selectedCategory.Features
+                    .Where(f => f.Name == newFeatureName)
+                    .SingleOrDefault();
+                Assert.IsNotNull(testNewFeature);
+            }
+        }
     }
 }
