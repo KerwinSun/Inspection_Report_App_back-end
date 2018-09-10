@@ -14,6 +14,7 @@ namespace InspectionReport.Models
     public class House
     {
         public long Id { get; set; }
+        public Boolean Completed { get; set; }
         public string Address { get; set; }
         public ICollection<HouseUser> InspectedBy { get; set; }
         public string ConstructionType { get; set; }
