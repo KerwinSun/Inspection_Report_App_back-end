@@ -125,25 +125,25 @@ namespace UnitTest
                 {
                     Name = featureNames[0],
                     Category = category1,
-                    Notes = featureNotes,
+                    Comments = featureNotes,
                 };
                 Feature feature2 = new Feature
                 {
                     Name = featureNames[1],
                     Category = category2,
-                    Notes = featureNotes,
+                    Comments = featureNotes,
                 };
                 Feature feature3 = new Feature
                 {
                     Name = featureNames[2],
                     Category = category3,
-                    Notes = featureNotes,
+                    Comments = featureNotes,
                 };
                 Feature feature4 = new Feature
                 {
                     Name = featureNames[3],
                     Category = category4,
-                    Notes = featureNotes,
+                    Comments = featureNotes,
                 };
                 
 
@@ -238,7 +238,7 @@ namespace UnitTest
                 Feature validFeature = new Feature
                 {
                     Name = featureNames[3],
-                    Notes = featureNotes,
+                    Comments = featureNotes,
                     Grade = 2,
                 };
 
@@ -320,7 +320,7 @@ namespace UnitTest
                 Feature newFeature = new Feature
                 {
                     Name = featureName,
-                    Notes = "some notes",
+                    Comments = "some notes",
                 };
                 Category newCategory = new Category
                 {
@@ -394,7 +394,7 @@ namespace UnitTest
                 Feature newFeature = new Feature
                 {
                     Name = featureName,
-                    Notes = "some notes",
+                    Comments = "some notes",
                 };
                 Category newCategory = new Category
                 {

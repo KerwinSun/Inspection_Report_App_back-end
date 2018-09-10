@@ -75,7 +75,7 @@ namespace InspectionReport.Controllers
             Feature feature = new Feature
             {
                 Name = "a feature name",
-                Notes = "feature notes here",
+                Comments = "feature notes here",
                 Category = catList[0]
             };
 
@@ -135,8 +135,8 @@ namespace InspectionReport.Controllers
                 Name = "Tonald Drump"
             };
 
-            Feature feat = new Feature { Name = "Benchtop", Notes = "The benchtop looks very nice for eating and yeah" };
-            Feature feat2 = new Feature { Name = "Taps", Notes = "The taps are not working :(" };
+            Feature feat = new Feature { Name = "Benchtop", Comments = "The benchtop looks very nice for eating and yeah" };
+            Feature feat2 = new Feature { Name = "Taps", Comments = "The taps are not working :(" };
 
             List<Feature> featList = new List<Feature>
             {

@@ -16,7 +16,7 @@ namespace InspectionReport.Models
         [Range(1,5)]
         public int? Grade { get; set; }
         public string Name { get; set; }
-        public string Notes { get; set; }
+        public string Comments { get; set; }
         public Category Category { get; set; }
     }
 }
