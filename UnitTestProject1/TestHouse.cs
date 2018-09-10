@@ -232,7 +232,7 @@ namespace UnitTest
                 // Check if sub-elements are still there
                 Assert.AreEqual(houseAddresses[0], retrievedHouse1.Address);
                 Assert.AreEqual(2, retrievedHouse1.Categories.Count);
-                Assert.AreEqual(2, retrievedHouse1.Categories.ElementAt(0).Features.Count);
+                Assert.AreEqual(1, retrievedHouse1.Categories.ElementAt(0).Features.Count);
                 
 
             }
@@ -561,10 +561,10 @@ namespace UnitTest
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);
-            }
-
-            using (var context = new ReportContext(options))
-            {
+//            }
+//
+//            using (var context = new ReportContext(options))
+//            {
                 //Verify that no new house, one new category, and no feature is added
                 Assert.AreEqual(2, context.House.Count());
                 Assert.AreEqual(5, context.Categories.Count());
