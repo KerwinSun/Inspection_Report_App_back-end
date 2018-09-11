@@ -13,8 +13,13 @@ namespace InspectionReport.Models
     /// A House entity represents a inspection report for a particular
     /// house.
     /// </summary>
-    public class House
+    public class House : IUpdatable<House>
     {
+        public House ()
+        {
+            InspectedBy = new List<HouseUser>();
+            Categories = new List<Category>();
+        }
         public long Id { get; set; }
         public Boolean Completed { get; set; }
         public string Address { get; set; }
@@ -26,5 +31,39 @@ namespace InspectionReport.Models
         public DateTime InspectionDate { get; set; }
         [InverseProperty("House")]
         public ICollection<Category> Categories { get; set; }
+
+        public void UpdateObjectFromOther (House other)
+        {
+            Completed = other.Completed;
+            Address = other.Address;
+            ConstructionType = other.ConstructionType;
+            InspectionDate = other.InspectionDate;
+            
+            //HouseUser update ignored.
+            //foreach (HouseUser hu in InspectedBy) {
+            //}
+
+            //Update all "existing" categories
+            foreach (Category category in Categories)
+            {
+                Category otherCategory = other.Categories.Where(c => c.Id == category.Id).SingleOrDefault();
+                if (otherCategory == null)
+                {
+                    //Perhaps the other category is deleted, so no longer in new house?
+                    //Do nothing for now, as deleting categories are not expected.
+                }
+                else
+                {
+                    category.UpdateObjectFromOther(otherCategory);
+                }
+            }
+
+            //Create all new categories.
+            ICollection<Category> newCategories = other.Categories.Where(c => c.Id == 0).ToList();
+            foreach (Category newCategory in newCategories)
+            {
+                Categories.Add(newCategory);
+            }
+        }
     }
 }
