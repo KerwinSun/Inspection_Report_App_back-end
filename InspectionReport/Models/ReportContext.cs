@@ -9,6 +9,7 @@ namespace InspectionReport.Models
 {
     public class ReportContext : DbContext
     {
+
         public ReportContext(DbContextOptions<ReportContext> options)
             : base(options)
         {
@@ -28,10 +29,10 @@ namespace InspectionReport.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<Category>()
                 .HasOne(p => p.House)
-                .WithMany(b => b.Categories);
+                .WithMany(b => b.Categories)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // establishing a many-to-many relationship between 
             modelBuilder.Entity<HouseUser>()
@@ -51,6 +52,14 @@ namespace InspectionReport.Models
             modelBuilder.Entity<Feature>()
                 .HasOne(p => p.Category)
                 .WithMany(b => b.Features);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFProviders.InMemory;Trusted_Connection=True;ConnectRetryCount=0");
+            }
         }
     }
 }
