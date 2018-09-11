@@ -63,19 +63,18 @@ namespace InspectionReport
             // Use SQL Database if in Azure, otherwise, use SQLite
             // To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
             // on both profiles in the launchSettings.json
-            services.AddDbContext<ReportContext>(options =>
-                   options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
-            /*
+
             if (_env.IsDevelopment())
             {
                 var connection = @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
                 services.AddDbContext<ReportContext>(options => options.UseSqlServer(connection));
-            } else
+            }
+            else
             {
                 services.AddDbContext<ReportContext>(options =>
                    options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
             }
-            */
+
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ReportContext>().Database.Migrate();
         }
