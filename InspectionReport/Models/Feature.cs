@@ -10,7 +10,7 @@ namespace InspectionReport.Models
     /// Features are object/ items found within a category.
     /// E.g. Within a Kitchen category is a benchtop, bar-stools etc.
     /// </summary>
-    public class Feature
+    public class Feature : IUpdatable<Feature>
     {
         public long Id { get; set; }
         [Range(1,5)]
@@ -18,5 +18,12 @@ namespace InspectionReport.Models
         public string Name { get; set; }
         public string Comments { get; set; }
         public Category Category { get; set; }
+
+        public void UpdateObjectFromOther (Feature other)
+        {
+            Grade = other.Grade;
+            Name = other.Name;
+            Comments = other.Comments;
+        }
     }
 }

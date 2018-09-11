@@ -59,17 +59,15 @@ namespace InspectionReport.Controllers
                 return BadRequest();
             }
 
-            House check = _context.House.Find(house.Id);
+            House houseInContext = _context.House
+                .Where(h => h.Id == house.Id)
+                .Include(h => h.Categories)
+                    .ThenInclude(c => c.Features)
+                .SingleOrDefault();
 
-            if (check != null)
+            if (houseInContext != null)
             {
-                /*
-                 Note:
-                 https://stackoverflow.com/questions/37586659/replace-entity-in-context-with-a-different-instance-of-the-same-entity
-                 */
-                _context.Entry(check).State = EntityState.Detached;
-                _context.House.Attach(house);
-                _context.Entry(house).State = EntityState.Modified;
+                houseInContext.UpdateObjectFromOther(house);
             }
             else
             {

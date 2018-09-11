@@ -595,10 +595,10 @@ namespace UnitTest
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);
-//            }
-//
-//            using (var context = new ReportContext(options))
-//            {
+            }
+
+            using (var context = new ReportContext(options))
+            {
                 //Verify that no new house, one new category, and no feature is added
                 Assert.AreEqual(2, context.House.Count());
                 Assert.AreEqual(5, context.Categories.Count());
@@ -696,10 +696,10 @@ namespace UnitTest
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);
-                //            }
-                //
-                //            using (var context = new ReportContext(options))
-                //            {
+            }
+
+            using (var context = new ReportContext(options))
+            {
 
                 //Verify that no new house, no new category and one new feature is added
                 Assert.AreEqual(2, context.House.Count());
