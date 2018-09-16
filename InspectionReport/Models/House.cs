@@ -38,10 +38,19 @@ namespace InspectionReport.Models
             Address = other.Address;
             ConstructionType = other.ConstructionType;
             InspectionDate = other.InspectionDate;
-            
-            //HouseUser update ignored.
-            //foreach (HouseUser hu in InspectedBy) {
-            //}
+
+            //add all new HouseUser objects
+            foreach (HouseUser hu in other.InspectedBy)
+            {
+                //attempt to find the house user in this
+                bool existInCurrent = InspectedBy
+                    .Where(thisHu => hu.UserId == thisHu.UserId)
+                    .Count() > 0;
+                if (!existInCurrent)
+                {
+                    InspectedBy.Add(hu);
+                }
+            }
 
             //Update all "existing" categories
             foreach (Category category in Categories)

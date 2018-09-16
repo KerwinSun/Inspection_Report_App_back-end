@@ -342,7 +342,7 @@ namespace UnitTest
                 };
 
                 CreatedAtRouteResult result =
-                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                    houseController.CreateOrUpdateHouse(newHouse) as CreatedAtRouteResult;
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);
@@ -419,7 +419,7 @@ namespace UnitTest
                 };
 
                 CreatedAtRouteResult result =
-                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                    houseController.CreateOrUpdateHouse(newHouse) as CreatedAtRouteResult;
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);
@@ -488,7 +488,7 @@ namespace UnitTest
                 };
 
                 CreatedAtRouteResult result =
-                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                    houseController.CreateOrUpdateHouse(newHouse) as CreatedAtRouteResult;
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);
@@ -591,7 +591,7 @@ namespace UnitTest
 
                 //PUT A BREAK POINT HERE TO OBSERVE THE NEW HOUSE.
                 CreatedAtRouteResult result =
-                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                    houseController.CreateOrUpdateHouse(newHouse) as CreatedAtRouteResult;
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);
@@ -692,7 +692,7 @@ namespace UnitTest
 
                 //PUT A BREAK POINT HERE TO OBSERVE THE NEW HOUSE.
                 CreatedAtRouteResult result =
-                    houseController.CreateHouse(newHouse) as CreatedAtRouteResult;
+                    houseController.CreateOrUpdateHouse(newHouse) as CreatedAtRouteResult;
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(result);
                 Assert.AreEqual(201, result.StatusCode);

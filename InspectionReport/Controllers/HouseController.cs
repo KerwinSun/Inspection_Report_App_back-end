@@ -38,6 +38,7 @@ namespace InspectionReport.Controllers
                             .Where(h => h.Id == id)
                             .Include(h => h.Categories)
                                 .ThenInclude(c => c.Features)
+                            .Include(h => h.InspectedBy)
                             .SingleOrDefault();
 
 
@@ -52,7 +53,7 @@ namespace InspectionReport.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateHouse([FromBody] House house)
+        public IActionResult CreateOrUpdateHouse([FromBody] House house)
         {
             if (house == null)
             {
@@ -63,6 +64,7 @@ namespace InspectionReport.Controllers
                 .Where(h => h.Id == house.Id)
                 .Include(h => h.Categories)
                     .ThenInclude(c => c.Features)
+                .Include(h => h.InspectedBy)
                 .SingleOrDefault();
 
             if (houseInContext != null)
@@ -71,8 +73,15 @@ namespace InspectionReport.Controllers
             }
             else
             {
+                //Add house-user relationship 
+                foreach (HouseUser hu in house.InspectedBy)
+                {
+                    hu.HouseId = house.Id;
+                }
+
                 _context.House.Add(house);
             }
+
             _context.SaveChanges();
 
             return CreatedAtRoute("GetHouse", new { id = house.Id }, house);
