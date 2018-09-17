@@ -14,12 +14,15 @@ using ImageMagick;
 using System.Linq;
 using System.Net.Http;
 using System.Net;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace InspectionReport.Controllers
 {
     [Route("api/Image")]
     public class ImageController : Controller
     {
+        private const string ContainerName = "house";
         private readonly ReportContext _context;
 
         private readonly CloudBlobClient client;
@@ -35,25 +38,38 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetImage")]
         public async Task<IActionResult> GetImage(long id)
         {
+            ICollection<FileContentResult> fileList = new List<FileContentResult>();
 
-            var container = client.GetContainerReference("reportpictures");
+            Feature feature = _context.Feature.Find(id);
+            long house_id = GetHouseIdFromFeatureId(id);
+
+            var container = client.GetContainerReference(ContainerName + house_id);
             if (!await container.ExistsAsync())
             {
+                //return fileList;
                 return NoContent();
             }
 
-            //Sourced from https://stackoverflow.com/questions/24312527/azure-blob-storage-downloadtobytearray-vs-downloadtostream
-            CloudBlockBlob image = container.GetBlockBlobReference("Capture.PNG0");
-            await image.FetchAttributesAsync();
-            long fileByteLength = image.Properties.Length;
-            byte[] fileContent = new byte[fileByteLength];
-            for (int i = 0; i < fileByteLength; i++)
-            {
-                fileContent[i] = 0x20;
-            }
-            await image.DownloadToByteArrayAsync(fileContent, 0);
-            return File(fileContent, "image/jpeg");
+            // Adapted from https://stackoverflow.com/questions/24312527/azure-blob-storage-downloadtobytearray-vs-downloadtostream
+            List<string> imageNames = new List<string>();
+            _context.Media.Where(m => m.Feature == feature).ToList().ForEach(m => imageNames.Add(m.MediaName));
 
+            foreach (string imgName in imageNames)
+            {
+                CloudBlockBlob image = container.GetBlockBlobReference(imgName);
+                await image.FetchAttributesAsync();
+                long fileByteLength = image.Properties.Length;
+                byte[] fileContent = new byte[fileByteLength];
+                for (int i = 0; i < fileByteLength; i++)
+                {
+                    fileContent[i] = 0x20;
+                }
+                await image.DownloadToByteArrayAsync(fileContent, 0);
+                return File(fileContent, "image/jpeg");
+                //fileList.Add(File(fileContent, "image/jpeg"));
+            }
+            return Ok();
+            //return fileList;
         }
 
         [HttpPost]
@@ -65,12 +81,33 @@ namespace InspectionReport.Controllers
             {
                 throw new NotSupportedException("Only jpeg and png are supported");
             }*/
+            
+            IFormCollection requestForm = HttpContext.Request.Form;
+            IHeaderDictionary header = HttpContext.Request.Headers;
+            long feature_id;
 
-            // One container for each house?
-            var container = client.GetContainerReference("reportpictures");
+            if (header.ContainsKey("feature-id"))
+            {
+                feature_id = Convert.ToInt64(header["feature-id"]);
+            } else
+            {
+                return BadRequest("No feature-id found in the header.");
+            }
+
+            // Get feature based on ID supplied in Header.
+            Feature feature = _context.Feature.Find(feature_id);
+            if (feature == null)
+            {
+                NotFound();
+            }
+            
+            long house_id = GetHouseIdFromFeatureId(feature_id);
+
+            // Containers on Azure are named "House" + house_id. E.g. House1 is the container
+            // for House with ID = 1.
+            string container_name = ContainerName + house_id;
+            var container = client.GetContainerReference(container_name);
             await container.CreateIfNotExistsAsync();
-
-            var requestForm = HttpContext.Request.Form;
 
             // Check for any uploaded file  
             if (requestForm.Files.Count > 0)
@@ -84,13 +121,7 @@ namespace InspectionReport.Controllers
                         int fileNameStartLocation = postedFile.FileName.LastIndexOf("\\") + 1;
                         string fileName = postedFile.FileName.Substring(fileNameStartLocation);
 
-                        // Blob reference is the name of the file uploaded. 
-                        // This should be named using a Guid which will be entered in the local context in combination
-                        // with the ID of the feature/ category to which the image belongs.
-
-                        CloudBlockBlob blockBlobImage = container.GetBlockBlobReference(fileName + i);
-                        // await container.CreateIfNotExistsAsync();
-                        //CloudBlockBlob blockBlobImage = container.GetBlobReference("img1");
+                        CloudBlockBlob blockBlobImage = container.GetBlockBlobReference(fileName);
 
                         blockBlobImage.Metadata.Add("DateCreated", DateTime.UtcNow.ToLongDateString());
                         blockBlobImage.Metadata.Add("TimeCreated", DateTime.UtcNow.ToLongTimeString());
@@ -107,17 +138,40 @@ namespace InspectionReport.Controllers
                         memoryStream.Position = 0;
 
                         await blockBlobImage.UploadFromStreamAsync(memoryStream);
+
+                        Media media = new Media
+                        {
+                            Feature = feature,
+                            MediaName = fileName
+                        };
+
+                        _context.Media.Add(media);
+                        _context.SaveChanges();
                     }
                 }
             } else
             {
                 return NoContent(); // No image uploaded.
             }
+
             return Ok();
-            // Return status code  
-            //return Request.CreateResponse(HttpStatusCode.Created);
         }
 
+        /// <summary>
+        /// Get HouseId corresponding to a feature.
+        /// </summary>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        private long GetHouseIdFromFeatureId(long id)
+        {
+            Feature feature = _context.Feature.Where(f => f.Id == id)
+                .Include(x => x.Category).SingleOrDefault();
+            long cat_id = feature.Category.Id;
+            long house_id = _context.Categories.Where(x => x.Id == cat_id)
+                .Include(h => h.House)
+                .SingleOrDefault().House.Id;
+            return house_id;
+        }
 
 
     }

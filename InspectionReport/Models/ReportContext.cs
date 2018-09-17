@@ -27,6 +27,8 @@ namespace InspectionReport.Models
 
         public DbSet<Feature> Feature { get; set; }
 
+        public DbSet<Media> Media { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Category>()
