@@ -32,7 +32,6 @@ namespace InspectionReport.Controllers
             client = storageAccount.CreateCloudBlobClient();
         }
 
-        [HttpGet]
         [HttpGet("{id}", Name = "GetImage")]
         public async Task<IActionResult> GetImage(long id)
         {
@@ -43,6 +42,7 @@ namespace InspectionReport.Controllers
                 return NoContent();
             }
 
+            //Sourced from https://stackoverflow.com/questions/24312527/azure-blob-storage-downloadtobytearray-vs-downloadtostream
             CloudBlockBlob image = container.GetBlockBlobReference("Capture.PNG0");
             await image.FetchAttributesAsync();
             long fileByteLength = image.Properties.Length;
