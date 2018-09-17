@@ -70,7 +70,6 @@ namespace InspectionReport.Controllers
                         blockBlobImage.Metadata.Add("TimeCreated", DateTime.UtcNow.ToLongTimeString());
 
                         MemoryStream memoryStream = new MemoryStream();
-                        
 
                         blockBlobImage.Properties.ContentType = postedFile.ContentType;
 
