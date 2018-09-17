@@ -36,11 +36,6 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetImage")]
         public async Task<IActionResult> GetImage(long id)
         {
-            /*Feature feature = _context.Feature.Find(id);
-            if (feature == null)
-            {
-                return NotFound();
-            }*/
 
             var container = client.GetContainerReference("reportpictures");
             if (!await container.ExistsAsync())
@@ -48,29 +43,17 @@ namespace InspectionReport.Controllers
                 return NoContent();
             }
 
-            MemoryStream memoryStream = new MemoryStream();
-            var image = container.GetBlobReference("img1");
-            
-            /*byte[] imgData;
+            CloudBlockBlob image = container.GetBlockBlobReference("Capture.PNG0");
+            await image.FetchAttributesAsync();
+            long fileByteLength = image.Properties.Length;
+            byte[] fileContent = new byte[fileByteLength];
+            for (int i = 0; i < fileByteLength; i++)
+            {
+                fileContent[i] = 0x20;
+            }
+            await image.DownloadToByteArrayAsync(fileContent, 0);
+            return File(fileContent, "image/jpeg");
 
-            await image.DownloadToByteArrayAsync(imgData,0);
-
-            byte[] imgData = memoryStream.ToArray();
-
-            MemoryStream ms = new MemoryStream(imgData);
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-            response.Content = new StreamContent(ms);
-            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-            return response;*/
-
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-            
-            MemoryStream ms = new MemoryStream();
-            await image.DownloadToStreamAsync(ms);
-
-            response.Content = new StreamContent(ms);
-            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-            return Ok(response);
         }
 
         [HttpPost]
