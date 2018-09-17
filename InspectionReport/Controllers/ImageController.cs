@@ -38,7 +38,7 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetImage")]
         public async Task<IActionResult> GetImage(long id)
         {
-            ICollection<FileContentResult> fileList = new List<FileContentResult>();
+            ICollection<IActionResult> fileList = new List<IActionResult>();
 
             Feature feature = _context.Feature.Find(id);
             long house_id = GetHouseIdFromFeatureId(id);
@@ -46,30 +46,20 @@ namespace InspectionReport.Controllers
             var container = client.GetContainerReference(ContainerName + house_id);
             if (!await container.ExistsAsync())
             {
-                //return fileList;
                 return NoContent();
             }
 
-            // Adapted from https://stackoverflow.com/questions/24312527/azure-blob-storage-downloadtobytearray-vs-downloadtostream
             List<string> imageNames = new List<string>();
             _context.Media.Where(m => m.Feature == feature).ToList().ForEach(m => imageNames.Add(m.MediaName));
 
+            List<string> UriResults = new List<string>();
             foreach (string imgName in imageNames)
             {
                 CloudBlockBlob image = container.GetBlockBlobReference(imgName);
-                await image.FetchAttributesAsync();
-                long fileByteLength = image.Properties.Length;
-                byte[] fileContent = new byte[fileByteLength];
-                for (int i = 0; i < fileByteLength; i++)
-                {
-                    fileContent[i] = 0x20;
-                }
-                await image.DownloadToByteArrayAsync(fileContent, 0);
-                return File(fileContent, "image/jpeg");
-                //fileList.Add(File(fileContent, "image/jpeg"));
+                UriResults.Add(GetBlobSASUri(image));
             }
-            return Ok();
-            //return fileList;
+
+            return Ok(UriResults);
         }
 
         [HttpPost]
@@ -171,6 +161,22 @@ namespace InspectionReport.Controllers
                 .Include(h => h.House)
                 .SingleOrDefault().House.Id;
             return house_id;
+        }
+
+        /// <summary>
+        /// Method is used to retreive a unique SAS link for a particular blob.
+        /// Shared Access Blob Policy dictates the time period before the link expires
+        /// and Permissions can be set to enable read/ write/ list the blob.
+        /// </summary>
+        /// <param name="blob"></param>
+        /// <returns></returns>
+        private string GetBlobSASUri(CloudBlockBlob blob)
+        {
+            SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy();
+            sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddDays(1);
+            sasConstraints.Permissions = SharedAccessBlobPermissions.Read | SharedAccessBlobPermissions.List;
+            string sasContainerToken = blob.GetSharedAccessSignature(sasConstraints);
+            return blob.Uri.AbsoluteUri + sasContainerToken;
         }
 
 
