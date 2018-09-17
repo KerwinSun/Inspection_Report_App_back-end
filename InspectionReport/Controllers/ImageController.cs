@@ -12,34 +12,77 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting.Internal;
 using ImageMagick;
 using System.Linq;
+using System.Net.Http;
+using System.Net;
 
 namespace InspectionReport.Controllers
 {
     [Route("api/Image")]
     public class ImageController : Controller
     {
-        private readonly CloudBlobContainer blobContainer;
-
         private readonly ReportContext _context;
+
+        private readonly CloudBlobClient client;
 
         public ImageController(ReportContext context)
         {
             _context = context;
+            String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            client = storageAccount.CreateCloudBlobClient();
+        }
+
+        [HttpGet]
+        [HttpGet("{id}", Name = "GetImage")]
+        public async Task<IActionResult> GetImage(long id)
+        {
+            /*Feature feature = _context.Feature.Find(id);
+            if (feature == null)
+            {
+                return NotFound();
+            }*/
+
+            var container = client.GetContainerReference("reportpictures");
+            if (!await container.ExistsAsync())
+            {
+                return NoContent();
+            }
+
+            MemoryStream memoryStream = new MemoryStream();
+            var image = container.GetBlobReference("img1");
+            
+            /*byte[] imgData;
+
+            await image.DownloadToByteArrayAsync(imgData,0);
+
+            byte[] imgData = memoryStream.ToArray();
+
+            MemoryStream ms = new MemoryStream(imgData);
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Content = new StreamContent(ms);
+            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            return response;*/
+
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+            
+            MemoryStream ms = new MemoryStream();
+            await image.DownloadToStreamAsync(ms);
+
+            response.Content = new StreamContent(ms);
+            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            return Ok(response);
         }
 
         [HttpPost]
-        public async Task PostImage()
+        public async Task<IActionResult> PostImage()
         {
             // Check appropriate file type
+            // TODO: restrict to only certain file types.
             /*if (!_supportedMimeTypes.Contains(headers.ContentType.ToString().ToLower()))
             {
                 throw new NotSupportedException("Only jpeg and png are supported");
             }*/
-            // TODO: restrict to only certain file types.
-            String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var client = storageAccount.CreateCloudBlobClient();
-            
+
             // One container for each house?
             var container = client.GetContainerReference("reportpictures");
             await container.CreateIfNotExistsAsync();
@@ -83,11 +126,16 @@ namespace InspectionReport.Controllers
                         await blockBlobImage.UploadFromStreamAsync(memoryStream);
                     }
                 }
+            } else
+            {
+                return NoContent(); // No image uploaded.
             }
-
+            return Ok();
             // Return status code  
             //return Request.CreateResponse(HttpStatusCode.Created);
         }
+
+
 
     }
 }
