@@ -40,7 +40,7 @@ namespace InspectionReport.Models
             InspectionDate = other.InspectionDate;
 
             //add all new HouseUser objects
-            foreach (HouseUser hu in other.InspectedBy)
+            foreach (HouseUser hu in other.InspectedBy ?? Enumerable.Empty<HouseUser>())
             {
                 //attempt to find the house user in this
                 bool existInCurrent = InspectedBy

@@ -149,7 +149,7 @@ namespace UnitTest
                     Category = category4,
                     Comments = featureNotes,
                 };
-                
+
 
                 context.Feature.Add(feature1);
                 context.Feature.Add(feature2);
@@ -261,7 +261,7 @@ namespace UnitTest
                 Assert.AreEqual(houseAddresses[0], retrievedHouse1.Address);
                 Assert.AreEqual(3, retrievedHouse1.Categories.Count);
                 Assert.AreEqual(1, retrievedHouse1.Categories.ElementAt(0).Features.Count);
-                
+
 
             }
         }
@@ -462,7 +462,7 @@ namespace UnitTest
         {
             string newAddress = "newAddress";
             House existingHouse;
-            
+
 
             //Retrieve the existingHouse1
             using (var context = new ReportContext(options))
@@ -577,7 +577,7 @@ namespace UnitTest
                     Count = 1,
                     Features = null,
                 };
-                List<Category> categoriesForBody 
+                List<Category> categoriesForBody
                     = new List<Category> { changedCategory, remains, newCategory };
 
                 House newHouse = new House
@@ -737,6 +737,151 @@ namespace UnitTest
                     .Where(f => f.Name == newFeatureName)
                     .SingleOrDefault();
                 Assert.IsNotNull(testNewFeature);
+            }
+        }
+
+        /// <summary>
+        /// Testing post a house with a new house user assignment.
+        /// </summary>
+        [TestMethod]
+        public void TestNewHouseWithHouseUser()
+        {
+            User firstUser = null;
+            User secondUser = null;
+            long houseId;
+
+            //Create a house object with new house-user assignment
+            using (var context = new ReportContext(options))
+            {
+                firstUser = context.Users.Where(u => u.Name == userNames[0]).Single();
+                secondUser = context.Users.Where(u => u.Name == userNames[1]).Single();
+                HouseController houseController = new HouseController(context);
+
+                HouseUser hu = new HouseUser
+                {
+                    UserId = firstUser.Id
+                };
+                HouseUser hu2 = new HouseUser
+                {
+                    UserId = secondUser.Id
+                };
+                ICollection<HouseUser> hus = new List<HouseUser>
+                {
+                    hu,
+                    hu2
+                };
+
+
+                House house = new House
+                {
+                    Address = "TestNewHouseWithHouseUser",
+                    InspectedBy = hus
+                };
+
+                CreatedAtRouteResult result =
+                    houseController.CreateOrUpdateHouse(house) as CreatedAtRouteResult;
+                Assert.IsNotNull(result);
+                
+                Assert.AreEqual(201, result.StatusCode);
+                House houseRecieved = result.Value as House;
+                houseId = houseRecieved.Id;
+            };
+
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+                OkObjectResult okResult = houseController.GetById(houseId) as OkObjectResult;
+                House houseAsPerAPI = okResult.Value as House;
+                Assert.IsNotNull(houseAsPerAPI);
+
+                ICollection<HouseUser> houseUsersAsPerAPI = houseAsPerAPI.InspectedBy;
+
+                Assert.IsNotNull(houseUsersAsPerAPI);
+                Assert.AreEqual(2, houseUsersAsPerAPI.Count);
+                
+                foreach (HouseUser hu in houseUsersAsPerAPI)
+                {
+                    Assert.IsTrue(hu.HouseId == houseId);
+                    Assert.IsTrue(hu.UserId == firstUser.Id
+                        || hu.UserId == secondUser.Id);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Testing post an old house with a new house user assignment.
+        /// 
+        /// All the old house user assignments should continue to exist
+        /// A new house user assignment should be added. 
+        /// </summary>
+        [TestMethod]
+        public void TestExistingHouseWithNewHouseUser()
+        {
+            House existing = null;
+            User newUser = new User
+            {
+                Name = "new inspector",
+            };
+            string newAddressName = "TestExistingHouseWithHouseUser";
+
+            //Add a new user
+            using (var context = new ReportContext(options))
+            {
+                context.Users.Add(newUser);
+                context.SaveChanges();
+            }
+
+            //Create an existing house object (with an ID) with new house-user assignment
+            using (var context = new ReportContext(options))
+            {
+                existing = context.House.Where(h => h.Address == houseAddresses[0]).Single();
+                HouseController houseController = new HouseController(context);
+
+                HouseUser newHu = new HouseUser
+                {
+                    UserId = newUser.Id,
+                };
+
+                ICollection<HouseUser> hus = new List<HouseUser>
+                {
+                    newHu,
+                };
+
+
+                House house = new House
+                {
+                    Id = existing.Id,
+                    Address = newAddressName,
+                    InspectedBy = hus
+                };
+
+                CreatedAtRouteResult result =
+                    houseController.CreateOrUpdateHouse(house) as CreatedAtRouteResult;
+                Assert.IsNotNull(result);
+
+                Assert.AreEqual(201, result.StatusCode);
+            };
+            
+            //Should now have 3 users on house.
+            //Address should also be updated.
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context);
+                OkObjectResult okResult = houseController.GetById(existing.Id) as OkObjectResult;
+                House houseAsPerAPI = okResult.Value as House;
+                Assert.IsNotNull(houseAsPerAPI);
+
+                Assert.AreEqual(newAddressName, houseAsPerAPI.Address);
+
+                ICollection<HouseUser> houseUsersAsPerAPI = houseAsPerAPI.InspectedBy;
+
+                Assert.IsNotNull(houseUsersAsPerAPI);
+                Assert.AreEqual(3, houseUsersAsPerAPI.Count);
+
+                //Can find the new user
+                HouseUser newHouseUserFound = houseUsersAsPerAPI
+                    .Where(hu => hu.UserId == newUser.Id).SingleOrDefault();
+                Assert.IsNotNull(newHouseUserFound);
             }
         }
     }

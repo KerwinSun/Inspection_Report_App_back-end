@@ -74,7 +74,7 @@ namespace InspectionReport.Controllers
             else
             {
                 //Add house-user relationship 
-                foreach (HouseUser hu in house.InspectedBy)
+                foreach (HouseUser hu in house.InspectedBy ?? Enumerable.Empty<HouseUser>())
                 {
                     hu.HouseId = house.Id;
                 }
