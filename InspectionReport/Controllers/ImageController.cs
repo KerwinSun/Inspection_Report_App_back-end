@@ -1,19 +1,13 @@
 ﻿using System;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using System.Configuration;
-using System.Web.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols;
 using System.Threading.Tasks;
 using System.IO;
 using InspectionReport.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting.Internal;
 using ImageMagick;
 using System.Linq;
-using System.Net.Http;
-using System.Net;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,7 +30,8 @@ namespace InspectionReport.Controllers
         public ImageController(ReportContext context)
         {
             _context = context;
-            String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
+            String storageConnectionString =
+                "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
             client = storageAccount.CreateCloudBlobClient();
         }
@@ -91,7 +86,8 @@ namespace InspectionReport.Controllers
             if (header.ContainsKey("feature-id"))
             {
                 feature_id = Convert.ToInt64(header["feature-id"]);
-            } else
+            }
+            else
             {
                 return BadRequest("No feature-id found in the header.");
             }
@@ -102,7 +98,7 @@ namespace InspectionReport.Controllers
             {
                 NotFound();
             }
-            
+
             long house_id = GetHouseIdFromFeatureId(feature_id);
 
             // Containers on Azure are named "House" + house_id. E.g. House1 is the container
@@ -119,9 +115,13 @@ namespace InspectionReport.Controllers
                 {
                     List<string> validTypes = new List<string>()
                     {
-                        "image/png", "image/jpeg", "image/hevc", "image/heif", "image/heic"
+                        "image/png",
+                        "image/jpeg",
+                        "image/hevc",
+                        "image/heif",
+                        "image/heic"
                     };
-                    
+
                     IFormFile postedFile = requestForm.Files[i];
                     // verify file is of correct type.
                     if (validTypes.FindIndex(x => x.Equals(postedFile.ContentType,
@@ -130,7 +130,7 @@ namespace InspectionReport.Controllers
                         Console.Write("Invalid file type");
                         continue;
                     }
-                   
+
                     if (postedFile != null)
                     {
                         int fileNameStartLocation = postedFile.FileName.LastIndexOf("\\") + 1;
@@ -164,13 +164,45 @@ namespace InspectionReport.Controllers
                         _context.SaveChanges();
                     }
                 }
-            } else
+            }
+            else
             {
                 return NoContent(); // No image uploaded.
             }
 
             return Ok();
         }
+
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("{id}", Name = "DeleteImage")]
+        public async Task<IActionResult> DeleteImage(long id)
+        {
+            ICollection<IActionResult> fileList = new List<IActionResult>();
+
+            Feature feature = _context.Feature.Find(id);
+            long house_id = GetHouseIdFromFeatureId(id);
+
+            var container = client.GetContainerReference(ContainerName + house_id);
+            if (!await container.ExistsAsync())
+            {
+                return NoContent();
+            }
+
+            List<string> imageNames = new List<string>();
+            _context.Media.Where(m => m.Feature == feature).ToList().ForEach(m => imageNames.Add(m.MediaName));
+
+            foreach (string imgName in imageNames)
+            {
+                CloudBlockBlob image = container.GetBlockBlobReference(imgName);
+                image.DeleteIfExistsAsync();
+            }
+
+            return Ok();
+        }
+
 
         /// <summary>
         /// Get HouseId corresponding to a feature.
@@ -203,9 +235,5 @@ namespace InspectionReport.Controllers
             string sasContainerToken = blob.GetSharedAccessSignature(sasConstraints);
             return blob.Uri.AbsoluteUri + sasContainerToken;
         }
-
-
     }
 }
-
-
