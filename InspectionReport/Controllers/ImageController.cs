@@ -173,8 +173,12 @@ namespace InspectionReport.Controllers
 
 
         /// <summary>
+        ///The HTTP Delete handles the deletion of particular images inside the Azure
+        /// Blob Storge's containers.
+        /// This method finds one or more images and deletes them if they exist.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="id">feature-id</param>
+        /// <returns>Task<IActionResult> for HTTP response</returns>
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
