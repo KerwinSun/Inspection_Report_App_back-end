@@ -73,7 +73,7 @@ namespace InspectionReport.Controllers
 
         /// <summary>
         /// HTTP Post handles the posting of a particular media (image) type to the Azure
-        /// Blob Storge. The request expects one or more Images (restricted to PNG and JPEG) files
+        /// Blob Storge. The request expects one or more Images (restricted to PNG and JPEG) 
         /// files to be included, along with a header with the key of: "feature-id" and the 
         /// corresponding value pair is the id of the feature to which the image must be uploaded.
         /// </summary>
@@ -97,7 +97,7 @@ namespace InspectionReport.Controllers
             Feature feature = _context.Feature.Find(feature_id);
             if (feature == null)
             {
-                NotFound();
+                return NotFound();
             }
             
             long house_id = GetHouseIdFromFeatureId(feature_id);
@@ -139,16 +139,13 @@ namespace InspectionReport.Controllers
                         blockBlobImage.Metadata.Add("TimeCreated", DateTime.UtcNow.ToLongTimeString());
 
                         MemoryStream memoryStream = new MemoryStream();
-
                         blockBlobImage.Properties.ContentType = postedFile.ContentType;
-
                         MagickImage image = new MagickImage(postedFile.OpenReadStream());
                         image.AutoOrient();
 
                         await memoryStream.WriteAsync(image.ToByteArray(), 0, image.ToByteArray().Length);
 
                         memoryStream.Position = 0;
-
                         await blockBlobImage.UploadFromStreamAsync(memoryStream);
 
                         // Check that media object doesn't already exist.
@@ -163,9 +160,6 @@ namespace InspectionReport.Controllers
                             _context.Media.Add(media);
                             _context.SaveChanges();
                         }
-                        
-
-                        
                     }
                 }
             } else
@@ -185,11 +179,11 @@ namespace InspectionReport.Controllers
         {
             Feature feature = _context.Feature.Where(f => f.Id == id)
                 .Include(x => x.Category).SingleOrDefault();
-            long cat_id = feature.Category.Id;
-            long house_id = _context.Categories.Where(x => x.Id == cat_id)
+            long CatId = feature.Category.Id;
+            long HouseId = _context.Categories.Where(x => x.Id == CatId)
                 .Include(h => h.House)
                 .SingleOrDefault().House.Id;
-            return house_id;
+            return HouseId;
         }
 
         /// <summary>
