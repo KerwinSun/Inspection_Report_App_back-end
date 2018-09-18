@@ -64,12 +64,9 @@ namespace InspectionReport.Controllers
             List<string> imageNames = new List<string>();
             _context.Media.Where(m => m.Feature == feature).ToList().ForEach(m => imageNames.Add(m.MediaName));
 
-            List<string> UriResults = new List<string>();
-            foreach (string imgName in imageNames)
-            {
-                CloudBlockBlob image = container.GetBlockBlobReference(imgName);
-                UriResults.Add(GetBlobSASUri(image));
-            }
+            List<string> UriResults = imageNames
+                .Select(imgName => GetBlobSASUri(container.GetBlockBlobReference(imgName)))
+                .ToList();
 
             return Ok(UriResults);
         }
@@ -154,14 +151,21 @@ namespace InspectionReport.Controllers
 
                         await blockBlobImage.UploadFromStreamAsync(memoryStream);
 
-                        Media media = new Media
+                        // Check that media object doesn't already exist.
+                        Media existingMedia = _context.Media.Where(m => m.Feature == feature && m.MediaName == fileName).SingleOrDefault();
+                        if (existingMedia == null)
                         {
-                            Feature = feature,
-                            MediaName = fileName
-                        };
+                            Media media = new Media
+                            {
+                                Feature = feature,
+                                MediaName = fileName
+                            };
+                            _context.Media.Add(media);
+                            _context.SaveChanges();
+                        }
+                        
 
-                        _context.Media.Add(media);
-                        _context.SaveChanges();
+                        
                     }
                 }
             } else
