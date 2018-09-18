@@ -182,8 +182,6 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
-            ICollection<IActionResult> fileList = new List<IActionResult>();
-
             Feature feature = _context.Feature.Find(id);
             long house_id = GetHouseIdFromFeatureId(id);
 
