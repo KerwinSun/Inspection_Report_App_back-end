@@ -27,6 +27,12 @@ namespace InspectionReport.Controllers
 
         private readonly CloudBlobClient client;
 
+        /// <summary>
+        /// The constructor initialises the Blob Strage and the context.
+        /// TODO: Remove connection string, and replace with Azure Key Vault once 
+        /// Authentication is complete.
+        /// </summary>
+        /// <param name="context"></param>
         public ImageController(ReportContext context)
         {
             _context = context;
@@ -35,6 +41,12 @@ namespace InspectionReport.Controllers
             client = storageAccount.CreateCloudBlobClient();
         }
 
+        /// <summary>
+        /// The GET method returns the links for the set of images within a particular feature.
+        /// TODO: make the links accessible only to authorized personnel once authentication is done. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}", Name = "GetImage")]
         public async Task<IActionResult> GetImage(long id)
         {
@@ -62,16 +74,16 @@ namespace InspectionReport.Controllers
             return Ok(UriResults);
         }
 
+        /// <summary>
+        /// HTTP Post handles the posting of a particular media (image) type to the Azure
+        /// Blob Storge. The request expects one or more Images (restricted to PNG and JPEG) files
+        /// files to be included, along with a header with the key of: "feature-id" and the 
+        /// corresponding value pair is the id of the feature to which the image must be uploaded.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> PostImage()
         {
-            // Check appropriate file type
-            // TODO: restrict to only certain file types.
-            /*if (!_supportedMimeTypes.Contains(headers.ContentType.ToString().ToLower()))
-            {
-                throw new NotSupportedException("Only jpeg and png are supported");
-            }*/
-            
             IFormCollection requestForm = HttpContext.Request.Form;
             IHeaderDictionary header = HttpContext.Request.Headers;
             long feature_id;
@@ -105,7 +117,20 @@ namespace InspectionReport.Controllers
                 //Loop through uploaded files  
                 for (int i = 0; i < requestForm.Files.Count; i++)
                 {
+                    List<string> validTypes = new List<string>()
+                    {
+                        "image/png", "image/jpeg", "image/hevc", "image/heif", "image/heic"
+                    };
+                    
                     IFormFile postedFile = requestForm.Files[i];
+                    // verify file is of correct type.
+                    if (validTypes.FindIndex(x => x.Equals(postedFile.ContentType,
+                            StringComparison.OrdinalIgnoreCase)) == -1)
+                    {
+                        Console.Write("Invalid file type");
+                        continue;
+                    }
+                   
                     if (postedFile != null)
                     {
                         int fileNameStartLocation = postedFile.FileName.LastIndexOf("\\") + 1;
