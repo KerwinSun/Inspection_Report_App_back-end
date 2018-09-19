@@ -199,7 +199,11 @@ namespace InspectionReport.Controllers
             }
 
             List<string> imageNames = new List<string>();
-            _context.Media.Where(m => m.Feature == feature).ToList().ForEach(m => imageNames.Add(m.MediaName));
+            _context
+                .Media
+                .Where(m => m.Feature == feature)
+                .ToList()
+                .ForEach(m => imageNames.Add(m.MediaName));
 
             foreach (string imgName in imageNames)
             {
@@ -217,18 +221,24 @@ namespace InspectionReport.Controllers
         /// <returns>IActionResult for HTTP responses</returns>
         private IActionResult DeleteMediaFromTable(Feature feature)
         {
-            Media media = _context
+            List<Media> medias = _context
                 .Media
-                .SingleOrDefault(m => m.Feature == feature);
+                .Where(m => m.Feature == feature)
+                .ToList();
 
-            if (media == null)
+            if (medias.Count == 0)
             {
                 return NotFound();
             }
             else
             {
-                _context.Remove(media);
+                foreach (Media media in medias)
+                {
+                    _context.Remove(media);
+                }
+
                 _context.SaveChanges();
+
                 return NoContent();
             }
         }
