@@ -204,7 +204,7 @@ namespace InspectionReport.Controllers
             foreach (string imgName in imageNames)
             {
                 CloudBlockBlob image = container.GetBlockBlobReference(imgName);
-                await image.DeleteIfExistsAsync();
+                image.DeleteIfExistsAsync();
             }
 
             return NoContent();
