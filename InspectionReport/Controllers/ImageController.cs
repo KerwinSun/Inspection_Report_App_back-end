@@ -183,32 +183,36 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
-            Feature feature = _context.Feature.Find(id);
-            IActionResult iActionResult = this.DeleteMediaFromTable(feature);
-            if (iActionResult.GetType() == typeof(NotFoundResult))
-            {
-                return iActionResult;
-            }
-
+            // Check if the container exists
             long house_id = GetHouseIdFromFeatureId(id);
-
             var container = client.GetContainerReference(ContainerName + house_id);
             if (!await container.ExistsAsync())
             {
                 return NoContent();
             }
 
-            List<string> imageNames = new List<string>();
+            // Remove the media CloudBlockBlob record
+            List<string> imageNamesToDelete = new List<string>();
+
+            Feature feature = _context.Feature.Find(id);
+
             _context
                 .Media
                 .Where(m => m.Feature == feature)
                 .ToList()
-                .ForEach(m => imageNames.Add(m.MediaName));
+                .ForEach(m => imageNamesToDelete.Add(m.MediaName));
 
-            foreach (string imgName in imageNames)
+            foreach (string imgName in imageNamesToDelete)
             {
                 CloudBlockBlob image = container.GetBlockBlobReference(imgName);
                 image.DeleteIfExistsAsync();
+            }
+
+            // Remove the media record from the media table 
+            IActionResult iActionResult = this.DeleteMediaFromTable(feature);
+            if (iActionResult.GetType() == typeof(NotFoundResult))
+            {
+                return NotFound();
             }
 
             return NoContent();
@@ -221,18 +225,18 @@ namespace InspectionReport.Controllers
         /// <returns>IActionResult for HTTP responses</returns>
         private IActionResult DeleteMediaFromTable(Feature feature)
         {
-            List<Media> medias = _context
+            List<Media> mediasToDelete = _context
                 .Media
                 .Where(m => m.Feature == feature)
                 .ToList();
 
-            if (medias.Count == 0)
+            if (mediasToDelete.Count == 0)
             {
                 return NotFound();
             }
             else
             {
-                foreach (Media media in medias)
+                foreach (Media media in mediasToDelete)
                 {
                     _context.Remove(media);
                 }
