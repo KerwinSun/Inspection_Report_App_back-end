@@ -204,14 +204,14 @@ namespace InspectionReport.Controllers
             foreach (string imgName in imageNames)
             {
                 CloudBlockBlob image = container.GetBlockBlobReference(imgName);
-                image.DeleteIfExistsAsync();
+                await image.DeleteIfExistsAsync();
             }
 
             return Ok();
         }
 
         /// <summary>
-        /// Delete corresponding feature record in the table if it exists..
+        /// Delete the corresponding feature record in the table if it exists..
         /// </summary>
         /// <param name="feature-id"></param>
         /// <returns>IActionResult for HTTP responses</returns>
