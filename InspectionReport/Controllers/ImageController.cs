@@ -190,9 +190,7 @@ namespace InspectionReport.Controllers
                 return iActionResult;
             }
 
-
             long house_id = GetHouseIdFromFeatureId(id);
-
 
             var container = client.GetContainerReference(ContainerName + house_id);
             if (!await container.ExistsAsync())
@@ -209,7 +207,7 @@ namespace InspectionReport.Controllers
                 await image.DeleteIfExistsAsync();
             }
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
