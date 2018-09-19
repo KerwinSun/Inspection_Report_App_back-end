@@ -149,7 +149,8 @@ namespace InspectionReport.Controllers
                         await blockBlobImage.UploadFromStreamAsync(memoryStream);
 
                         // Check that media object doesn't already exist.
-                        Media existingMedia = _context.Media.Where(m => m.Feature == feature && m.MediaName == fileName).SingleOrDefault();
+                        Media existingMedia = _context.Media.Where(m => m.Feature == feature && m.MediaName == fileName)
+                            .SingleOrDefault();
                         if (existingMedia == null)
                         {
                             Media media = new Media
@@ -182,6 +183,8 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
+            IActionResult iActionResult = this.DeleteFeatureFromTable(id);
+
             Feature feature = _context.Feature.Find(id);
             long house_id = GetHouseIdFromFeatureId(id);
 
@@ -201,6 +204,27 @@ namespace InspectionReport.Controllers
             }
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Delete corresponding feature record in the table if it exists..
+        /// </summary>
+        /// <param name="feature-id"></param>
+        /// <returns>IActionResult for HTTP responses</returns>
+        private IActionResult DeleteFeatureFromTable(long id)
+        {
+            Feature feature = _context.Feature.Find(id);
+
+            if (feature == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                _context.Remove(feature);
+                _context.SaveChanges();
+                return Ok();
+            }
         }
 
 
