@@ -184,6 +184,10 @@ namespace InspectionReport.Controllers
         public async Task<IActionResult> DeleteImage(long id)
         {
             IActionResult iActionResult = this.DeleteFeatureFromTable(id);
+            if (iActionResult.GetType() == typeof(NoContentResult))
+            {
+                return iActionResult;
+            }
 
             Feature feature = _context.Feature.Find(id);
             long house_id = GetHouseIdFromFeatureId(id);
