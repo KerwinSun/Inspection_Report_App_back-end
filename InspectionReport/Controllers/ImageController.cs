@@ -185,7 +185,7 @@ namespace InspectionReport.Controllers
         {
             Feature feature = _context.Feature.Find(id);
             IActionResult iActionResult = this.DeleteMediaFromTable(feature);
-            if (iActionResult.GetType() == typeof(NoContentResult))
+            if (iActionResult.GetType() == typeof(NotFoundResult))
             {
                 return iActionResult;
             }
@@ -231,7 +231,7 @@ namespace InspectionReport.Controllers
             {
                 _context.Remove(media);
                 _context.SaveChanges();
-                return Ok();
+                return NoContent();
             }
         }
 
