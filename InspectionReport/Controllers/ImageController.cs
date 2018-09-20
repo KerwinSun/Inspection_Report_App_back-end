@@ -177,14 +177,24 @@ namespace InspectionReport.Controllers
         ///The HTTP Delete handles the deletion of particular images inside the Azure
         /// Blob Storge's containers.
         /// This method finds one or more images and deletes them if they exist.
+        /// This method deletes the corresponding image in a one request one image manner. 
+        /// 
+        /// Note: A header with the key of: "image-id" is required!
         /// </summary>
         /// <param name="id">feature-id</param>
         /// <returns>Task<IActionResult> for HTTP response</returns>
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
+            // Get Image idea in request
+            long? image_id_InInt64 = this.GetImageIDFromRequest();
+            if (image_id_InInt64 == null)
+            {
+                return BadRequest("No image-id found in the header.");
+            }
+
             // Check if the container exists
-            long house_id = GetHouseIdFromFeatureId(id);
+            long house_id = this.GetHouseIdFromFeatureId(id);
             var container = client.GetContainerReference(ContainerName + house_id);
             if (!await container.ExistsAsync())
             {
@@ -192,24 +202,11 @@ namespace InspectionReport.Controllers
             }
 
             // Remove the media CloudBlockBlob record
-            List<string> imageNamesToDelete = new List<string>();
-
-            Feature feature = _context.Feature.Find(id);
-
-            _context
-                .Media
-                .Where(m => m.Feature == feature)
-                .ToList()
-                .ForEach(m => imageNamesToDelete.Add(m.MediaName));
-
-            foreach (string imgName in imageNamesToDelete)
-            {
-                CloudBlockBlob image = container.GetBlockBlobReference(imgName);
-                image.DeleteIfExistsAsync();
-            }
+            CloudBlockBlob image = container.GetBlockBlobReference(image_id_InInt64.ToString());
+            image.DeleteIfExistsAsync();
 
             // Remove the media record from the media table 
-            IActionResult iActionResult = this.DeleteMediaFromTable(feature);
+            IActionResult iActionResult = this.DeleteMediaFromTable((long) image_id_InInt64);
             if (iActionResult.GetType() == typeof(NotFoundResult))
             {
                 return NotFound();
@@ -218,29 +215,41 @@ namespace InspectionReport.Controllers
             return NoContent();
         }
 
+        private long? GetImageIDFromRequest()
+        {
+            IFormCollection requestForm = HttpContext.Request.Form;
+            IHeaderDictionary header = HttpContext.Request.Headers;
+            long image_id_InInt64;
+
+            if (header.ContainsKey("image-id"))
+            {
+                image_id_InInt64 = Convert.ToInt64(header["image-id"]);
+                return image_id_InInt64;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         /// <summary>
         /// Delete the corresponding media record in the table if it exists.
         /// </summary>
-        /// <param name="feature object"></param>
+        /// <param name="long image_id_InInt64"></param>
         /// <returns>IActionResult for HTTP responses</returns>
-        private IActionResult DeleteMediaFromTable(Feature feature)
+        private IActionResult DeleteMediaFromTable(long image_id_InInt64)
         {
-            List<Media> mediasToDelete = _context
+            Media mediaToDelete = _context
                 .Media
-                .Where(m => m.Feature == feature)
-                .ToList();
+                .SingleOrDefault(m => m.MediaName == image_id_InInt64.ToString());
 
-            if (mediasToDelete.Count == 0)
+            if (mediaToDelete == null)
             {
                 return NotFound();
             }
             else
             {
-                foreach (Media media in mediasToDelete)
-                {
-                    _context.Remove(media);
-                }
-
+                _context.Remove(mediaToDelete);
                 _context.SaveChanges();
 
                 return NoContent();
