@@ -186,6 +186,8 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
+            Console.WriteLine("DeleteImage(long " + id);
+
             // Get Image name in request
             IHeaderDictionary header = HttpContext.Request.Headers;
 
@@ -193,7 +195,7 @@ namespace InspectionReport.Controllers
 
             if (header.ContainsKey("image-name"))
             {
-                image_name= header["image-name"];
+                image_name = header["image-name"];
             }
             else
             {
@@ -222,7 +224,7 @@ namespace InspectionReport.Controllers
 
             return NoContent();
         }
-        
+
 
         /// <summary>
         /// Delete the corresponding media record in the table if it exists.
@@ -241,7 +243,7 @@ namespace InspectionReport.Controllers
             }
             else
             {
-                _context.Remove(mediaToDelete);
+                _context.Media.Remove(mediaToDelete);
                 _context.SaveChanges();
 
                 return NoContent();
