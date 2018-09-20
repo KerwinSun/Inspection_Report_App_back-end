@@ -1,19 +1,13 @@
 ﻿using System;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using System.Configuration;
-using System.Web.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols;
 using System.Threading.Tasks;
 using System.IO;
 using InspectionReport.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting.Internal;
 using ImageMagick;
 using System.Linq;
-using System.Net.Http;
-using System.Net;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,7 +30,8 @@ namespace InspectionReport.Controllers
         public ImageController(ReportContext context)
         {
             _context = context;
-            String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
+            String storageConnectionString =
+                "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
             client = storageAccount.CreateCloudBlobClient();
         }
@@ -88,7 +83,8 @@ namespace InspectionReport.Controllers
             if (header.ContainsKey("feature-id"))
             {
                 feature_id = Convert.ToInt64(header["feature-id"]);
-            } else
+            }
+            else
             {
                 return BadRequest("No feature-id found in the header.");
             }
@@ -99,7 +95,7 @@ namespace InspectionReport.Controllers
             {
                 return NotFound();
             }
-            
+
             long house_id = GetHouseIdFromFeatureId(feature_id);
 
             // Containers on Azure are named "House" + house_id. E.g. House1 is the container
@@ -116,9 +112,13 @@ namespace InspectionReport.Controllers
                 {
                     List<string> validTypes = new List<string>()
                     {
-                        "image/png", "image/jpeg", "image/hevc", "image/heif", "image/heic"
+                        "image/png",
+                        "image/jpeg",
+                        "image/hevc",
+                        "image/heif",
+                        "image/heic"
                     };
-                    
+
                     IFormFile postedFile = requestForm.Files[i];
                     // verify file is of correct type.
                     if (validTypes.FindIndex(x => x.Equals(postedFile.ContentType,
@@ -127,7 +127,7 @@ namespace InspectionReport.Controllers
                         Console.Write("Invalid file type");
                         continue;
                     }
-                   
+
                     if (postedFile != null)
                     {
                         int fileNameStartLocation = postedFile.FileName.LastIndexOf("\\") + 1;
@@ -149,7 +149,8 @@ namespace InspectionReport.Controllers
                         await blockBlobImage.UploadFromStreamAsync(memoryStream);
 
                         // Check that media object doesn't already exist.
-                        Media existingMedia = _context.Media.Where(m => m.Feature == feature && m.MediaName == fileName).SingleOrDefault();
+                        Media existingMedia = _context.Media.Where(m => m.Feature == feature && m.MediaName == fileName)
+                            .SingleOrDefault();
                         if (existingMedia == null)
                         {
                             Media media = new Media
@@ -162,12 +163,88 @@ namespace InspectionReport.Controllers
                         }
                     }
                 }
-            } else
+            }
+            else
             {
                 return NoContent(); // No image uploaded.
             }
 
             return Ok();
+        }
+
+
+        /// <summary>
+        /// This HTTP Delete method handles the deletion of particular images inside the Azure
+        /// Blob Storge's containers.
+        /// This method deletes the corresponding database table's record as well.
+        /// This method deletes the corresponding image in a one request one image manner. 
+        /// 
+        /// Note: A header with the key of: "image-name" is required!
+        /// </summary>
+        /// <param name="id">feature-id</param>
+        /// <returns>Task<IActionResult> for HTTP response</returns>
+        [HttpDelete("{id}", Name = "DeleteImage")]
+        public async Task<IActionResult> DeleteImage(long id)
+        {
+            // Get Image name in request
+            IHeaderDictionary header = HttpContext.Request.Headers;
+
+            string image_name;
+
+            if (header.ContainsKey("image-name"))
+            {
+                image_name = header["image-name"];
+            }
+            else
+            {
+                return BadRequest("No image-name found in the header.");
+            }
+
+            // Check if the container exists
+            long house_id = this.GetHouseIdFromFeatureId(id);
+            var container = client.GetContainerReference(ContainerName + house_id);
+            if (!await container.ExistsAsync())
+            {
+                return NoContent();
+            }
+
+            // Remove the media CloudBlockBlob record
+            CloudBlockBlob image = container.GetBlockBlobReference(image_name);
+            await image.DeleteIfExistsAsync();
+
+            // Remove the media record from the media table 
+            IActionResult iActionResult = this.DeleteMediaFromTable(image_name, id);
+            if (iActionResult.GetType() == typeof(NotFoundResult))
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+
+
+        /// <summary>
+        /// Delete the corresponding media record in the table if it exists.
+        /// </summary>
+        /// <param name="string image_name, long feature_id"></param>
+        /// <returns>IActionResult for HTTP responses</returns>
+        private IActionResult DeleteMediaFromTable(string image_name, long feature_id)
+        {
+            Media mediaToDelete = _context
+                .Media
+                .SingleOrDefault(m => m.MediaName == image_name && m.Feature.Id == feature_id);
+
+            if (mediaToDelete == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                _context.Media.Remove(mediaToDelete);
+                _context.SaveChanges();
+
+                return NoContent();
+            }
         }
 
         /// <summary>
@@ -201,9 +278,5 @@ namespace InspectionReport.Controllers
             string sasContainerToken = blob.GetSharedAccessSignature(sasConstraints);
             return blob.Uri.AbsoluteUri + sasContainerToken;
         }
-
-
     }
 }
-
-
