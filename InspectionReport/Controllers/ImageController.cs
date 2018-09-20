@@ -186,8 +186,6 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
-            Console.WriteLine("DeleteImage(long " + id);
-
             // Get Image name in request
             IHeaderDictionary header = HttpContext.Request.Headers;
 
@@ -202,7 +200,6 @@ namespace InspectionReport.Controllers
                 return BadRequest("No image-name found in the header.");
             }
 
-
             // Check if the container exists
             long house_id = this.GetHouseIdFromFeatureId(id);
             var container = client.GetContainerReference(ContainerName + house_id);
@@ -213,10 +210,10 @@ namespace InspectionReport.Controllers
 
             // Remove the media CloudBlockBlob record
             CloudBlockBlob image = container.GetBlockBlobReference(image_name);
-            image.DeleteIfExistsAsync();
+            await image.DeleteIfExistsAsync();
 
             // Remove the media record from the media table 
-            IActionResult iActionResult = this.DeleteMediaFromTable(image_name);
+            IActionResult iActionResult = this.DeleteMediaFromTable(image_name, id);
             if (iActionResult.GetType() == typeof(NotFoundResult))
             {
                 return NotFound();
@@ -229,13 +226,13 @@ namespace InspectionReport.Controllers
         /// <summary>
         /// Delete the corresponding media record in the table if it exists.
         /// </summary>
-        /// <param name="string image_name"></param>
+        /// <param name="string image_name, long feature_id"></param>
         /// <returns>IActionResult for HTTP responses</returns>
-        private IActionResult DeleteMediaFromTable(string image_name)
+        private IActionResult DeleteMediaFromTable(string image_name, long feature_id)
         {
             Media mediaToDelete = _context
                 .Media
-                .SingleOrDefault(m => m.MediaName == image_name);
+                .SingleOrDefault(m => m.MediaName == image_name && m.Feature.Id == feature_id);
 
             if (mediaToDelete == null)
             {
