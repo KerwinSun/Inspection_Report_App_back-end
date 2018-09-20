@@ -174,9 +174,9 @@ namespace InspectionReport.Controllers
 
 
         /// <summary>
-        ///The HTTP Delete handles the deletion of particular images inside the Azure
+        /// This HTTP Delete method handles the deletion of particular images inside the Azure
         /// Blob Storge's containers.
-        /// This method finds one or more images and deletes them if they exist.
+        /// This method deletes the corresponding database table's record as well.
         /// This method deletes the corresponding image in a one request one image manner. 
         /// 
         /// Note: A header with the key of: "image-name" is required!
