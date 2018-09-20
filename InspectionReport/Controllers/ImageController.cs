@@ -179,7 +179,7 @@ namespace InspectionReport.Controllers
         /// This method finds one or more images and deletes them if they exist.
         /// This method deletes the corresponding image in a one request one image manner. 
         /// 
-        /// Note: A header with the key of: "image-id" is required!
+        /// Note: A header with the key of: "image-name" is required!
         /// </summary>
         /// <param name="id">feature-id</param>
         /// <returns>Task<IActionResult> for HTTP response</returns>
@@ -187,11 +187,27 @@ namespace InspectionReport.Controllers
         public async Task<IActionResult> DeleteImage(long id)
         {
             // Get Image idea in request
-            long? image_id_InInt64 = this.GetImageIDFromRequest();
+            /*long? image_id_InInt64 = this.GetImageIDFromRequest();
             if (image_id_InInt64 == null)
             {
-                return BadRequest("No image-id found in the header.");
+                return BadRequest("No image-name found in the header.");
+            }*/
+
+            //IFormCollection requestForm = HttpContext.Request.Form;
+
+            IHeaderDictionary header = HttpContext.Request.Headers;
+
+            string image_name;
+
+            if (header.ContainsKey("image-name"))
+            {
+                image_name= header["image-name"];
             }
+            else
+            {
+                return BadRequest("No image-name found in the header.");
+            }
+
 
             // Check if the container exists
             long house_id = this.GetHouseIdFromFeatureId(id);
@@ -202,11 +218,11 @@ namespace InspectionReport.Controllers
             }
 
             // Remove the media CloudBlockBlob record
-            CloudBlockBlob image = container.GetBlockBlobReference(image_id_InInt64.ToString());
+            CloudBlockBlob image = container.GetBlockBlobReference(image_name);
             image.DeleteIfExistsAsync();
 
             // Remove the media record from the media table 
-            IActionResult iActionResult = this.DeleteMediaFromTable((long) image_id_InInt64);
+            IActionResult iActionResult = this.DeleteMediaFromTable(image_name);
             if (iActionResult.GetType() == typeof(NotFoundResult))
             {
                 return NotFound();
@@ -214,34 +230,18 @@ namespace InspectionReport.Controllers
 
             return NoContent();
         }
-
-        private long? GetImageIDFromRequest()
-        {
-            IFormCollection requestForm = HttpContext.Request.Form;
-            IHeaderDictionary header = HttpContext.Request.Headers;
-            long image_id_InInt64;
-
-            if (header.ContainsKey("image-id"))
-            {
-                image_id_InInt64 = Convert.ToInt64(header["image-id"]);
-                return image_id_InInt64;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        
 
         /// <summary>
         /// Delete the corresponding media record in the table if it exists.
         /// </summary>
-        /// <param name="long image_id_InInt64"></param>
+        /// <param name="string image_name"></param>
         /// <returns>IActionResult for HTTP responses</returns>
-        private IActionResult DeleteMediaFromTable(long image_id_InInt64)
+        private IActionResult DeleteMediaFromTable(string image_name)
         {
             Media mediaToDelete = _context
                 .Media
-                .SingleOrDefault(m => m.MediaName == image_id_InInt64.ToString());
+                .SingleOrDefault(m => m.MediaName == image_name);
 
             if (mediaToDelete == null)
             {
