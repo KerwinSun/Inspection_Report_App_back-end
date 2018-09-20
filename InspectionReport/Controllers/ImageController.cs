@@ -186,15 +186,7 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}", Name = "DeleteImage")]
         public async Task<IActionResult> DeleteImage(long id)
         {
-            // Get Image idea in request
-            /*long? image_id_InInt64 = this.GetImageIDFromRequest();
-            if (image_id_InInt64 == null)
-            {
-                return BadRequest("No image-name found in the header.");
-            }*/
-
-            //IFormCollection requestForm = HttpContext.Request.Form;
-
+            // Get Image name in request
             IHeaderDictionary header = HttpContext.Request.Headers;
 
             string image_name;
