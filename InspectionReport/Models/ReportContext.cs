@@ -29,6 +29,8 @@ namespace InspectionReport.Models
 
         public DbSet<Media> Media { get; set; }
 
+        public DbSet<Client> Client { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Category>()
