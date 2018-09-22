@@ -4,14 +4,16 @@ using InspectionReport.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace InspectionReport.Migrations
 {
     [DbContext(typeof(ReportContext))]
-    partial class TodoContextModelSnapshot : ModelSnapshot
+    [Migration("20180922062542_variable-name-change")]
+    partial class variablenamechange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,7 +113,7 @@ namespace InspectionReport.Migrations
 
                     b.Property<string>("Address");
 
-                    b.Property<long?>("AreaInspectedId");
+                    b.Property<long?>("AreaId");
 
                     b.Property<string>("Comments");
 
@@ -129,7 +131,7 @@ namespace InspectionReport.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaInspectedId");
+                    b.HasIndex("AreaId");
 
                     b.HasIndex("SummonsedById");
 
@@ -212,9 +214,9 @@ namespace InspectionReport.Migrations
 
             modelBuilder.Entity("InspectionReport.Models.House", b =>
                 {
-                    b.HasOne("InspectionReport.Models.AreaInspected", "AreaInspected")
+                    b.HasOne("InspectionReport.Models.AreaInspected", "Area")
                         .WithMany()
-                        .HasForeignKey("AreaInspectedId");
+                        .HasForeignKey("AreaId");
 
                     b.HasOne("InspectionReport.Models.Client", "SummonsedBy")
                         .WithMany()

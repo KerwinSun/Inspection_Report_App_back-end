@@ -25,11 +25,12 @@ namespace InspectionReport.Models
         public Boolean Completed { get; set; }
         public string Address { get; set; }
         public ICollection<HouseUser> InspectedBy { get; set; }
-        public Client SummonedBy { get; set; }
+        public Client SummonsedBy { get; set; }
         public string ConstructionType { get; set; }
         public string Comments { get; set; }
         public string EstimateSummary { get; set; }
         public string RoomsSummary { get; set; }
+        public AreaInspected AreaInspected { get; set; }
 
 
         [JsonProperty]
