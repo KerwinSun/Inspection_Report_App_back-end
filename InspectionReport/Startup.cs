@@ -12,6 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using InspectionReport.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace InspectionReport
 {
@@ -75,6 +78,26 @@ namespace InspectionReport
                    options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
             }
 
+            /*services.AddIdentityCore<ApplicationUser>(options => { });
+            new IdentityBuilder(typeof(ApplicationUser), typeof(IdentityRole), services)
+                .AddRoleManager<RoleManager<IdentityRole>>()
+                .AddSignInManager<SignInManager<ApplicationUser>>()
+                .AddEntityFrameworkStores<ReportContext>()
+                .AddDefaultTokenProviders();*/
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ReportContext>()
+                .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+            });
+
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ReportContext>().Database.Migrate();
         }
@@ -87,6 +110,7 @@ namespace InspectionReport
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseCors("localhost");
             app.UseCors("deployment");
             app.UseMvc();

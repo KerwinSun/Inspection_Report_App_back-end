@@ -168,7 +168,7 @@ namespace UnitTest
                 context.Categories.RemoveRange(context.Categories);
                 context.HouseUser.RemoveRange(context.HouseUser);
                 context.House.RemoveRange(context.House);
-                context.Users.RemoveRange(context.Users);
+                context.AppUsers.RemoveRange(context.AppUsers);
 
                 context.SaveChanges();
             };
@@ -753,8 +753,8 @@ namespace UnitTest
             //Create a house object with new house-user assignment
             using (var context = new ReportContext(options))
             {
-                firstUser = context.Users.Where(u => u.Name == userNames[0]).Single();
-                secondUser = context.Users.Where(u => u.Name == userNames[1]).Single();
+                firstUser = context.AppUsers.Where(u => u.Name == userNames[0]).Single();
+                secondUser = context.AppUsers.Where(u => u.Name == userNames[1]).Single();
                 HouseController houseController = new HouseController(context);
 
                 HouseUser hu = new HouseUser
@@ -827,7 +827,7 @@ namespace UnitTest
             //Add a new user
             using (var context = new ReportContext(options))
             {
-                context.Users.Add(newUser);
+                context.AppUsers.Add(newUser);
                 context.SaveChanges();
             }
 

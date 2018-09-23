@@ -23,13 +23,13 @@ namespace InspectionReport.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_context.Users.ToList());
+            return Ok(_context.AppUsers.ToList());
         }
 
         [HttpGet("{id}", Name = "GetUser")]
         public IActionResult GetById(long id)
         {
-            User user = _context.Users
+            User user = _context.AppUsers
                             .Include(u => u.Inspected)
                                 .ThenInclude(hu => hu.House)
                             .Where(u => u.Id == id)
@@ -49,7 +49,7 @@ namespace InspectionReport.Controllers
                 return BadRequest();
             }
 
-            _context.Users.Add(user);
+            _context.AppUsers.Add(user);
             _context.SaveChanges();
 
             return CreatedAtRoute("GetUser", new { id = user.Id }, user);

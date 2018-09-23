@@ -47,7 +47,7 @@ namespace InspectionReport.Controllers
             user.Inspected = new List<HouseUser> { hu };
             house.InspectedBy = new List<HouseUser> { hu };
 
-            _context.Users.Add(user);
+            _context.AppUsers.Add(user);
             _context.SaveChanges();
 			
 			
@@ -113,7 +113,7 @@ namespace InspectionReport.Controllers
 
             user2.Inspected = new List<HouseUser> { hu2 };
             house3.InspectedBy = new List<HouseUser> { hu2 };
-            _context.Users.Add(user2);
+            _context.AppUsers.Add(user2);
             _context.SaveChanges();
 
 
