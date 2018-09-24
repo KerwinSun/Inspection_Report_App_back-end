@@ -35,8 +35,9 @@ td, th {
 }
 
 table th {
-    background-color: dodgerblue;
-    color: white;
+	/* Facebook Blue */
+	background-color: #3B5998;
+	color: white;
 }
 
 .nameStyling {
