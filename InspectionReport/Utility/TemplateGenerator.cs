@@ -62,26 +62,42 @@ namespace InspectionReport.Utility
 
             foreach (Category category in house.Categories)
             {
-                sb.AppendFormat(@"
+                int sum = 0;
+
+                foreach (Feature feature in category.Features)
+                {
+                    int count = _context.Media
+                        .Where(m => m.Feature == feature).ToList().Count;
+
+                    sum = sum + count;
+                }
+
+                if (sum > 0)
+                {
+                    sb.AppendFormat(@"
 				<div>
 					<h2>
 						{0}
 					</h2>
 				</div>
 			        ", category.Name);
+                }
 
                 foreach (Feature feature in category.Features)
                 {
-                    sb.AppendFormat(@"
+                    List<Media> medias = _context.Media
+                        .Where(m => m.Feature == feature).ToList();
+
+                    if (medias != null && medias.Count != 0)
+                    {
+                        sb.AppendFormat(@"
 				<div>
 					<h3>
 						{0}
 					</h3>
 				</div>
 			        ", feature.Name);
-
-                    List<Media> medias = _context.Media
-                        .Where(m => m.Feature == feature).ToList();
+                    }
 
                     OkObjectResult mediaQueryResult = _iController.GetImage(feature.Id).Result as OkObjectResult;
                     List<string> URIResults = mediaQueryResult.Value as List<string>;
