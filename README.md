@@ -21,6 +21,10 @@ The SQL Database is published on Azure.
 
 Continuous Deployment is configured on Azure and any code merged into master is deployed.
 
+## Link to the App
+
+https://inspection-report-app.azurewebsites.net
+
 ## Link to Frontend
 https://github.com/Karim-C/Inspection_Report_App_front-end
 
