@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using InspectionReport.Models;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SQLitePCL;
 using System.Linq;
-using System.Threading.Tasks;
 using InspectionReport.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +13,8 @@ namespace InspectionReport.Utility
         private ReportContext _context;
 
         private ImageController _iController;
+
+        private Boolean generateImageSection = false;
 
         public TemplateGenerator(ReportContext context)
         {
@@ -36,7 +36,10 @@ namespace InspectionReport.Utility
             GenerateTitlePage(sb, house, inspectors);
             GenerateHousePage(sb, house);
 
-            GenerateImageSection(sb, house);
+            if (generateImageSection)
+            {
+                GenerateImageSection(sb, house);
+            }
 
             sb.Append(
                 @"
