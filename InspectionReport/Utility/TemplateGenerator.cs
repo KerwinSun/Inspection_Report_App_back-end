@@ -202,7 +202,11 @@ namespace InspectionReport.Utility
 						<th>Count</th>
 					</tr>
 					<tr>
-						<td>{0}</td>
+						<td>
+<h3>
+{0}
+</h3>
+</td>
 						<td>{1}</td>
 					</tr>
 			        ", category.Name, category.Count);
@@ -234,7 +238,11 @@ namespace InspectionReport.Utility
 
                 sb.AppendFormat(@"
 						<tr>
-							<td>{0}</td>
+							<td>
+<b>
+{0}
+</b>
+</td>
 							<td>{1}</td>
 							<td>{2}</td>
 						</tr>",
