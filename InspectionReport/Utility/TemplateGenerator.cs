@@ -131,8 +131,12 @@ Hitch Building Inspections
 </div>
 				<table>
 					<tr>
-						<td>Date of Inspection:</td>
-						<td>{0}</td>
+						<td style='padding-left: 10px;'>
+Date of Inspection:
+</td>
+                         <td style='padding-left: 10px;'>
+{0}
+</td>
 					</tr>
 					<tr>
 						<td>Client Information:</td>
