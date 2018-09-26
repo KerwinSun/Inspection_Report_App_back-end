@@ -28,10 +28,10 @@ table {
 }
 
 td, th {
-    border: 1px solid gray;
-    padding: 15px;
-    font-size: 22px;
-    text-align: center;
+	border: 1px solid gray;
+	padding: 15px;
+	font-size: 22px;
+	text-align: left;
 }
 
 table th {
@@ -50,4 +50,8 @@ table th {
 
 .commentStyling {
     width: 60%;
+}
+
+.topHeaderStyling {
+	text-align: center;
 }

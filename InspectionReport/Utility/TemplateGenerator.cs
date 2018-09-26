@@ -124,63 +124,67 @@ namespace InspectionReport.Utility
         private void GenerateTitlePage(StringBuilder sb, House house, string inspectors)
         {
             sb.AppendFormat(@"
-				<div><h1> Hitch Building Inspections </h1></div>
+				<div class='topHeaderStyling'>
+<h1>
+Hitch Building Inspections
+</h1>
+</div>
 				<table>
 					<tr>
-						<td>Date of Inspection</td>
+						<td>Date of Inspection:</td>
 						<td>{0}</td>
 					</tr>
 					<tr>
-						<td>Client Information</td>
+						<td>Client Information:</td>
 					</tr>
 					<tr>
-						<td>Address Inspected</td>
+						<td>Address Inspected:</td>
 						<td>{1}</td>
 					</tr>
 					<tr>
-						<td>Summonsed By</td>
+						<td>Summonsed By:</td>
 						<td>{2}</td>
 					</tr>
 					<tr>
-						<td>Inspected By</td>
+						<td>Inspected By:</td>
 						<td>{3}</td>
 					</tr>
 					<tr>
-						<td>Contact Details</td>
+						<td>Contact Details:</td>
 					</tr>
 					<tr>
-						<td>Home Number</td>
+						<td>Home Number:</td>
 						<td>{4}</td>
 					</tr>
 					<tr>
-						<td>Mobile Number</td>
+						<td>Mobile Number:</td>
 						<td>{5}</td>
 					</tr>
 					<tr>
-						<td>Address</td>
+						<td>Address:</td>
 						<td>{6}</td>
 					</tr>
 					<tr>
-						<td>Email Address</td>
+						<td>Email Address:</td>
 						<td>{6}</td>
 					</tr>
 					<tr>
-						<td>Real Estate & Agent</td>
+						<td>Real Estate & Agent:</td>
 						<td>{8}</td>
 					</tr>
 					<tr>
-						<td>House Description</td>
+						<td>House Description:</td>
 					</tr>
 					<tr>
-						<td>Estimate Summary</td>
+						<td>Estimate Summary:</td>
 						<td>{9}</td>
 					</tr>
 					<tr>
-						<td>Rooms Summary</td>
+						<td>Rooms Summary:</td>
 						<td>{10}</td>
 					</tr>
 					<tr>
-						<td>Construction Types</td>
+						<td>Construction Types:</td>
 						<td>{11}</td>
 					</tr>
 				</table>
