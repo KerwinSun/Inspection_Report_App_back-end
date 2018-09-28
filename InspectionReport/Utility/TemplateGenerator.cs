@@ -143,7 +143,7 @@ Hitch Building Inspections
             Client Information:
         </td>
         <td style='padding-left: 10px;'>
-            Robert Kirkpatrick
+            {1}
         </td>
     </tr>
     <tr>
@@ -151,7 +151,7 @@ Hitch Building Inspections
             Address Inspected:
         </td>
         <td style='padding-left: 10px;'>
-            {1}
+            {2}
         </td>
     </tr>
     <tr>
@@ -159,7 +159,7 @@ Hitch Building Inspections
             Summonsed By:
         </td>
         <td style='padding-left: 10px;'>
-            {2}
+            {3}
         </td>
     </tr>
     <tr>
@@ -167,7 +167,7 @@ Hitch Building Inspections
             Inspected By:
         </td>
         <td style='padding-left: 10px;'>
-            {3}
+            {4}
         </td>
     </tr>
     <tr>
@@ -175,7 +175,7 @@ Hitch Building Inspections
             Contact Details:
         </td>
         <td style='padding-left: 10px;'>
-            r.kirkpatrick@auckland.ac.nz
+            {5}
         </td>
     </tr>
     <tr>
@@ -183,7 +183,7 @@ Hitch Building Inspections
             Home Number:
         </td>
         <td style='padding-left: 10px;'>
-            {4}
+            {6}
         </td>
     </tr>
     <tr>
@@ -191,7 +191,7 @@ Hitch Building Inspections
             Mobile Number:
         </td>
         <td style='padding-left: 10px;'>
-            {5}
+            {7}
         </td>
     </tr>
     <tr>
@@ -199,7 +199,7 @@ Hitch Building Inspections
             Address:
         </td>
         <td style='padding-left: 10px;'>
-            {6}
+            {8}
         </td>
     </tr>
     <tr>
@@ -207,7 +207,7 @@ Hitch Building Inspections
             Email Address:
         </td>
         <td style='padding-left: 10px;'>
-            {7}
+            {9}
         </td>
     </tr>
     <tr>
@@ -215,7 +215,7 @@ Hitch Building Inspections
             Real Estate & Agent:
         </td>
         <td style='padding-left: 10px;'>
-            {8}
+            {10}
         </td>
     </tr>
     <tr>
@@ -223,7 +223,7 @@ Hitch Building Inspections
             House Description:
         </td>
         <td style='padding-left: 10px;'>
-            Rob's House
+            {11}
         </td>
     </tr>
     <tr>
@@ -231,7 +231,7 @@ Hitch Building Inspections
             Estimate Summary:
         </td>
         <td style='padding-left: 10px;'>
-            {9}
+            {12}
         </td>
     </tr>
     <tr>
@@ -239,7 +239,7 @@ Hitch Building Inspections
             Rooms Summary:
         </td>
         <td style='padding-left: 10px;'>
-            {10}
+            {13}
         </td>
     </tr>
     <tr>
@@ -247,19 +247,22 @@ Hitch Building Inspections
             Construction Types:
         </td>
         <td style='padding-left: 10px;'>
-            {11}
+            {14}
         </td>
     </tr>
 </table>",
                 house.InspectionDate,
+                "Robert Kirkpatrick",
                 house.Address,
                 "Frano Stanisic",
+                "r.kirkpatrick@auckland.ac.nz",
                 inspectors,
                 "home number",
                 "phone number",
                 "address",
                 "email address",
                 "real estate & agent",
+                "Rob's House",
                 "estimate summary",
                 "rooms summary",
                 house.ConstructionType
