@@ -123,7 +123,8 @@ namespace InspectionReport.Utility
 
         private void GenerateTitlePage(StringBuilder sb, House house, string inspectors)
         {
-            sb.AppendFormat(@"
+            sb.AppendFormat(
+               @"
 <div class='topHeaderStyling'>
     <h1>
 Hitch Building Inspections
@@ -131,152 +132,152 @@ Hitch Building Inspections
 </div>
 <table>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Date of Inspection:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {0}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Client Information:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {1}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Address Inspected:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {2}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Summonsed By:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {3}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Inspected By:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {4}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Contact Details:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {5}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Home Number:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {6}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Mobile Number:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {7}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Address:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {8}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Email Address:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {9}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Real Estate & Agent:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {10}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             House Description:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {11}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Estimate Summary:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {12}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Rooms Summary:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {13}
         </td>
     </tr>
     <tr>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
             Construction Types:
 </b>
         </td>
-        <td style='padding-left: 10px;'>
+        <td style='padding-left: 10px; padding-bottom: 1em;'>
             {14}
         </td>
     </tr>
