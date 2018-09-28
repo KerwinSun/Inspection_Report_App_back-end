@@ -124,76 +124,144 @@ namespace InspectionReport.Utility
         private void GenerateTitlePage(StringBuilder sb, House house, string inspectors)
         {
             sb.AppendFormat(@"
-				<div class='topHeaderStyling'>
-<h1>
+<div class='topHeaderStyling'>
+    <h1>
 Hitch Building Inspections
 </h1>
 </div>
-				<table>
-					<tr>
-						<td style='padding-left: 10px;'>
-Date of Inspection:
-</td>
-                         <td style='padding-left: 10px;'>
-{0}
-</td>
-					</tr>
-					<tr>
-						<td>Client Information:</td>
-					</tr>
-					<tr>
-						<td>Address Inspected:</td>
-						<td>{1}</td>
-					</tr>
-					<tr>
-						<td>Summonsed By:</td>
-						<td>{2}</td>
-					</tr>
-					<tr>
-						<td>Inspected By:</td>
-						<td>{3}</td>
-					</tr>
-					<tr>
-						<td>Contact Details:</td>
-					</tr>
-					<tr>
-						<td>Home Number:</td>
-						<td>{4}</td>
-					</tr>
-					<tr>
-						<td>Mobile Number:</td>
-						<td>{5}</td>
-					</tr>
-					<tr>
-						<td>Address:</td>
-						<td>{6}</td>
-					</tr>
-					<tr>
-						<td>Email Address:</td>
-						<td>{6}</td>
-					</tr>
-					<tr>
-						<td>Real Estate & Agent:</td>
-						<td>{8}</td>
-					</tr>
-					<tr>
-						<td>House Description:</td>
-					</tr>
-					<tr>
-						<td>Estimate Summary:</td>
-						<td>{9}</td>
-					</tr>
-					<tr>
-						<td>Rooms Summary:</td>
-						<td>{10}</td>
-					</tr>
-					<tr>
-						<td>Construction Types:</td>
-						<td>{11}</td>
-					</tr>
-				</table>
-				", house.InspectionDate, house.Address, "Frano Stanisic", inspectors, "home number",
-                "phone number", "address", "email address", "real estate & agent", "estimate summary", "rooms summary",
+<table>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Date of Inspection:
+        </td>
+        <td style='padding-left: 10px;'>
+            {0}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Client Information:
+        </td>
+        <td style='padding-left: 10px;'>
+            Robert Kirkpatrick
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Address Inspected:
+        </td>
+        <td style='padding-left: 10px;'>
+            {1}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Summonsed By:
+        </td>
+        <td style='padding-left: 10px;'>
+            {2}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Inspected By:
+        </td>
+        <td style='padding-left: 10px;'>
+            {3}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Contact Details:
+        </td>
+        <td style='padding-left: 10px;'>
+            r.kirkpatrick@auckland.ac.nz
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Home Number:
+        </td>
+        <td style='padding-left: 10px;'>
+            {4}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Mobile Number:
+        </td>
+        <td style='padding-left: 10px;'>
+            {5}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Address:
+        </td>
+        <td style='padding-left: 10px;'>
+            {6}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Email Address:
+        </td>
+        <td style='padding-left: 10px;'>
+            {7}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Real Estate & Agent:
+        </td>
+        <td style='padding-left: 10px;'>
+            {8}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            House Description:
+        </td>
+        <td style='padding-left: 10px;'>
+            Rob's House
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Estimate Summary:
+        </td>
+        <td style='padding-left: 10px;'>
+            {9}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Rooms Summary:
+        </td>
+        <td style='padding-left: 10px;'>
+            {10}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-left: 10px;'>
+            Construction Types:
+        </td>
+        <td style='padding-left: 10px;'>
+            {11}
+        </td>
+    </tr>
+</table>",
+                house.InspectionDate,
+                house.Address,
+                "Frano Stanisic",
+                inspectors,
+                "home number",
+                "phone number",
+                "address",
+                "email address",
+                "real estate & agent",
+                "estimate summary",
+                "rooms summary",
                 house.ConstructionType
             );
         }
@@ -206,16 +274,20 @@ Date of Inspection:
                 sb.AppendFormat(@"
 					<table>
 					<tr>
-						<th>Category Name</th>
-						<th>Count</th>
+						<th style='padding-left: 10px;'>
+Category Name
+</th>
+						<th style='padding-left: 10px;'>
+Count
+</th>
 					</tr>
 					<tr>
-						<td>
+						<td style='padding-left: 10px;'>
 <h3>
 {0}
 </h3>
 </td>
-						<td>{1}</td>
+						<td style='padding-left: 10px;'>{1}</td>
 					</tr>
 			        ", category.Name, category.Count);
 
@@ -232,9 +304,15 @@ Date of Inspection:
 					<table>
 					
 					<tr>
-						<th class='nameStyling'>Name</th>
-						<th class='gradeStyling'>Grade</th>
-						<th class='commentStyling'>Comment</th>
+						<th class='nameStyling' style='padding-left: 10px;'>
+Name
+</th>
+						<th class='gradeStyling' style='padding-left: 10px;'>
+Grade
+</th>
+						<th class='commentStyling' style='padding-left: 10px;'>
+Comment
+</th>
 					</tr>
 					");
 
@@ -246,13 +324,17 @@ Date of Inspection:
 
                 sb.AppendFormat(@"
 						<tr>
-							<td>
+							<td style='padding-left: 10px;'>
 <b>
 {0}
 </b>
 </td>
-							<td>{1}</td>
-							<td>{2}</td>
+							<td style='padding-left: 10px;'>
+{1}
+</td>
+							<td style='padding-left: 10px;'>
+{2}
+</td>
 						</tr>",
                     name,
                     featureGrade,
