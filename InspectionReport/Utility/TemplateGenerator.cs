@@ -130,7 +130,7 @@ namespace InspectionReport.Utility
 Hitch Building Inspections
 </h1>
 </div>
-<table>
+<table border='0'>
     <tr>
         <td style='padding-left: 10px; padding-bottom: 1em;'>
             <b>
@@ -306,7 +306,7 @@ Hitch Building Inspections
             {
                 sb.Append(@"<br />");
                 sb.AppendFormat(@"
-					<table>
+					<table border='1'>
 					<tr>
 						<th style='padding-left: 10px;'>
 Category Name
@@ -335,7 +335,7 @@ Count
         private StringBuilder appendFeatureTable(StringBuilder sb, Category category)
         {
             sb.Append(@"
-					<table>
+					<table border='1'>
 					
 					<tr>
 						<th class='nameStyling' style='padding-left: 10px;'>
