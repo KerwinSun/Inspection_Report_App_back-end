@@ -386,13 +386,17 @@ Comment
             if (gradeNumber == null)
                 return null;
             if (gradeNumber == 1)
-                return "Good";
+//                return "Good";
+                return "A";
             if (gradeNumber == 2)
-                return "Will need attention soon";
+                //                return "Will need attention soon";
+                return "B";
             if (gradeNumber == 3)
-                return "Will need immediate attention";
+                //                return "Will need immediate attention";
+                return "C";
             if (gradeNumber == 4)
-                return "N/A";
+                //                return "N/A";
+                return "D";
 
             return null;
         }
