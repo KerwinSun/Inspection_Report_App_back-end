@@ -282,7 +282,7 @@ Hitch Building Inspections
         </td>
     </tr>
 </table>",
-                house.InspectionDate,
+                house.InspectionDate.ToShortDateString(),
                 "Robert Kirkpatrick",
                 house.Address,
                 "Frano Stanisic",
