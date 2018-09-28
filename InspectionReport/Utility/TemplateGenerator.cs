@@ -132,7 +132,7 @@ Hitch Building Inspections
 <table>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Date of Inspection:
 </b>
         </td>
@@ -142,7 +142,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Client Information:
 </b>
         </td>
@@ -152,7 +152,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Address Inspected:
 </b>
         </td>
@@ -162,7 +162,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Summonsed By:
 </b>
         </td>
@@ -172,7 +172,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Inspected By:
 </b>
         </td>
@@ -182,7 +182,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Contact Details:
 </b>
         </td>
@@ -192,7 +192,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Home Number:
 </b>
         </td>
@@ -202,7 +202,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Mobile Number:
 </b>
         </td>
@@ -212,7 +212,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Address:
 </b>
         </td>
@@ -222,7 +222,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Email Address:
 </b>
         </td>
@@ -232,7 +232,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Real Estate & Agent:
 </b>
         </td>
@@ -242,7 +242,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             House Description:
 </b>
         </td>
@@ -252,7 +252,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Estimate Summary:
 </b>
         </td>
@@ -262,7 +262,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Rooms Summary:
 </b>
         </td>
@@ -272,7 +272,7 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
-<b>
+            <b>
             Construction Types:
 </b>
         </td>
@@ -285,8 +285,8 @@ Hitch Building Inspections
                 "Robert Kirkpatrick",
                 house.Address,
                 "Frano Stanisic",
-                "r.kirkpatrick@auckland.ac.nz",
                 inspectors,
+                "r.kirkpatrick@auckland.ac.nz",
                 "home number",
                 "phone number",
                 "address",
