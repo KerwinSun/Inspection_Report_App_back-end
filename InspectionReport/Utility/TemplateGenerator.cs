@@ -132,7 +132,9 @@ Hitch Building Inspections
 <table>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Date of Inspection:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {0}
@@ -140,7 +142,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Client Information:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {1}
@@ -148,7 +152,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Address Inspected:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {2}
@@ -156,7 +162,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Summonsed By:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {3}
@@ -164,7 +172,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Inspected By:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {4}
@@ -172,7 +182,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Contact Details:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {5}
@@ -180,7 +192,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Home Number:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {6}
@@ -188,7 +202,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Mobile Number:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {7}
@@ -196,7 +212,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Address:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {8}
@@ -204,7 +222,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Email Address:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {9}
@@ -212,7 +232,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Real Estate & Agent:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {10}
@@ -220,7 +242,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             House Description:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {11}
@@ -228,7 +252,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Estimate Summary:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {12}
@@ -236,7 +262,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Rooms Summary:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {13}
@@ -244,7 +272,9 @@ Hitch Building Inspections
     </tr>
     <tr>
         <td style='padding-left: 10px;'>
+<b>
             Construction Types:
+</b>
         </td>
         <td style='padding-left: 10px;'>
             {14}
