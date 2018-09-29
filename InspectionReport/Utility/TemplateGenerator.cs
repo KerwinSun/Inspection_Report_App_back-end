@@ -36,7 +36,7 @@ namespace InspectionReport.Utility
             GenerateTitlePage(sb, house, inspectors);
             GenerateHousePage(sb, house);
 
-            GenerateImageSection(sb, house);
+ //           GenerateImageSection(sb, house);
 
             sb.Append(
                 @"
