@@ -1,0 +1,52 @@
+﻿body {
+    border: 2px solid black;
+}
+
+.row {
+    width: 100%;
+}
+
+.col-left {
+    float: left;
+    width: 45%;
+}
+
+.col-right {
+    float: right;
+    width: 45%;
+}
+
+.border {
+    border: 1px solid black;
+}
+
+/* From: https://code-maze.com/create-pdf-dotnetcore/#projectpreparation*/
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid gray;
+    padding: 15px;
+    font-size: 22px;
+    text-align: center;
+}
+
+table th {
+    background-color: dodgerblue;
+    color: white;
+}
+
+.nameStyling {
+    width: 25%;
+}
+
+.gradeStyling {
+    width: 15%;
+}
+
+.commentStyling {
+    width: 60%;
+}
