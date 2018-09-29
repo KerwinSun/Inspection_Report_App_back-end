@@ -14,6 +14,8 @@ using Microsoft.Extensions.Options;
 using InspectionReport.Models;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using InspectionReport.Utility;
+using System.IO;
 
 namespace InspectionReport
 {
@@ -62,13 +64,16 @@ namespace InspectionReport
                     options => options.SerializerSettings.ReferenceLoopHandling =
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
-            /// TODO: Should put the connection string as an environment variable.
+			/// TODO: Should put the connection string as an environment variable.
 
-            // Use SQL Database if in Azure, otherwise, use SQLite
-            // To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
-            // on both profiles in the launchSettings.json
+			// Use SQL Database if in Azure, otherwise, use SQLite
+			// To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
+			// on both profiles in the launchSettings.json
 
-            if (_env.IsDevelopment())
+			var dinkContext = new CustomAssemblyLoadContext();
+			dinkContext.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "libwkhtmltox.dll"));
+
+			if (_env.IsDevelopment())
             {
                 var connection =
                     @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
