@@ -64,7 +64,7 @@ namespace InspectionReport.Controllers
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings {Top = 10},
-                DocumentTitle = "Inspection PDF Report for House " + house.Id,
+                DocumentTitle = "Inspection PDF Report",
             };
 
             TemplateGenerator templateGenerator = new TemplateGenerator(_context);
