@@ -17,13 +17,16 @@ namespace InspectionReport.Controllers
     {
         private UserManager<ApplicationUser> _userManager = null;
         private SignInManager<ApplicationUser> _signInManager = null;
+        private ReportContext _context = null;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ReportContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         // GET: Dummy method to create a new user.
@@ -50,15 +53,16 @@ namespace InspectionReport.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ActionName("login")]
-        public async Task<IActionResult> SignIn([FromBody]LoginViewModel model)
+        public async Task<IActionResult> SignIn([FromBody]LoginModel model)
         {
             // TODO: Sign out to clean up in-case user is attempting to sign-in while already signed-in.
             // Get user and check credentials
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
             var result = await _signInManager.PasswordSignInAsync(user, model.Password, true, false);
             if (result.Succeeded)
             {
-                return Ok();
+                var currentUser = _context.AppUsers.Where(u => u.AppLoginUser == user).SingleOrDefault();
+                return Ok(currentUser);
             }
             else
             {

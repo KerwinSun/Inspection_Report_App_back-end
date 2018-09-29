@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +19,6 @@ namespace InspectionReport.Models
         public long Id { get; set; }
         public string Name { get; set; }
         public ICollection<HouseUser> Inspected { get; set; }
+        public ApplicationUser AppLoginUser { get; set; }
     }
 }

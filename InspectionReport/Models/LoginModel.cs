@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InspectionReport.Models
 {
-    public class LoginViewModel
+    public class LoginModel
     {
         [Required]
         [EmailAddress]
