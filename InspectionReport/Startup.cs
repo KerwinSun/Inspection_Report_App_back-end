@@ -12,12 +12,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using InspectionReport.Models;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
 namespace InspectionReport
 {
     public class Startup
     {
         private readonly IHostingEnvironment _env;
+
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             _env = env;
@@ -56,7 +59,8 @@ namespace InspectionReport
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(
-                    options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                    options => options.SerializerSettings.ReferenceLoopHandling =
+                        Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
             /// TODO: Should put the connection string as an environment variable.
 
@@ -66,14 +70,19 @@ namespace InspectionReport
 
             if (_env.IsDevelopment())
             {
-                var connection = @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
+                var connection =
+                    @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
                 services.AddDbContext<ReportContext>(options => options.UseSqlServer(connection));
             }
             else
             {
                 services.AddDbContext<ReportContext>(options =>
-                   options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
+                    options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
             }
+
+
+            // Injecting the PDF tool
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ReportContext>().Database.Migrate();
