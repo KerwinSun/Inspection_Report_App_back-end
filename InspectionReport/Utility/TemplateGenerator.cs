@@ -124,7 +124,7 @@ namespace InspectionReport.Utility
         private void GenerateTitlePage(StringBuilder sb, House house, string inspectors)
         {
             sb.AppendFormat(
-               @"
+                @"
 <div class='topHeaderStyling'>
     <h1>
 Hitch Building Inspections
@@ -378,6 +378,52 @@ Comment
 
             sb.Append(@"</table>");
             sb.Append(@"<br />");
+
+            appendGradeMapping(sb);
+
+            return sb;
+        }
+
+        private StringBuilder appendGradeMapping(StringBuilder sb)
+        {
+            sb.Append(@"<table border='1'>");
+            sb.Append(@"<tr>");
+            sb.Append(@"<th style='padding-left: 10px;'>
+Grade
+</th>");
+            sb.Append(@"<th style='padding-left: 10px;'>
+Explanation
+</th>");
+            sb.Append(@"</tr>");
+
+            sb.Append(@"<tr>");
+            sb.Append(@"<td style='padding-left: 10px;'>
+A
+</td>");
+            sb.Append(@"<td style='padding-left: 10px;'>
+Good
+</td>");
+            sb.Append(@"</tr>");
+
+            sb.Append(@"<tr>");
+            sb.Append(@"<td style='padding-left: 10px;'>
+B
+</td>");
+            sb.Append(@"<td style='padding-left: 10px;'>
+Will need attention soon
+</td>");
+            sb.Append(@"</tr>");
+
+            sb.Append(@"<tr>");
+            sb.Append(@"<td style='padding-left: 10px;'>
+C
+</td>");
+            sb.Append(@"<td style='padding-left: 10px;'>
+Will need immediate attention
+</td>");
+            sb.Append(@"</tr>");
+
+            sb.Append(@"</table>");
             return sb;
         }
 
@@ -386,17 +432,16 @@ Comment
             if (gradeNumber == null)
                 return null;
             if (gradeNumber == 1)
-//                return "Good";
+                // "Good";
                 return "A";
             if (gradeNumber == 2)
-                //                return "Will need attention soon";
+                // "Will need attention soon";
                 return "B";
             if (gradeNumber == 3)
-                //                return "Will need immediate attention";
+                // "Will need immediate attention";
                 return "C";
             if (gradeNumber == 4)
-                //                return "N/A";
-                return "D";
+                return "N/A";
 
             return null;
         }
