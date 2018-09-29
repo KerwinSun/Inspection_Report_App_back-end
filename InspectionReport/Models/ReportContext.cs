@@ -18,7 +18,7 @@ namespace InspectionReport.Models
 
         public DbSet<TodoItem> TodoItems { get; set; }
 
-        public DbSet<User> AppUsers { get; set; }
+        public DbSet<User> User { get; set; }
 
         public DbSet<House> House { get; set; }
 

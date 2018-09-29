@@ -1,5 +1,6 @@
 ﻿using InspectionReport.Controllers;
 using InspectionReport.Models;
+using InspectionReport.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -168,7 +169,7 @@ namespace UnitTest
                 context.Categories.RemoveRange(context.Categories);
                 context.HouseUser.RemoveRange(context.HouseUser);
                 context.House.RemoveRange(context.House);
-                context.AppUsers.RemoveRange(context.AppUsers);
+                context.User.RemoveRange(context.User);
 
                 context.SaveChanges();
             };
@@ -182,7 +183,7 @@ namespace UnitTest
             //Create two users, two houses, four categories, four features.
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, new AuthorizeService(context, null));
                 OkObjectResult result = houseController.GetAll() as OkObjectResult;
                 ICollection<House> housesGot = result.Value as ICollection<House>;
 
@@ -219,7 +220,7 @@ namespace UnitTest
             //Get a house by a specified id
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 // Get houses with database-specified ids
                 House selection1 = context.House.Where(x => x.Address == houseAddresses[0]).Single();
@@ -275,7 +276,7 @@ namespace UnitTest
             //Get a house by a specified id
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 // Get houses with database-specified ids
                 House selection1 = context.House.Where(x => x.Address == houseAddresses[0]).Single();
@@ -320,7 +321,7 @@ namespace UnitTest
             string houseAddress = "newHouse";
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 Feature newFeature = new Feature
                 {
@@ -396,7 +397,7 @@ namespace UnitTest
 
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 Feature newFeature = new Feature
                 {
@@ -476,7 +477,7 @@ namespace UnitTest
 
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 House newHouse = new House
                 {
@@ -551,7 +552,7 @@ namespace UnitTest
 
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 //Change one of the default category
                 Category changedCategory = new Category
@@ -659,7 +660,7 @@ namespace UnitTest
 
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 //Change the default feature
                 Feature changedFeature = new Feature
@@ -753,9 +754,9 @@ namespace UnitTest
             //Create a house object with new house-user assignment
             using (var context = new ReportContext(options))
             {
-                firstUser = context.AppUsers.Where(u => u.Name == userNames[0]).Single();
-                secondUser = context.AppUsers.Where(u => u.Name == userNames[1]).Single();
-                HouseController houseController = new HouseController(context);
+                firstUser = context.User.Where(u => u.Name == userNames[0]).Single();
+                secondUser = context.User.Where(u => u.Name == userNames[1]).Single();
+                HouseController houseController = new HouseController(context, null);
 
                 HouseUser hu = new HouseUser
                 {
@@ -789,7 +790,7 @@ namespace UnitTest
 
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
                 OkObjectResult okResult = houseController.GetById(houseId) as OkObjectResult;
                 House houseAsPerAPI = okResult.Value as House;
                 Assert.IsNotNull(houseAsPerAPI);
@@ -827,7 +828,7 @@ namespace UnitTest
             //Add a new user
             using (var context = new ReportContext(options))
             {
-                context.AppUsers.Add(newUser);
+                context.User.Add(newUser);
                 context.SaveChanges();
             }
 
@@ -835,7 +836,7 @@ namespace UnitTest
             using (var context = new ReportContext(options))
             {
                 existing = context.House.Where(h => h.Address == houseAddresses[0]).Single();
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
 
                 HouseUser newHu = new HouseUser
                 {
@@ -866,7 +867,7 @@ namespace UnitTest
             //Address should also be updated.
             using (var context = new ReportContext(options))
             {
-                HouseController houseController = new HouseController(context);
+                HouseController houseController = new HouseController(context, null);
                 OkObjectResult okResult = houseController.GetById(existing.Id) as OkObjectResult;
                 House houseAsPerAPI = okResult.Value as House;
                 Assert.IsNotNull(houseAsPerAPI);

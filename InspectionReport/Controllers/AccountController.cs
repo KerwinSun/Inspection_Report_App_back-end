@@ -35,16 +35,26 @@ namespace InspectionReport.Controllers
         [ActionName("dummypost")]
         public async Task<IEnumerable<string>> CreateUserAsync()
         {
-            ApplicationUser user = new ApplicationUser()
+            ApplicationUser appUser = new ApplicationUser()
             {
-                UserName = "bob",
-                Email = "bob@bob.com"
+                UserName = "rob",
+                Email = "rob@rob.com"
             };
 
-            var result = await _userManager.CreateAsync(user, "Test123!");
+            var result = await _userManager.CreateAsync(appUser, "Test123!");
             if (result.Succeeded)
             {
-                return new string[] { user.Id, user.UserName };
+                User user = new User()
+                {
+                    Name = "Rob Kirkpatrick",
+                    AppLoginUser = appUser
+                };
+
+                user.AppLoginUser = appUser;
+
+                _context.User.Add(user);
+
+                return new string[] { appUser.Id, appUser.UserName };
             }
             return new string[] { "Not Created" };
         }
@@ -61,7 +71,7 @@ namespace InspectionReport.Controllers
             var result = await _signInManager.PasswordSignInAsync(user, model.Password, true, false);
             if (result.Succeeded)
             {
-                var currentUser = _context.AppUsers.Where(u => u.AppLoginUser == user).SingleOrDefault();
+                var currentUser = _context.User.Where(u => u.AppLoginUser == user).SingleOrDefault();
                 return Ok(currentUser);
             }
             else

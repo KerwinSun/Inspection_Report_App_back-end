@@ -13,6 +13,8 @@ using InspectionReport.Models;
 using Microsoft.AspNetCore.Identity;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using InspectionReport.Services;
+using InspectionReport.Services.Interfaces;
 
 namespace InspectionReport
 {
@@ -82,6 +84,7 @@ namespace InspectionReport
 
             // Injecting the PDF tool
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.AddTransient<IAuthorizeService, AuthorizeService>();
 
             /*services.AddIdentityCore<ApplicationUser>(options => { });
             new IdentityBuilder(typeof(ApplicationUser), typeof(IdentityRole), services)

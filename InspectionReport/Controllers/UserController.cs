@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 using Microsoft.AspNetCore.Mvc;
 using InspectionReport.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
     [Route("api/User")]
     [ApiController]
     public class UserController : ControllerBase
@@ -23,13 +25,13 @@ namespace InspectionReport.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_context.AppUsers.ToList());
+            return Ok(_context.User.ToList());
         }
 
         [HttpGet("{id}", Name = "GetUser")]
         public IActionResult GetById(long id)
         {
-            User user = _context.AppUsers
+            User user = _context.User
                             .Include(u => u.Inspected)
                                 .ThenInclude(hu => hu.House)
                             .Where(u => u.Id == id)
@@ -49,7 +51,7 @@ namespace InspectionReport.Controllers
                 return BadRequest();
             }
 
-            _context.AppUsers.Add(user);
+            _context.User.Add(user);
             _context.SaveChanges();
 
             return CreatedAtRoute("GetUser", new { id = user.Id }, user);

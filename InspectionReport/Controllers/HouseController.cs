@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InspectionReport.Models;
+using InspectionReport.Services;
+using InspectionReport.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,14 +14,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
     [Route("api/House")]
     public class HouseController : Controller
     {
         private readonly ReportContext _context;
+        private readonly IAuthorizeService _authService;
 
-        public HouseController(ReportContext context)
+        public HouseController(ReportContext context, IAuthorizeService authService)
         {
             _context = context;
+            _authService = authService;
         }
 
         [HttpGet(Name = "GetAll")]
@@ -34,6 +41,11 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetHouse")]
         public IActionResult GetById(long id)
         {
+            if (!_authService.AuthorizeUserForHouse(id, HttpContext.User))
+            {
+                return Unauthorized();
+            }
+
             House house = _context.House
                             .Where(h => h.Id == id)
                             .Include(h => h.Categories)
@@ -58,6 +70,12 @@ namespace InspectionReport.Controllers
             if (house == null)
             {
                 return BadRequest();
+            }
+
+            //Editing a house needs authorization.
+            if (house.Id != 0 && !_authService.AuthorizeUserForHouse(house.Id, HttpContext.User))
+            {
+                return Unauthorized();
             }
 
             House houseInContext = _context.House

@@ -10,9 +10,11 @@ using ImageMagick;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
     [Route("api/Image")]
     public class ImageController : Controller
     {

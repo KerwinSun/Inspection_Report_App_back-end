@@ -4,11 +4,13 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using InspectionReport.Models;
 using InspectionReport.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
     [Route("api/Export")]
     public class ExportController : Controller
     {
@@ -44,7 +46,7 @@ namespace InspectionReport.Controllers
 
             foreach (var hu in house.InspectedBy)
             {
-                User user = _context.Users
+                User user = _context.User
                     .Where(u => u.Id == hu.UserId)
                     .SingleOrDefault();
 
