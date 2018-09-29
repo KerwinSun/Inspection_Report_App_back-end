@@ -6,7 +6,7 @@ using System.Text;
 namespace InspectionReport.Models
 {
     /// <summary>
-    /// An area inspected is the area which and inspector inspected during their inspection.
+    /// An area inspected is the area which an inspector inspected during their inspection.
     /// </summary>
     public class AreaInspected
     {
