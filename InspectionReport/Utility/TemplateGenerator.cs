@@ -14,7 +14,7 @@ namespace InspectionReport.Utility
 
         private ImageController _iController;
 
-        private Boolean generateImageSection = false;
+        private Boolean generateImageSection = true;
 
         public TemplateGenerator(ReportContext context)
         {
