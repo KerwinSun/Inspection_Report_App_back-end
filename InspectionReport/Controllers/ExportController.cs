@@ -3,6 +3,7 @@ using System.Linq;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using InspectionReport.Models;
+using InspectionReport.Services.Interfaces;
 using InspectionReport.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,13 @@ namespace InspectionReport.Controllers
     {
         private readonly ReportContext _context;
         private readonly IConverter _converter;
+        private readonly IAuthorizeService _authorizeService;
 
-        public ExportController(ReportContext context, IConverter converter)
+        public ExportController(ReportContext context, IConverter converter, IAuthorizeService authorizeService)
         {
             _context = context;
             _converter = converter;
+            _authorizeService = authorizeService;
         }
 
         /// <summary>
@@ -69,7 +72,9 @@ namespace InspectionReport.Controllers
                 DocumentTitle = "PDF Report"
             };
 
-            TemplateGenerator templateGenerator = new TemplateGenerator(_context);
+            //TODO: 
+            //I strongly recommend this to be created as a service and be injected via DI. (Victor)
+            TemplateGenerator templateGenerator = new TemplateGenerator(_context, _authorizeService);
 
 
             ObjectSettings objectSettings = new ObjectSettings

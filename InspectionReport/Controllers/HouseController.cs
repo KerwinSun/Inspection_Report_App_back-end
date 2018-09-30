@@ -41,7 +41,7 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetHouse")]
         public IActionResult GetById(long id)
         {
-            if (!_authService.AuthorizeUserForHouse(id, HttpContext.User))
+            if (!_authService.AuthorizeUserForHouse(id, HttpContext?.User))
             {
                 return Unauthorized();
             }
@@ -73,7 +73,7 @@ namespace InspectionReport.Controllers
             }
 
             //Editing a house needs authorization.
-            if (house.Id != 0 && !_authService.AuthorizeUserForHouse(house.Id, HttpContext.User))
+            if (house.Id != 0 && !_authService.AuthorizeUserForHouse(house.Id, HttpContext?.User))
             {
                 return Unauthorized();
             }
