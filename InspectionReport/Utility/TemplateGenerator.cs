@@ -103,21 +103,24 @@ namespace InspectionReport.Utility
                     }
 
                     OkObjectResult mediaQueryResult = _iController.GetImage(feature.Id).Result as OkObjectResult;
-                    List<string> URIResults = mediaQueryResult.Value as List<string>;
+					if (mediaQueryResult != null)
+					{
+						List<string> URIResults = mediaQueryResult.Value as List<string>;
 
-                    foreach (string URIResult in URIResults)
-                    {
-                        sb.AppendFormat(@"
+						foreach (string URIResult in URIResults)
+						{
+							sb.AppendFormat(@"
 				<div>
 					<img src='{0}' alt='Feature Image'>
 				</div>
 			        ",
-                            URIResult.ToString()
-                        );
+								URIResult.ToString()
+							);
 
-                        sb.Append(@"<br />");
-                    }
-                }
+							sb.Append(@"<br />");
+						}
+					}
+				}
             }
         }
 
