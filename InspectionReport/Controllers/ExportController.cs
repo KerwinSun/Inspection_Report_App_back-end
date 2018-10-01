@@ -38,7 +38,7 @@ namespace InspectionReport.Controllers
 		{
 			_context = context;
 			_authorizeService = authorizeService;
-			_iController = new ImageController(_context);
+			_iController = new ImageController(_context, authorizeService);
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
