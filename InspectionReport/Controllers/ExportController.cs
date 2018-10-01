@@ -18,6 +18,7 @@ namespace InspectionReport.Controllers
 	public class ExportController : Controller
 	{
 		private readonly ReportContext _context;
+		private ImageController _iController;
 		private ImageHandler _imageHandler;
 		private XFont _largeRegularFont;
 		private XFont _normalRegularFont;
@@ -33,6 +34,7 @@ namespace InspectionReport.Controllers
 		public ExportController(ReportContext context)
 		{
 			_context = context;
+			_iController = new ImageController(_context);
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
@@ -113,7 +115,7 @@ namespace InspectionReport.Controllers
 			WriteLine("summonsed by", _normalRegularFont, initialX + 200);
 			NewLine();
 			WriteLine("Inspected By: ", _normalBoldFont, initialX);
-			WriteLine("inspected by", _normalRegularFont, initialX + 200);
+			WriteLine(names, _normalRegularFont, initialX + 200);
 			NewLine();
 			WriteLine("Contact Details", _normalBoldFont, initialX);
 			NewLine();
@@ -153,12 +155,22 @@ namespace InspectionReport.Controllers
 		{
 			_page = _document.AddPage();
 			_gfx = XGraphics.FromPdfPage(_page);
+			_gfx.DrawLine(XPens.Black, 460, initialY, 460, _page.Height - initialY);
+			_gfx.DrawLine(XPens.Black, 490, initialY, 490, _page.Height - initialY);
+			_gfx.DrawLine(XPens.Black, 520, initialY, 520, _page.Height - initialY);
+			_gfx.DrawLine(XPens.Black, 550, initialY, 550, _page.Height - initialY);
 			currentY = 50;
 
 			foreach (Category category in house.Categories)
 			{
 				WriteLine(category.Name, _normalBoldFont, initialX);
 				WriteLine("Count: " + category.Count.ToString(), _normalBoldFont, initialX + 300);
+				_gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
+				_gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
 				NewLine();
 				DrawFeatures(_gfx, category);
 			}
@@ -208,7 +220,32 @@ namespace InspectionReport.Controllers
 		{
 			_page = _document.AddPage();
 			_gfx = XGraphics.FromPdfPage(_page);
-			_gfx.DrawString("Images", _normalRegularFont, XBrushes.Black, initialX, initialY);
+			currentY = 50;
+			WriteLine("Images", _normalBoldFont, initialX);
+			NewLine();
+
+			foreach(Category category in house.Categories)
+			{
+				foreach (Feature feature in category.Features)
+				{
+					List<Media> medias = _context.Media
+						.Where(m => m.Feature == feature).ToList();
+					if (medias != null && medias.Count != 0)
+					{
+						WriteLine(category.Name + " - " + feature.Name, _normalRegularFont, initialX);
+					}
+					if (_iController.GetImage(feature.Id).Result is OkObjectResult mediaQueryResult)
+					{
+						List<string> URIResults = mediaQueryResult.Value as List<string>;
+						foreach (string URIResult in URIResults)
+						{
+							XImage image = _imageHandler.FromURI(URIResult.ToString());
+							double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+							_gfx.DrawImage(image, initialX + 10, currentY + 10, image.PixelWidth / scale, image.PixelHeight / scale);
+						}
+					}
+				}
+			}
 		}
 
 		private void WriteLine(string stringToWrite, XFont font, int x)
@@ -222,9 +259,14 @@ namespace InspectionReport.Controllers
 				currentY = initialY;
 				_page = _document.AddPage();
 				_gfx = XGraphics.FromPdfPage(_page);
+				_gfx.DrawLine(XPens.Black, 460, initialY, 460, _page.Height - initialY);
+				_gfx.DrawLine(XPens.Black, 490, initialY, 490, _page.Height - initialY);
+				_gfx.DrawLine(XPens.Black, 520, initialY, 520, _page.Height - initialY);
+				_gfx.DrawLine(XPens.Black, 550, initialY, 550, _page.Height - initialY);
+
 				_gfx.DrawString(stringToWrite, font, XBrushes.Black, x, currentY);
 			}
-			_gfx.DrawLine(XPens.Silver, initialX, currentY + 10, _page.Width - initialX, currentY + 10);
+			//_gfx.DrawLine(XPens.Silver, initialX, currentY + 10, _page.Width - initialX, currentY + 10);
 		}
 
 		private void AddFooter()
