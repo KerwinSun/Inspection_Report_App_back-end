@@ -89,14 +89,8 @@ namespace InspectionReport
 
             // Injecting the PDF tool
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            // Injecting the Authorize Service
             services.AddTransient<IAuthorizeService, AuthorizeService>();
-
-            /*services.AddIdentityCore<ApplicationUser>(options => { });
-            new IdentityBuilder(typeof(ApplicationUser), typeof(IdentityRole), services)
-                .AddRoleManager<RoleManager<IdentityRole>>()
-                .AddSignInManager<SignInManager<ApplicationUser>>()
-                .AddEntityFrameworkStores<ReportContext>()
-                .AddDefaultTokenProviders();*/
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ReportContext>()
