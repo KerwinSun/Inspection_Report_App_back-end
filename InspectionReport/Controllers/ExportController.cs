@@ -9,9 +9,8 @@ using InspectionReport.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Fonts;
-using PdfSharpCore.Pdf;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
 
 namespace InspectionReport.Controllers
 {
@@ -19,23 +18,23 @@ namespace InspectionReport.Controllers
 	public class ExportController : Controller
 	{
 		private readonly ReportContext _context;
+		private ImageHandler _imageHandler;
 		private XFont _largeRegularFont;
 		private XFont _normalRegularFont;
 		private XFont _normalBoldFont;
 		private PdfDocument _document;
-		private const int initialY = 30;
-		private const int initialX = 30;
+		private const int initialY = 50;
+		private const int initialX = 50;
 		private int currentY = initialY;
 		private const int lineSpace = 25;
 
 		public ExportController(ReportContext context)
 		{
 			_context = context;
-
-			GlobalFontSettings.FontResolver = new FontResolver();
-			_largeRegularFont = new XFont("OpenSans", 20, XFontStyle.Bold);
-			_normalRegularFont = new XFont("OpenSans", 13, XFontStyle.Regular);
-			_normalBoldFont = new XFont("OpenSans", 13, XFontStyle.Bold);
+			_imageHandler = new ImageHandler();
+			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
+			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
+			_normalBoldFont = new XFont("Arial", 13, XFontStyle.Bold);
 			_document = new PdfDocument();
 		}
 
@@ -83,7 +82,7 @@ namespace InspectionReport.Controllers
 			CreateHousePages(house);
 			CreateImagePages(house);
 
-			string pdfFilename = "InspectionReport" + "" + ".pdf";
+			string pdfFilename = "InspectionReport" + house.Id + ".pdf";
 
 			using (MemoryStream ms = new MemoryStream())
 			{
@@ -103,60 +102,105 @@ namespace InspectionReport.Controllers
 			XGraphics gfx = XGraphics.FromPdfPage(page);
 			gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, page.Width, page.Height), XStringFormats.TopCenter);
 			currentY = 100;
-			gfx.DrawString("Date of Inspection:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString(house.InspectionDate.ToShortDateString(), _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Date of Inspection:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString(house.InspectionDate.ToShortDateString(), _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Client Information", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
+			gfx.DrawString("Client Information", _normalBoldFont, XBrushes.Black, initialX, currentY);
 			NewLine();
-			gfx.DrawString("Summonsed By:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("summonsed by", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Summonsed By:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("summonsed by", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Inspected By:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("inspected by", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Inspected By:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("inspected by", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Contact Details", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
+			gfx.DrawString("Contact Details", _normalBoldFont, XBrushes.Black, initialX, currentY);
 			NewLine();
-			gfx.DrawString("Home ph #:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("home phone number", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Home ph #:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("home phone number", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Mobile #:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("mobile number", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Mobile #:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("mobile number", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Address:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("client address", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Address:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("client address", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Email Address:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("email address", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Email Address:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("email address", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Real Estate & Agent:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("real estate & agent", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Real Estate & Agent:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("real estate & agent", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("House Description", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("house description", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("House Description", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("house description", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Estimate Summary:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("estimate summary", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Estimate Summary:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("estimate summary", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Rooms Summary:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("rooms summary", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Rooms Summary:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("rooms summary", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
-			gfx.DrawString("Construction Types:", _normalBoldFont, XBrushes.Black, initialX, currentY, XStringFormats.Default);
-			gfx.DrawString("construction type", _normalRegularFont, XBrushes.Black, initialX + 200, currentY, XStringFormats.Default);
+			gfx.DrawString("Construction Types:", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("construction type", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
 			NewLine();
+			//XImage image = _imageHandler.FromURI(house.categories[0].);
+			XImage image = _imageHandler.FromURI("https://camo.githubusercontent.com/556a7850bef41de27438eeebc4c1acbdc494d9c5/68747470733a2f2f692e696d6775722e636f6d2f687a3863486e712e706e67");
+			double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+			gfx.DrawImage(image, initialX + 10, currentY, image.PixelWidth / scale, image.PixelHeight / scale);
 		}
 
 		private void CreateHousePages(House house)
 		{
 			PdfPage page = _document.AddPage();
 			XGraphics gfx = XGraphics.FromPdfPage(page);
-			gfx.DrawString("house to draw", _normalRegularFont, XBrushes.Black, initialX, initialY, XStringFormats.Default);
+			currentY = 50;
+
+			foreach (Category category in house.Categories)
+			{
+				if (currentY < 450)
+				{
+
+				}
+				gfx.DrawString(category.Name, _normalBoldFont, XBrushes.Black, initialX, currentY);
+				gfx.DrawString("Count: " + category.Count.ToString(), _normalBoldFont, XBrushes.Black, initialX + 300, currentY);
+				NewLine();
+				DrawFeatureTable(gfx, category);
+			}
+		}
+
+		private void DrawFeatureTable(XGraphics gfx, Category category)
+		{
+			gfx.DrawString("Name", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			gfx.DrawString("Comments", _normalBoldFont, XBrushes.Black, initialX + 100, currentY);
+			gfx.DrawString("A", _normalBoldFont, XBrushes.Black, initialX + 400, currentY);
+			gfx.DrawString("B", _normalBoldFont, XBrushes.Black, initialX + 420, currentY);
+			gfx.DrawString("C", _normalBoldFont, XBrushes.Black, initialX + 440, currentY);
+			NewLine();
+
+			foreach (Feature feature in category.Features)
+			{
+				gfx.DrawString(feature.Name, _normalRegularFont, XBrushes.Black, initialX, currentY);
+				gfx.DrawString(feature.Comments, _normalRegularFont, XBrushes.Black, initialX + 100, currentY);
+				if (feature.Grade == 1)
+				{
+					gfx.DrawString("X", _normalRegularFont, XBrushes.Black, initialX + 400, currentY);
+				}
+				else if (feature.Grade == 2)
+				{
+					gfx.DrawString("X", _normalRegularFont, XBrushes.Black, initialX + 420, currentY);
+				}
+				else if (feature.Grade == 3)
+				{
+					gfx.DrawString("X", _normalRegularFont, XBrushes.Black, initialX + 440, currentY);
+				}
+				NewLine();
+			}
 		}
 
 		private void CreateImagePages(House house)
 		{
 			PdfPage page = _document.AddPage();
 			XGraphics gfx = XGraphics.FromPdfPage(page);
-			gfx.DrawString("Images", _normalRegularFont, XBrushes.Black, initialX, initialY, XStringFormats.Default);
+			gfx.DrawString("Images", _normalRegularFont, XBrushes.Black, initialX, initialY);
 		}
 
 		private void NewLine()
