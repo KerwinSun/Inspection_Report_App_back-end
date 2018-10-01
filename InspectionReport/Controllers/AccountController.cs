@@ -68,7 +68,7 @@ namespace InspectionReport.Controllers
             // TODO: Sign out to clean up in-case user is attempting to sign-in while already signed-in.
             // Get user and check credentials
             ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, true, false);
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
             if (result.Succeeded)
             {
                 var currentUser = _context.User.Where(u => u.AppLoginUser == user).SingleOrDefault();
