@@ -122,7 +122,8 @@ namespace InspectionReport
             {
                 app.UseDeveloperExceptionPage();
             }
-
+			
+	    	app.UseDeveloperExceptionPage(); // Remove once finished debugging.
             app.UseAuthentication();
             app.UseCors("localhost");
             app.UseCors("deployment");
