@@ -5,6 +5,7 @@ using InspectionReport.Models;
 using System.Linq;
 using InspectionReport.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using InspectionReport.Services.Interfaces;
 
 namespace InspectionReport.Utility
 {
@@ -14,12 +15,12 @@ namespace InspectionReport.Utility
 
         private ImageController _iController;
 
-        private Boolean generateImageSection = true;
+        private bool generateImageSection = true;
 
-        public TemplateGenerator(ReportContext context)
+        public TemplateGenerator(ReportContext context, IAuthorizeService authorizeService)
         {
             _context = context;
-            _iController = new ImageController(_context);
+            _iController = new ImageController(_context, authorizeService);
         }
 
         public string Generate(House house, string inspectors)
