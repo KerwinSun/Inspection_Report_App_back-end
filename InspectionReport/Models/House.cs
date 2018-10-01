@@ -20,11 +20,18 @@ namespace InspectionReport.Models
             InspectedBy = new List<HouseUser>();
             Categories = new List<Category>();
         }
+
         public long Id { get; set; }
         public Boolean Completed { get; set; }
         public string Address { get; set; }
         public ICollection<HouseUser> InspectedBy { get; set; }
+        public Client SummonsedBy { get; set; }
         public string ConstructionType { get; set; }
+        public string Comments { get; set; }
+        public string EstimateSummary { get; set; }
+        public string RoomsSummary { get; set; }
+        public AreaInspected AreaInspected { get; set; }
+
 
         [JsonProperty]
         [JsonConverter(typeof(ESDateTimeConverter))]
@@ -38,6 +45,10 @@ namespace InspectionReport.Models
             Address = other.Address;
             ConstructionType = other.ConstructionType;
             InspectionDate = other.InspectionDate;
+            Comments = other.Comments;
+            EstimateSummary = other.EstimateSummary;
+            RoomsSummary = other.RoomsSummary;
+
 
             //add all new HouseUser objects
             foreach (HouseUser hu in other.InspectedBy ?? Enumerable.Empty<HouseUser>())
