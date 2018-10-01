@@ -23,6 +23,8 @@ namespace InspectionReport.Controllers
 		private XFont _normalRegularFont;
 		private XFont _normalBoldFont;
 		private PdfDocument _document;
+		private PdfPage _page;
+		private XGraphics _gfx;
 		private const int initialY = 50;
 		private const int initialX = 50;
 		private int currentY = initialY;
@@ -98,109 +100,136 @@ namespace InspectionReport.Controllers
 
 		private void CreateTitlePage(House house, string names)
 		{
-			PdfPage page = _document.AddPage();
-			XGraphics gfx = XGraphics.FromPdfPage(page);
-			gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, page.Width, page.Height), XStringFormats.TopCenter);
+			_page = _document.AddPage();
+			_gfx = XGraphics.FromPdfPage(_page);
+			_gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
 			currentY = 100;
-			gfx.DrawString("Date of Inspection:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString(house.InspectionDate.ToShortDateString(), _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Date of Inspection: ", _normalBoldFont, initialX);
+			WriteLine(house.InspectionDate.ToShortDateString(), _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Client Information", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			WriteLine("Client Information", _normalBoldFont, initialX);
 			NewLine();
-			gfx.DrawString("Summonsed By:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("summonsed by", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Summonsed By: ", _normalBoldFont, initialX);
+			WriteLine("summonsed by", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Inspected By:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("inspected by", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Inspected By: ", _normalBoldFont, initialX);
+			WriteLine("inspected by", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Contact Details", _normalBoldFont, XBrushes.Black, initialX, currentY);
+			WriteLine("Contact Details", _normalBoldFont, initialX);
 			NewLine();
-			gfx.DrawString("Home ph #:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("home phone number", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Home ph #: ", _normalBoldFont, initialX);
+			WriteLine("home phone number", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Mobile #:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("mobile number", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Mobile #: ", _normalBoldFont, initialX);
+			WriteLine("mobile number", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Address:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("client address", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Address: ", _normalBoldFont, initialX);
+			WriteLine("client address", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Email Address:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("email address", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Email Address: ", _normalBoldFont, initialX);
+			WriteLine("email address", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Real Estate & Agent:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("real estate & agent", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Real Estate & Agent: ", _normalBoldFont, initialX);
+			WriteLine("real estate & agent", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("House Description", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("house description", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("House Description", _normalBoldFont, initialX);
 			NewLine();
-			gfx.DrawString("Estimate Summary:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("estimate summary", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Estimate Summary: ", _normalBoldFont, initialX);
+			WriteLine("estimate summary", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Rooms Summary:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("rooms summary", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Rooms Summary: ", _normalBoldFont, initialX);
+			WriteLine("rooms summary", _normalRegularFont, initialX + 200);
 			NewLine();
-			gfx.DrawString("Construction Types:", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("construction type", _normalRegularFont, XBrushes.Black, initialX + 200, currentY);
+			WriteLine("Construction Types: ", _normalBoldFont, initialX);
+			WriteLine("construction type", _normalRegularFont, initialX + 200);
 			NewLine();
 			//XImage image = _imageHandler.FromURI(house.categories[0].);
 			XImage image = _imageHandler.FromURI("https://camo.githubusercontent.com/556a7850bef41de27438eeebc4c1acbdc494d9c5/68747470733a2f2f692e696d6775722e636f6d2f687a3863486e712e706e67");
 			double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
-			gfx.DrawImage(image, initialX + 10, currentY, image.PixelWidth / scale, image.PixelHeight / scale);
+			_gfx.DrawImage(image, initialX + 10, currentY, image.PixelWidth / scale, image.PixelHeight / scale);
 		}
 
 		private void CreateHousePages(House house)
 		{
-			PdfPage page = _document.AddPage();
-			XGraphics gfx = XGraphics.FromPdfPage(page);
+			_page = _document.AddPage();
+			_gfx = XGraphics.FromPdfPage(_page);
 			currentY = 50;
 
 			foreach (Category category in house.Categories)
 			{
-				if (currentY < 450)
-				{
-
-				}
-				gfx.DrawString(category.Name, _normalBoldFont, XBrushes.Black, initialX, currentY);
-				gfx.DrawString("Count: " + category.Count.ToString(), _normalBoldFont, XBrushes.Black, initialX + 300, currentY);
+				WriteLine(category.Name, _normalBoldFont, initialX);
+				WriteLine("Count: " + category.Count.ToString(), _normalBoldFont, initialX + 300);
 				NewLine();
-				DrawFeatureTable(gfx, category);
+				DrawFeatures(_gfx, category);
 			}
 		}
 
-		private void DrawFeatureTable(XGraphics gfx, Category category)
+		private void DrawFeatures(XGraphics _gfx, Category category)
 		{
-			gfx.DrawString("Name", _normalBoldFont, XBrushes.Black, initialX, currentY);
-			gfx.DrawString("Comments", _normalBoldFont, XBrushes.Black, initialX + 100, currentY);
-			gfx.DrawString("A", _normalBoldFont, XBrushes.Black, initialX + 400, currentY);
-			gfx.DrawString("B", _normalBoldFont, XBrushes.Black, initialX + 420, currentY);
-			gfx.DrawString("C", _normalBoldFont, XBrushes.Black, initialX + 440, currentY);
+			WriteLine("Name", _normalBoldFont, initialX);
+			WriteLine("Comments", _normalBoldFont, initialX + 200);
+			WriteLine("A", _normalBoldFont, initialX + 420);
+			WriteLine("B", _normalBoldFont, initialX + 450);
+			WriteLine("C", _normalBoldFont, initialX + 480);
+			_gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 35);
+			_gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 35);
+			_gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 35);
+			_gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 35);
+			_gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
+			_gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
 			NewLine();
 
 			foreach (Feature feature in category.Features)
 			{
-				gfx.DrawString(feature.Name, _normalRegularFont, XBrushes.Black, initialX, currentY);
-				gfx.DrawString(feature.Comments, _normalRegularFont, XBrushes.Black, initialX + 100, currentY);
+				WriteLine(feature.Name, _normalRegularFont, initialX);
+				WriteLine(feature.Comments, _normalRegularFont, initialX + 200);
 				if (feature.Grade == 1)
 				{
-					gfx.DrawString("X", _normalRegularFont, XBrushes.Black, initialX + 400, currentY);
+					WriteLine("X", _normalRegularFont, initialX + 420);
 				}
 				else if (feature.Grade == 2)
 				{
-					gfx.DrawString("X", _normalRegularFont, XBrushes.Black, initialX + 420, currentY);
+					WriteLine("X", _normalRegularFont, initialX + 450);
 				}
 				else if (feature.Grade == 3)
 				{
-					gfx.DrawString("X", _normalRegularFont, XBrushes.Black, initialX + 440, currentY);
+					WriteLine("X", _normalRegularFont, initialX + 480);
 				}
+				_gfx.DrawLine(XPens.Black, 460, currentY + 10, 460, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 490, currentY + 10, 490, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 520, currentY + 10, 520, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 550, currentY + 10, 550, currentY + 35);
+				_gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
 				NewLine();
 			}
 		}
 
 		private void CreateImagePages(House house)
 		{
-			PdfPage page = _document.AddPage();
-			XGraphics gfx = XGraphics.FromPdfPage(page);
-			gfx.DrawString("Images", _normalRegularFont, XBrushes.Black, initialX, initialY);
+			_page = _document.AddPage();
+			_gfx = XGraphics.FromPdfPage(_page);
+			_gfx.DrawString("Images", _normalRegularFont, XBrushes.Black, initialX, initialY);
+		}
+
+		private void WriteLine(string stringToWrite, XFont font, int x)
+		{
+			if (currentY < 700)
+			{
+				_gfx.DrawString(stringToWrite, font, XBrushes.Black, x, currentY);
+			}
+			else
+			{
+				currentY = initialY;
+				_page = _document.AddPage();
+				_gfx = XGraphics.FromPdfPage(_page);
+				_gfx.DrawString(stringToWrite, font, XBrushes.Black, x, currentY);
+			}
+			_gfx.DrawLine(XPens.Silver, initialX, currentY + 10, _page.Width - initialX, currentY + 10);
+		}
+
+		private void AddFooter()
+		{
+
 		}
 
 		private void NewLine()
