@@ -41,10 +41,10 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetHouse")]
         public IActionResult GetById(long id)
         {
-           // if (!_authService.AuthorizeUserForHouse(id, HttpContext?.User))
-            //{
-            //    return Unauthorized();
-            //}
+            if (!_authService.AuthorizeUserForHouse(id, HttpContext?.User))
+            {
+                return Unauthorized();
+            }
 
             House house = _context.House
                             .Where(h => h.Id == id)
