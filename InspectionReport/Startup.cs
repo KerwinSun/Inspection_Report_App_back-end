@@ -9,11 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using InspectionReport.Models;
+using Microsoft.AspNetCore.Identity;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using InspectionReport.Services;
+using InspectionReport.Services.Interfaces;
+using InspectionReport.Utility;
+using System.IO;
 
 namespace InspectionReport
 {
@@ -62,13 +65,16 @@ namespace InspectionReport
                     options => options.SerializerSettings.ReferenceLoopHandling =
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
-            /// TODO: Should put the connection string as an environment variable.
+			/// TODO: Should put the connection string as an environment variable.
 
-            // Use SQL Database if in Azure, otherwise, use SQLite
-            // To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
-            // on both profiles in the launchSettings.json
+			// Use SQL Database if in Azure, otherwise, use SQLite
+			// To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
+			// on both profiles in the launchSettings.json
 
-            if (_env.IsDevelopment())
+			//var dinkContext = new CustomAssemblyLoadContext();
+			// dinkContext.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "libwkhtmltox.dll"));
+
+			if (_env.IsDevelopment())
             {
                 var connection =
                     @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
@@ -82,7 +88,22 @@ namespace InspectionReport
 
 
             // Injecting the PDF tool
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            // Injecting the Authorize Service
+            services.AddTransient<IAuthorizeService, AuthorizeService>();
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ReportContext>()
+                .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+            });
 
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ReportContext>().Database.Migrate();
@@ -95,7 +116,9 @@ namespace InspectionReport
             {
                 app.UseDeveloperExceptionPage();
             }
-
+			
+	    	app.UseDeveloperExceptionPage(); // Remove once finished debugging.
+            app.UseAuthentication();
             app.UseCors("localhost");
             app.UseCors("deployment");
             app.UseMvc();

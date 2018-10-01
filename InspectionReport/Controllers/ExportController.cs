@@ -3,22 +3,27 @@ using System.Linq;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using InspectionReport.Models;
+using InspectionReport.Services.Interfaces;
 using InspectionReport.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
     [Route("api/Export")]
     public class ExportController : Controller
     {
         private readonly ReportContext _context;
         private readonly IConverter _converter;
+        private readonly IAuthorizeService _authorizeService;
 
-        public ExportController(ReportContext context, IConverter converter)
+        public ExportController(ReportContext context, IConverter converter, IAuthorizeService authorizeService)
         {
             _context = context;
             _converter = converter;
+            _authorizeService = authorizeService;
         }
 
         /// <summary>
@@ -44,7 +49,7 @@ namespace InspectionReport.Controllers
 
             foreach (var hu in house.InspectedBy)
             {
-                User user = _context.Users
+                User user = _context.User
                     .Where(u => u.Id == hu.UserId)
                     .SingleOrDefault();
 
@@ -64,10 +69,12 @@ namespace InspectionReport.Controllers
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings {Top = 10},
-                DocumentTitle = "PDF Report"
+                DocumentTitle = "Inspection PDF Report",
             };
 
-            TemplateGenerator templateGenerator = new TemplateGenerator(_context);
+            //TODO: 
+            //I strongly recommend this to be created as a service and be injected via DI. (Victor)
+            TemplateGenerator templateGenerator = new TemplateGenerator(_context, _authorizeService);
 
 
             ObjectSettings objectSettings = new ObjectSettings

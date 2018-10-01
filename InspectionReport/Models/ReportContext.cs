@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace InspectionReport.Models
 {
-    public class ReportContext : DbContext
+    public class ReportContext : IdentityDbContext<ApplicationUser>
     {
 
         public ReportContext(DbContextOptions<ReportContext> options)
@@ -17,7 +18,7 @@ namespace InspectionReport.Models
 
         public DbSet<TodoItem> TodoItems { get; set; }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> User { get; set; }
 
         public DbSet<House> House { get; set; }
 
@@ -35,6 +36,8 @@ namespace InspectionReport.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Category>()
                 .HasOne(p => p.House)
                 .WithMany(b => b.Categories)
