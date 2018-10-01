@@ -785,7 +785,7 @@ namespace UnitTest
                 CreatedAtRouteResult result =
                     houseController.CreateOrUpdateHouse(house) as CreatedAtRouteResult;
                 Assert.IsNotNull(result);
-                
+
                 Assert.AreEqual(201, result.StatusCode);
                 House houseRecieved = result.Value as House;
                 houseId = houseRecieved.Id;
@@ -802,7 +802,7 @@ namespace UnitTest
 
                 Assert.IsNotNull(houseUsersAsPerAPI);
                 Assert.AreEqual(2, houseUsersAsPerAPI.Count);
-                
+
                 foreach (HouseUser hu in houseUsersAsPerAPI)
                 {
                     Assert.IsTrue(hu.HouseId == houseId);
@@ -865,7 +865,7 @@ namespace UnitTest
 
                 Assert.AreEqual(201, result.StatusCode);
             };
-            
+
             //Should now have 3 users on house.
             //Address should also be updated.
             using (var context = new ReportContext(options))
@@ -887,6 +887,109 @@ namespace UnitTest
                     .Where(hu => hu.UserId == newUser.Id).SingleOrDefault();
                 Assert.IsNotNull(newHouseUserFound);
             }
+        }
+
+        /// <summary>
+        /// Testing ordering of categories and features.
+        /// Categories were sent as: order 1, 0.
+        /// Feature were sent as: {1, 0, 2}, {0}.
+        /// 
+        /// The expected results:
+        ///     First category:  order 0,
+        ///         First feature: order 0.
+        /// </summary>
+        [TestMethod]
+        public void TestCategoryAndFeatureOrder()
+        {
+            //====FEATURES=====
+            //c1: ORDER 1
+            //  f1-f3: ORDER: 1, 0, 2
+            //c2: ORDER 0
+            //  f4: ORDER: 0
+            Feature f1 = new Feature
+            {
+                Name = "f1",
+                Order = 1
+            };
+
+            Feature f2 = new Feature
+            {
+                Name = "f2",
+                Order = 0
+            };
+            Feature f3 = new Feature
+            {
+                Name = "f3",
+                Order = 2
+            };
+
+            Feature f4 = new Feature
+            {
+                Name = "f4",
+                Order = 0
+            };
+
+            Category c1 = new Category
+            {
+                Name = "c1",
+                Order = 1,
+                Features = { f1, f2, f3 }
+            };
+
+            Category c2 = new Category
+            {
+                Name = "c2",
+                Order = 0,
+                Features = { f4 }
+            };
+            House house = new House
+            {
+                Address = "TestNewHouseWithHouseUser",
+                Categories = { c1, c2 }
+            };
+
+            long houseId;
+            long cat2Id;
+            long feat2Id;
+
+            //Create a house object with new house-user assignment
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context, AUTH_SERVICE);
+
+                CreatedAtRouteResult result =
+                    houseController.CreateOrUpdateHouse(house) as CreatedAtRouteResult;
+                Assert.IsNotNull(result);
+
+                Assert.AreEqual(201, result.StatusCode);
+                House houseRecieved = result.Value as House;
+                houseId = houseRecieved.Id;
+                Category firstCat = house.Categories.Where(c => c.Name == c2.Name).SingleOrDefault();
+                cat2Id = firstCat.Id;
+
+                Category secondCat = house.Categories.Where(c => c.Name == c1.Name).SingleOrDefault();
+                feat2Id = secondCat.Features.Where(f => f.Name == f2.Name).SingleOrDefault().Id;
+            };
+
+            using (var context = new ReportContext(options))
+            {
+                HouseController houseController = new HouseController(context, AUTH_SERVICE);
+                OkObjectResult okResult = houseController.GetById(houseId) as OkObjectResult;
+                House houseAsPerAPI = okResult.Value as House;
+                Assert.IsNotNull(houseAsPerAPI);
+
+                Category firstCategory = houseAsPerAPI.Categories.FirstOrDefault();
+                
+                Assert.AreEqual(0, firstCategory.Order);
+                Assert.AreEqual(cat2Id, firstCategory.Id); //Category2 was the first category
+
+                Category secondCategory = houseAsPerAPI.Categories.LastOrDefault();
+                Feature firstFeatureOfFirstCategory = secondCategory.Features.FirstOrDefault();
+
+                Assert.AreEqual(0, firstFeatureOfFirstCategory.Order);
+                Assert.AreEqual(feat2Id, firstFeatureOfFirstCategory.Id); //Feature2 was the first feature
+            }
+
         }
     }
 }
