@@ -5,14 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="libwkhtmltox.dll" />
     <None Remove="Properties\PublishProfiles\InspectionReport20180815124100 - Web Deploy.pubxml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="libwkhtmltox.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -21,9 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DinkToPdf" Version="1.0.8" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.2" />
+    <PackageReference Include="PdfSharpCore" Version="1.0.4" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.1" />
   </ItemGroup>
 

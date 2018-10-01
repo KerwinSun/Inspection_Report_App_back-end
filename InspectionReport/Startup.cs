@@ -12,9 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using InspectionReport.Models;
-using DinkToPdf;
-using DinkToPdf.Contracts;
-using InspectionReport.Utility;
 using System.IO;
 
 namespace InspectionReport
@@ -70,9 +67,6 @@ namespace InspectionReport
 			// To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
 			// on both profiles in the launchSettings.json
 
-			var dinkContext = new CustomAssemblyLoadContext();
-			dinkContext.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "libwkhtmltox.dll"));
-
 			if (_env.IsDevelopment())
             {
                 var connection =
@@ -84,10 +78,6 @@ namespace InspectionReport
                 services.AddDbContext<ReportContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
             }
-
-
-            // Injecting the PDF tool
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ReportContext>().Database.Migrate();
