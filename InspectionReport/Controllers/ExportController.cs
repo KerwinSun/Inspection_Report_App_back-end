@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using InspectionReport.Models;
+using InspectionReport.Services.Interfaces;
 using InspectionReport.Utility;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PdfSharp.Drawing;
@@ -30,10 +32,12 @@ namespace InspectionReport.Controllers
 		private const int initialX = 50;
 		private int currentY = initialY;
 		private const int lineSpace = 25;
+		private readonly IAuthorizeService _authorizeService;
 
-		public ExportController(ReportContext context)
+		public ExportController(ReportContext context, IAuthorizeService authorizeService)
 		{
 			_context = context;
+			_authorizeService = authorizeService;
 			_iController = new ImageController(_context);
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);

@@ -10,9 +10,12 @@ using ImageMagick;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using InspectionReport.Services.Interfaces;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
     [Route("api/Image")]
     public class ImageController : Controller
     {
@@ -20,6 +23,7 @@ namespace InspectionReport.Controllers
         private readonly ReportContext _context;
 
         private readonly CloudBlobClient client;
+        private readonly IAuthorizeService _authorizeService;
 
         /// <summary>
         /// The constructor initialises the Blob Strage and the context.
@@ -27,9 +31,10 @@ namespace InspectionReport.Controllers
         /// Authentication is complete.
         /// </summary>
         /// <param name="context"></param>
-        public ImageController(ReportContext context)
+        public ImageController(ReportContext context, IAuthorizeService authorizeService)
         {
             _context = context;
+            _authorizeService = authorizeService;
             String storageConnectionString =
                 "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
@@ -49,6 +54,15 @@ namespace InspectionReport.Controllers
 
             Feature feature = _context.Feature.Find(id);
             long house_id = GetHouseIdFromFeatureId(id);
+            if (house_id == 0)
+            {
+                return NotFound();
+            }
+
+            if (!_authorizeService.AuthorizeUserForHouse(house_id, HttpContext?.User))
+            {
+                return Unauthorized();
+            }
 
             var container = client.GetContainerReference(ContainerName + house_id);
             if (!await container.ExistsAsync())
@@ -97,6 +111,10 @@ namespace InspectionReport.Controllers
             }
 
             long house_id = GetHouseIdFromFeatureId(feature_id);
+            if (house_id == 0)
+            {
+                return NotFound();
+            }
 
             // Containers on Azure are named "House" + house_id. E.g. House1 is the container
             // for House with ID = 1.
@@ -200,8 +218,18 @@ namespace InspectionReport.Controllers
                 return BadRequest("No image-name found in the header.");
             }
 
-            // Check if the container exists
+            
             long house_id = this.GetHouseIdFromFeatureId(id);
+            if (house_id == 0)
+            {
+                return NotFound();
+            }
+            if(_authorizeService.AuthorizeUserForHouse(house_id, HttpContext.User))
+            {
+                return Unauthorized();
+            }
+
+            // Check if the container exists
             var container = client.GetContainerReference(ContainerName + house_id);
             if (!await container.ExistsAsync())
             {
@@ -256,6 +284,11 @@ namespace InspectionReport.Controllers
         {
             Feature feature = _context.Feature.Where(f => f.Id == id)
                 .Include(x => x.Category).SingleOrDefault();
+            if (feature == null)
+            {
+                return 0;
+            }
+
             long CatId = feature.Category.Id;
             long HouseId = _context.Categories.Where(x => x.Id == CatId)
                 .Include(h => h.House)

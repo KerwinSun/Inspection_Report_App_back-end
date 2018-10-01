@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using InspectionReport.Models;
+using Microsoft.AspNetCore.Identity;
+using InspectionReport.Services;
+using InspectionReport.Services.Interfaces;
+using InspectionReport.Utility;
 using System.IO;
 
 namespace InspectionReport
@@ -79,6 +81,24 @@ namespace InspectionReport
                     options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
             }
 
+            // Injecting the PDF tool
+            //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            // Injecting the Authorize Service
+            services.AddTransient<IAuthorizeService, AuthorizeService>();
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ReportContext>()
+                .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+            });
+
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ReportContext>().Database.Migrate();
         }
@@ -90,7 +110,9 @@ namespace InspectionReport
             {
                 app.UseDeveloperExceptionPage();
             }
-	    app.UseDeveloperExceptionPage(); // Remove once finished debugging.
+			
+	    	app.UseDeveloperExceptionPage(); // Remove once finished debugging.
+            app.UseAuthentication();
             app.UseCors("localhost");
             app.UseCors("deployment");
             app.UseMvc();

@@ -43,8 +43,8 @@ namespace UnitTest
             //Inspect that single user
             using (var context = new ReportContext(options))
             {
-                Assert.AreEqual(1, context.Users.Count());
-                Assert.AreEqual("Test User", context.Users.Single().Name);
+                Assert.AreEqual(1, context.User.Count());
+                Assert.AreEqual("Test User", context.User.Single().Name);
             }
 
             //Create more users
@@ -61,7 +61,7 @@ namespace UnitTest
             //Inspect both users are in
             using (var context = new ReportContext(options))
             {
-                Assert.AreEqual(2, context.Users.Count());
+                Assert.AreEqual(2, context.User.Count());
             }
         }
 
@@ -95,7 +95,7 @@ namespace UnitTest
                 ICollection<User> users = result.Value as ICollection<User>;
 
                 Assert.AreEqual(200, result.StatusCode);
-                Assert.AreEqual(10, context.Users.Count());
+                Assert.AreEqual(10, context.User.Count());
             }
         }
 
@@ -159,7 +159,7 @@ namespace UnitTest
             using (var context = new ReportContext(options))
             {
                 //Find id of user!
-                long userId = context.Users.Single().Id;
+                long userId = context.User.Single().Id;
 
                 //Find id of house!
                 long houseId1 = context.House.Where(h => h.Address == address1).Single().Id;

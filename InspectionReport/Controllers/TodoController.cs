@@ -5,19 +5,27 @@ using System.Text;
 
 using Microsoft.AspNetCore.Mvc;
 using InspectionReport.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
     [Route("api/Todo")]
     [ApiController]
     public class TodoController : ControllerBase
     {
         private readonly ReportContext _context;
 
-        public TodoController(ReportContext context)
+        private UserManager<ApplicationUser> _userManager = null;
+        private SignInManager<ApplicationUser> _signInManager = null;
+
+        public TodoController(ReportContext context, UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _context = context;
-
+            _userManager = userManager;
+            _signInManager = signInManager;
             if (_context.TodoItems.Count() == 0)
             {
                 _context.TodoItems.Add(new TodoItem { Name = "Hello World!" });

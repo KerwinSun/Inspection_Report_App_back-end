@@ -4,14 +4,16 @@ using InspectionReport.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace InspectionReport.Migrations
 {
     [DbContext(typeof(ReportContext))]
-    partial class TodoContextModelSnapshot : ModelSnapshot
+    [Migration("20180929024229_ApplicationUserRelationship")]
+    partial class ApplicationUserRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,6 +56,8 @@ namespace InspectionReport.Migrations
 
                     b.Property<bool>("TwoFactorEnabled");
 
+                    b.Property<long?>("UserId");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
@@ -66,6 +70,8 @@ namespace InspectionReport.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -181,15 +187,11 @@ namespace InspectionReport.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AppLoginUserId");
-
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppLoginUserId");
-
-                    b.ToTable("User");
+                    b.ToTable("AppUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -302,6 +304,13 @@ namespace InspectionReport.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("InspectionReport.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("InspectionReport.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("InspectionReport.Models.Category", b =>
                 {
                     b.HasOne("InspectionReport.Models.House", "House")
@@ -336,13 +345,6 @@ namespace InspectionReport.Migrations
                         .WithMany("ImageFileNames")
                         .HasForeignKey("FeatureId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("InspectionReport.Models.User", b =>
-                {
-                    b.HasOne("InspectionReport.Models.ApplicationUser", "AppLoginUser")
-                        .WithMany()
-                        .HasForeignKey("AppLoginUserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -4,14 +4,16 @@ using InspectionReport.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace InspectionReport.Migrations
 {
     [DbContext(typeof(ReportContext))]
-    partial class TodoContextModelSnapshot : ModelSnapshot
+    [Migration("20180923012120_IdentityUser")]
+    partial class IdentityUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,15 +183,11 @@ namespace InspectionReport.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AppLoginUserId");
-
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppLoginUserId");
-
-                    b.ToTable("User");
+                    b.ToTable("AppUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -336,13 +334,6 @@ namespace InspectionReport.Migrations
                         .WithMany("ImageFileNames")
                         .HasForeignKey("FeatureId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("InspectionReport.Models.User", b =>
-                {
-                    b.HasOne("InspectionReport.Models.ApplicationUser", "AppLoginUser")
-                        .WithMany()
-                        .HasForeignKey("AppLoginUserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
