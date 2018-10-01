@@ -71,8 +71,8 @@ namespace InspectionReport
 			// To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
 			// on both profiles in the launchSettings.json
 
-			var dinkContext = new CustomAssemblyLoadContext();
-			dinkContext.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "libwkhtmltox.dll"));
+			//var dinkContext = new CustomAssemblyLoadContext();
+			// dinkContext.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "libwkhtmltox.dll"));
 
 			if (_env.IsDevelopment())
             {
@@ -88,7 +88,7 @@ namespace InspectionReport
 
 
             // Injecting the PDF tool
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             // Injecting the Authorize Service
             services.AddTransient<IAuthorizeService, AuthorizeService>();
 
