@@ -54,6 +54,10 @@ namespace InspectionReport.Controllers
 
             Feature feature = _context.Feature.Find(id);
             long house_id = GetHouseIdFromFeatureId(id);
+            if (house_id == 0)
+            {
+                return NotFound();
+            }
 
             if (!_authorizeService.AuthorizeUserForHouse(house_id, HttpContext?.User))
             {
@@ -107,6 +111,10 @@ namespace InspectionReport.Controllers
             }
 
             long house_id = GetHouseIdFromFeatureId(feature_id);
+            if (house_id == 0)
+            {
+                return NotFound();
+            }
 
             // Containers on Azure are named "House" + house_id. E.g. House1 is the container
             // for House with ID = 1.
@@ -212,6 +220,10 @@ namespace InspectionReport.Controllers
 
             
             long house_id = this.GetHouseIdFromFeatureId(id);
+            if (house_id == 0)
+            {
+                return NotFound();
+            }
             if(_authorizeService.AuthorizeUserForHouse(house_id, HttpContext.User))
             {
                 return Unauthorized();
@@ -272,6 +284,11 @@ namespace InspectionReport.Controllers
         {
             Feature feature = _context.Feature.Where(f => f.Id == id)
                 .Include(x => x.Category).SingleOrDefault();
+            if (feature == null)
+            {
+                return 0;
+            }
+
             long CatId = feature.Category.Id;
             long HouseId = _context.Categories.Where(x => x.Id == CatId)
                 .Include(h => h.House)

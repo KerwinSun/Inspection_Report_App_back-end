@@ -69,7 +69,7 @@ namespace InspectionReport.Controllers
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings {Top = 10},
-                DocumentTitle = "PDF Report"
+                DocumentTitle = "Inspection PDF Report",
             };
 
             //TODO: 
