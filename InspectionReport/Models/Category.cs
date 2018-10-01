@@ -21,6 +21,7 @@ namespace InspectionReport.Models
         public long Id { get; set; }
         public string Name { get; set; }
         public int Count { get; set; }
+        public int Order { get; set; }
         [Required]
         public House House { get; set; }
 
@@ -29,6 +30,7 @@ namespace InspectionReport.Models
         {
             Name = other.Name;
             Count = other.Count;
+            Order = other.Order;
 
             //Update all "existing" features
             foreach (Feature feature in Features)
