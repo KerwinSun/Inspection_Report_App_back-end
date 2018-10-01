@@ -16,6 +16,7 @@ using PdfSharp.Pdf;
 
 namespace InspectionReport.Controllers
 {
+	[Authorize]
 	[Route("api/Export")]
 	public class ExportController : Controller
 	{
@@ -38,7 +39,7 @@ namespace InspectionReport.Controllers
 		{
 			_context = context;
 			_authorizeService = authorizeService;
-			_iController = new ImageController(_context);
+			_iController = new ImageController(_context, authorizeService);
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
@@ -72,7 +73,7 @@ namespace InspectionReport.Controllers
 
 			foreach (var hu in house.InspectedBy)
 			{
-				User user = _context.Users
+				User user = _context.User
 					.Where(u => u.Id == hu.UserId)
 					.SingleOrDefault();
 
@@ -238,7 +239,8 @@ namespace InspectionReport.Controllers
 					{
 						WriteLine(category.Name + " - " + feature.Name, _normalRegularFont, initialX);
 					}
-					if (_iController.GetImage(feature.Id).Result is OkObjectResult mediaQueryResult)
+					OkObjectResult mediaQueryResult = _iController.GetImage(feature.Id).Result as OkObjectResult;
+					if (mediaQueryResult != null)
 					{
 						List<string> URIResults = mediaQueryResult.Value as List<string>;
 						foreach (string URIResult in URIResults)
