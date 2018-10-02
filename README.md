@@ -31,12 +31,12 @@ https://github.com/Karim-C/Inspection_Report_App_front-end
 ## Link to the API
 Here is the link to the API:
 
-http://inspection-report-app-server.azurewebsites.net/api
+https://inspectionreportservice.azurewebsites.net/api/
 
 ## An example of a URI
-An example of a URI for a GET request to retrieve all Todo Items in the database:
+An example of a URI for a GET request to retrieve all Todo Items in the database (dummy API controller):
 
-http://inspection-report-app-server.azurewebsites.net/api/todo
+https://inspectionreportservice.azurewebsites.net/api/todo
 
 ## Team
 Team members:<br/>
