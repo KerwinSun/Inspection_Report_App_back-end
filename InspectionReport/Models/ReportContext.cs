@@ -30,6 +30,10 @@ namespace InspectionReport.Models
 
         public DbSet<Media> Media { get; set; }
 
+        public DbSet<Client> Client { get; set; }
+
+        public DbSet<AreaInspected> AreaInspected { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

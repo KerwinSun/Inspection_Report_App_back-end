@@ -65,9 +65,13 @@ namespace InspectionReport.Controllers
         [ActionName("login")]
         public async Task<IActionResult> SignIn([FromBody]LoginModel model)
         {
-            // TODO: Sign out to clean up in-case user is attempting to sign-in while already signed-in.
             // Get user and check credentials
             ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return Unauthorized(); //Email not found.
+            }
+
             var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
             if (result.Succeeded)
             {
@@ -76,7 +80,7 @@ namespace InspectionReport.Controllers
             }
             else
             {
-                return BadRequest();
+                return Unauthorized();
             }
         }
 
