@@ -19,10 +19,12 @@ namespace InspectionReport.Controllers
     public class HouseController : Controller
     {
         private readonly ReportContext _context;
+        private readonly IAuthorizeService _authorizeService;
 
-        public HouseController(ReportContext context)
+        public HouseController(ReportContext context, IAuthorizeService authorizeService)
         {
             _context = context;
+            _authorizeService = authorizeService;
         }
 
         [HttpGet(Name = "GetAll")]
@@ -39,6 +41,10 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetHouse")]
         public IActionResult GetById(long id)
         {
+            if (!_authorizeService.AuthorizeUserForHouse(id, HttpContext.User)) {
+                return Unauthorized();
+            }
+
             House house = _context.House
                             .Where(h => h.Id == id)
                             .Include(h => h.Categories)
@@ -63,6 +69,10 @@ namespace InspectionReport.Controllers
             if (house == null)
             {
                 return BadRequest();
+            }
+
+            if (house.Id != 0 && !_authorizeService.AuthorizeUserForHouse(house.Id, HttpContext.User)) {
+                return Unauthorized();
             }
 
             House houseInContext = _context.House
@@ -96,6 +106,10 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
+            if (!_authorizeService.AuthorizeUserForHouse(id, HttpContext.User)) {
+                return Unauthorized();
+            }
+
             House house = _context.House.Find(id);
             if (house == null)
             {
