@@ -41,7 +41,7 @@ namespace InspectionReport.Services.Interfaces
         /// 1. NotFound - no house found fo feature id, or feature id not found.
         /// 2. NoContent - no container for image
         /// 3. Unauthorized - user not belonging to house
-        /// 3. Ok - image urls returned.
+        /// 4. Ok - image urls returned.
         /// 
         /// </summary>
         /// <param name="featureId"></param>
@@ -83,7 +83,7 @@ namespace InspectionReport.Services.Interfaces
                 .ToList();
 
             List<string> uriResults = imageNames
-                .Select(imgName => GetBlobSASUri(container.GetBlockBlobReference(imgName)))
+                .Select(imgName => GetBlobSAsUri(container.GetBlockBlobReference(imgName)))
                 .ToList();
 
             outStatusCode = HttpStatusCode.OK;
@@ -205,16 +205,78 @@ namespace InspectionReport.Services.Interfaces
         /// Deleting images belong to a feature.
         /// 
         /// Possible HTTP status codes:
-        /// 1.
-        /// 2.
-        /// 3.
+        /// 1.Not found: feature id, house id (for feature), image name, or container doesn't exist
+        /// 2.Unauthorized: user did not log in for houseId.
+        /// 3.No content: delete suceessful.
         /// </summary>
         /// <param name="featureId"></param>
         /// <param name="outStatusCode"></param>
-        public void DeleteImageForFeature(long featureId, string fileName, out HttpStatusCode outStatusCode, ClaimsPrincipal userClaim)
+        public void DeleteImageForFeature(long featureId, string imageName, out HttpStatusCode outStatusCode, ClaimsPrincipal userClaim)
         {
+            // Get feature based on ID supplied in Header.
+            Feature feature = _context.Feature.Find(featureId);
+            if (feature == null)
+            {
+                outStatusCode = HttpStatusCode.NotFound;
+                return;
+            }
+
+            long houseId = GetHouseIdFromFeatureId(featureId);
+            if (houseId == 0)
+            {
+                outStatusCode = HttpStatusCode.NotFound;
+                return;
+            }
+
+            if (!_authorizeService.AuthorizeUserForHouse(houseId, userClaim))
+            {
+                outStatusCode = HttpStatusCode.Unauthorized;
+                return;
+            }
+
+            // Check if the container exists
+            var container = client.GetContainerReference(ContainerName + houseId);
+            if (!container.ExistsAsync().Result)
+            {
+                outStatusCode = HttpStatusCode.NotFound;
+                return;
+            }
+
+            // Remove the media CloudBlockBlob record
+            CloudBlockBlob image = container.GetBlockBlobReference(imageName);
+            image.DeleteIfExistsAsync().Wait();
+
+            // Remove the media record from the media table 
+            if (!DeleteMediaFromTable(imageName, featureId))
+            {
+                outStatusCode = HttpStatusCode.NotFound;
+                return;
+            }
+
             outStatusCode = HttpStatusCode.NoContent;
             return;
+        }
+
+        /// <summary>
+        /// Delete the corresponding media record in the table if it exists.
+        /// retruns whether the table record existed.
+        /// </summary>
+        /// <param name="string image_name, long feature_id"></param>
+        /// <returns>IActionResult for HTTP responses</returns>
+        private bool DeleteMediaFromTable(string imageName, long featureId)
+        {
+            Media mediaToDelete = _context
+                .Media
+                .SingleOrDefault(m => m.MediaName == imageName && m.Feature.Id == featureId);
+
+            if (mediaToDelete != null)
+            {
+                _context.Media.Remove(mediaToDelete);
+                _context.SaveChanges();
+                return true;
+            }
+
+            return false;
         }
 
 
@@ -249,7 +311,7 @@ namespace InspectionReport.Services.Interfaces
         /// </summary>
         /// <param name="blob"></param>
         /// <returns></returns>
-        private string GetBlobSASUri(CloudBlockBlob blob)
+        private string GetBlobSAsUri(CloudBlockBlob blob)
         {
             SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy
             {

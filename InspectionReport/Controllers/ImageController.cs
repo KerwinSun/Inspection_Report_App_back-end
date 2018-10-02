@@ -122,114 +122,35 @@ namespace InspectionReport.Controllers
         /// <param name="id">feature-id</param>
         /// <returns>Task<IActionResult> for HTTP response</returns>
         [HttpDelete("{id}", Name = "DeleteImage")]
-        public async Task<IActionResult> DeleteImage(long id)
+        public IActionResult DeleteImage(long id)
         {
             // Get Image name in request
             IHeaderDictionary header = HttpContext.Request.Headers;
 
-            string image_name;
+            string imageName;
 
             if (header.ContainsKey("image-name"))
             {
-                image_name = header["image-name"];
+                imageName = header["image-name"];
             }
             else
             {
                 return BadRequest("No image-name found in the header.");
             }
 
-            
-            long house_id = this.GetHouseIdFromFeatureId(id);
-            if (house_id == 0)
+            _imageService.DeleteImageForFeature(id, imageName, out HttpStatusCode statusCode, HttpContext.User);
+
+            switch (statusCode)
             {
-                return NotFound();
+                case HttpStatusCode.NotFound:
+                    return NotFound();
+                case HttpStatusCode.Unauthorized:
+                    return Unauthorized();
+                case HttpStatusCode.NoContent:
+                    return NoContent();
+                default:
+                    throw new NotImplementedException();
             }
-            if(!_authorizeService.AuthorizeUserForHouse(house_id, HttpContext.User))
-            {
-                return Unauthorized();
-            }
-
-            // Check if the container exists
-            var container = client.GetContainerReference(ContainerName + house_id);
-            if (!await container.ExistsAsync())
-            {
-                return NoContent();
-            }
-
-            // Remove the media CloudBlockBlob record
-            CloudBlockBlob image = container.GetBlockBlobReference(image_name);
-            await image.DeleteIfExistsAsync();
-
-            // Remove the media record from the media table 
-            IActionResult iActionResult = this.DeleteMediaFromTable(image_name, id);
-            if (iActionResult.GetType() == typeof(NotFoundResult))
-            {
-                return NotFound();
-            }
-
-            return NoContent();
-        }
-
-
-        /// <summary>
-        /// Delete the corresponding media record in the table if it exists.
-        /// </summary>
-        /// <param name="string image_name, long feature_id"></param>
-        /// <returns>IActionResult for HTTP responses</returns>
-        private IActionResult DeleteMediaFromTable(string image_name, long feature_id)
-        {
-            Media mediaToDelete = _context
-                .Media
-                .SingleOrDefault(m => m.MediaName == image_name && m.Feature.Id == feature_id);
-
-            if (mediaToDelete == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                _context.Media.Remove(mediaToDelete);
-                _context.SaveChanges();
-
-                return NoContent();
-            }
-        }
-
-        /// <summary>
-        /// Get HouseId corresponding to a feature.
-        /// </summary>
-        /// <param name="feature"></param>
-        /// <returns></returns>
-        private long GetHouseIdFromFeatureId(long id)
-        {
-            Feature feature = _context.Feature.Where(f => f.Id == id)
-                .Include(x => x.Category).SingleOrDefault();
-            if (feature == null)
-            {
-                return 0;
-            }
-
-            long CatId = feature.Category.Id;
-            long HouseId = _context.Categories.Where(x => x.Id == CatId)
-                .Include(h => h.House)
-                .SingleOrDefault().House.Id;
-            return HouseId;
-        }
-
-        /// <summary>
-        /// Method is used to retreive a unique SAS link for a particular blob.
-        /// Shared Access Blob Policy dictates the time period before the link expires
-        /// and Permissions can be set to enable read/ write/ list the blob.
-        /// </summary>
-        /// <param name="blob"></param>
-        /// <returns></returns>
-        private string GetBlobSASUri(CloudBlockBlob blob)
-        {
-            SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy();
-            sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddDays(1);
-            sasConstraints.Permissions = SharedAccessBlobPermissions.Read | SharedAccessBlobPermissions.List;
-            string sasContainerToken = blob.GetSharedAccessSignature(sasConstraints);
-            return blob.Uri.AbsoluteUri + sasContainerToken;
         }
     }
 }
