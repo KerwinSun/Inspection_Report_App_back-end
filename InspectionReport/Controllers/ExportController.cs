@@ -13,10 +13,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
+using PdfSharp.Drawing.Layout;
 
 namespace InspectionReport.Controllers
 {
-	[Authorize]
 	[Route("api/Export")]
 	public class ExportController : Controller
 	{
@@ -33,18 +33,19 @@ namespace InspectionReport.Controllers
 		private const int initialX = 50;
 		private int currentY = initialY;
 		private const int lineSpace = 25;
-		private readonly IAuthorizeService _authorizeService;
+		private XTextFormatter _tf;
 
-		public ExportController(ReportContext context, IAuthorizeService authorizeService)
+		public ExportController(ReportContext context)
 		{
 			_context = context;
-			_authorizeService = authorizeService;
-			_iController = new ImageController(_context, authorizeService);
+			_iController = new ImageController(_context);
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
 			_normalBoldFont = new XFont("Arial", 13, XFontStyle.Bold);
 			_document = new PdfDocument();
+
+			
 		}
 
 		[HttpGet("{id}")]
@@ -109,6 +110,8 @@ namespace InspectionReport.Controllers
 		{
 			_page = _document.AddPage();
 			_gfx = XGraphics.FromPdfPage(_page);
+			_tf = new XTextFormatter(_gfx);
+			//_tf.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
 			_gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
 			currentY = 100;
 			WriteLine("Date of Inspection: ", _normalBoldFont, initialX);
@@ -158,24 +161,15 @@ namespace InspectionReport.Controllers
 
 		private void CreateHousePages(House house)
 		{
-			_page = _document.AddPage();
-			_gfx = XGraphics.FromPdfPage(_page);
-			_gfx.DrawLine(XPens.Black, 460, initialY, 460, _page.Height - initialY);
-			_gfx.DrawLine(XPens.Black, 490, initialY, 490, _page.Height - initialY);
-			_gfx.DrawLine(XPens.Black, 520, initialY, 520, _page.Height - initialY);
-			_gfx.DrawLine(XPens.Black, 550, initialY, 550, _page.Height - initialY);
 			currentY = 50;
+			AddNewPage();
+			NewLine();
 
 			foreach (Category category in house.Categories)
 			{
-				WriteLine(category.Name, _normalBoldFont, initialX);
-				WriteLine("Count: " + category.Count.ToString(), _normalBoldFont, initialX + 300);
-				_gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
-				_gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
+				_gfx.DrawRectangle(XBrushes.SlateGray, initialX, currentY -15, _page.Width - 2*initialX + 5, 25);
+				WriteLine(category.Name + " (Count: " + category.Count.ToString() + ")", _normalBoldFont, initialX);
+				DrawLine();
 				NewLine();
 				DrawFeatures(_gfx, category);
 			}
@@ -183,23 +177,11 @@ namespace InspectionReport.Controllers
 
 		private void DrawFeatures(XGraphics _gfx, Category category)
 		{
-			WriteLine("Name", _normalBoldFont, initialX);
-			WriteLine("Comments", _normalBoldFont, initialX + 200);
-			WriteLine("A", _normalBoldFont, initialX + 420);
-			WriteLine("B", _normalBoldFont, initialX + 450);
-			WriteLine("C", _normalBoldFont, initialX + 480);
-			_gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 35);
-			_gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 35);
-			_gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 35);
-			_gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 35);
-			_gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
-			_gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
-			NewLine();
-
 			foreach (Feature feature in category.Features)
 			{
+
 				WriteLine(feature.Name, _normalRegularFont, initialX);
-				WriteLine(feature.Comments, _normalRegularFont, initialX + 200);
+				WriteLine("Count Count Count Count Count Count Count Count Count Count Count Count Count CountCount Count Count Count Count Count Count Count", _normalRegularFont, initialX + 200, 220);
 				if (feature.Grade == 1)
 				{
 					WriteLine("X", _normalRegularFont, initialX + 420);
@@ -212,11 +194,7 @@ namespace InspectionReport.Controllers
 				{
 					WriteLine("X", _normalRegularFont, initialX + 480);
 				}
-				_gfx.DrawLine(XPens.Black, 460, currentY + 10, 460, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 490, currentY + 10, 490, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 520, currentY + 10, 520, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 550, currentY + 10, 550, currentY + 35);
-				_gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
+				DrawLine();
 				NewLine();
 			}
 		}
@@ -225,6 +203,7 @@ namespace InspectionReport.Controllers
 		{
 			_page = _document.AddPage();
 			_gfx = XGraphics.FromPdfPage(_page);
+			_tf = new XTextFormatter(_gfx);
 			currentY = 50;
 			WriteLine("Images", _normalBoldFont, initialX);
 			NewLine();
@@ -254,6 +233,21 @@ namespace InspectionReport.Controllers
 			}
 		}
 
+		private void WriteLine(string stringToWrite, XFont font, int x, int textWidth)
+		{
+			if (currentY < 700)
+			{
+				_tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, currentY, textWidth, _page.Height), XStringFormats.TopLeft);
+			}
+			else
+			{
+				currentY = initialY;
+				AddNewPage();
+				NewLine();
+				_tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, currentY, textWidth, _page.Height), XStringFormats.TopLeft);
+			}
+		}
+
 		private void WriteLine(string stringToWrite, XFont font, int x)
 		{
 			if (currentY < 700)
@@ -263,16 +257,55 @@ namespace InspectionReport.Controllers
 			else
 			{
 				currentY = initialY;
-				_page = _document.AddPage();
-				_gfx = XGraphics.FromPdfPage(_page);
-				_gfx.DrawLine(XPens.Black, 460, initialY, 460, _page.Height - initialY);
-				_gfx.DrawLine(XPens.Black, 490, initialY, 490, _page.Height - initialY);
-				_gfx.DrawLine(XPens.Black, 520, initialY, 520, _page.Height - initialY);
-				_gfx.DrawLine(XPens.Black, 550, initialY, 550, _page.Height - initialY);
-
+				AddNewPage();
+				NewLine();
 				_gfx.DrawString(stringToWrite, font, XBrushes.Black, x, currentY);
 			}
-			//_gfx.DrawLine(XPens.Silver, initialX, currentY + 10, _page.Width - initialX, currentY + 10);
+		}
+			private void AddNewPage()
+		{
+			_page = _document.AddPage();
+			_gfx = XGraphics.FromPdfPage(_page);
+			_tf = new XTextFormatter(_gfx);
+			WriteLine("A", _normalBoldFont, initialX + 420);
+			WriteLine("B", _normalBoldFont, initialX + 450);
+			WriteLine("C", _normalBoldFont, initialX + 480);
+			_gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
+			_gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
+			_gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 10);
+			_gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 10);
+			_gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 10);
+			_gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 10);
+
+		}
+
+		private void DrawLine()
+		{
+			if (currentY < 700)
+			{
+				_gfx.DrawLine(XPens.Black, 460, currentY -15, 460, currentY +10);
+				_gfx.DrawLine(XPens.Black, 490, currentY -15, 490, currentY +10);
+				_gfx.DrawLine(XPens.Black, 520, currentY -15, 520, currentY +10);
+				_gfx.DrawLine(XPens.Black, 550, currentY -15, 550, currentY +10);
+				_gfx.DrawLine(XPens.LightGray, initialX, currentY +10, 460, currentY +10);
+				_gfx.DrawLine(XPens.LightGray, initialX, currentY -15, 460, currentY -15);
+				_gfx.DrawLine(XPens.Black, 460, currentY +10, 550, currentY + 10);
+				_gfx.DrawLine(XPens.Black, 460, currentY -15, 550, currentY -15);
+			}
+			else
+			{
+				currentY = initialY;
+				_page = _document.AddPage();
+				_gfx = XGraphics.FromPdfPage(_page);
+				_gfx.DrawLine(XPens.Black, 460, currentY -15, 460, currentY +10);
+				_gfx.DrawLine(XPens.Black, 490, currentY -15, 490, currentY +10);
+				_gfx.DrawLine(XPens.Black, 520, currentY -15, 520, currentY +10);
+				_gfx.DrawLine(XPens.Black, 550, currentY -15, 550, currentY +10);
+				_gfx.DrawLine(XPens.LightGray, initialX, currentY +10, 460, currentY +10);
+				_gfx.DrawLine(XPens.LightGray, initialX, currentY -15, 460, currentY -15);
+				_gfx.DrawLine(XPens.Black, 460, currentY +10, 550, currentY +10);
+				_gfx.DrawLine(XPens.Black, 460, currentY -15, 550, currentY -15);
+			}
 		}
 
 		private void AddFooter()
@@ -283,6 +316,11 @@ namespace InspectionReport.Controllers
 		private void NewLine()
 		{
 			currentY += lineSpace;
+		}
+
+		private double spaceWidth()
+		{
+			return _gfx.MeasureString("Hello World!", _normalRegularFont).Width;
 		}
 	}
 }
