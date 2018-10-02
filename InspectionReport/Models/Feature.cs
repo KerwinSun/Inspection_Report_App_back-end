@@ -13,10 +13,11 @@ namespace InspectionReport.Models
     public class Feature : IUpdatable<Feature>
     {
         public long Id { get; set; }
-        [Range(1,5)]
+        [Range(1, 5)]
         public int? Grade { get; set; }
         public string Name { get; set; }
         public string Comments { get; set; }
+        public int Order { get; set; }
         public Category Category { get; set; }
         public ICollection<Media> ImageFileNames { get; set; }
 
@@ -24,6 +25,7 @@ namespace InspectionReport.Models
         {
             Grade = other.Grade;
             Name = other.Name;
+            Order = other.Order;
             Comments = other.Comments;
         }
     }
