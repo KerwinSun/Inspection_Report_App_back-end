@@ -14,14 +14,15 @@ using Microsoft.EntityFrameworkCore;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing.Layout;
+using System.Net;
 
 namespace InspectionReport.Controllers
 {
+    [Authorize]
 	[Route("api/Export")]
 	public class ExportController : Controller
 	{
 		private readonly ReportContext _context;
-		private ImageController _iController;
 		private ImageHandler _imageHandler;
 		private XFont _largeRegularFont;
 		private XFont _normalRegularFont;
@@ -34,12 +35,12 @@ namespace InspectionReport.Controllers
 		private int currentY = initialY;
 		private const int lineSpace = 25;
 		private XTextFormatter _tf;
-		private readonly IAuthorizeService _authorizeService;
+        private readonly IImageService _imageService;
 
-		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
+		public ExportController(ReportContext context, IImageService imageService)
 		{
 			_context = context;
-			_iController = new ImageController(_context, authorizeService, imageService);
+            _imageService = imageService;
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
@@ -219,15 +220,18 @@ namespace InspectionReport.Controllers
 					{
 						WriteLine(category.Name + " - " + feature.Name, _normalRegularFont, initialX);
 					}
-                    if (_iController.GetImage(feature.Id) is OkObjectResult mediaQueryResult)
+
+                    List<string> URIResults = _imageService.GetUriResultsForFeature(feature.Id, out HttpStatusCode statusCode, HttpContext.User);
+                    if (statusCode != HttpStatusCode.OK)
                     {
-                        List<string> URIResults = mediaQueryResult.Value as List<string>;
-                        foreach (string URIResult in URIResults)
-                        {
-                            XImage image = _imageHandler.FromURI(URIResult.ToString());
-                            double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
-                            _gfx.DrawImage(image, initialX + 10, currentY + 10, image.PixelWidth / scale, image.PixelHeight / scale);
-                        }
+                        //TODO: @CJ think about what happens when image cannot be get. 
+                        throw new NotImplementedException("Unexpected error, image cannot be found or is unauthorized.");
+                    }
+                    foreach (string URIResult in URIResults)
+                    {
+                        XImage image = _imageHandler.FromURI(URIResult.ToString());
+                        double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+                        _gfx.DrawImage(image, initialX + 10, currentY + 10, image.PixelWidth / scale, image.PixelHeight / scale);
                     }
                 }
 			}
