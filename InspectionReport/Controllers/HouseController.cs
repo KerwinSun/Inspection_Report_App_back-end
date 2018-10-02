@@ -53,15 +53,19 @@ namespace InspectionReport.Controllers
                             .Include(h => h.InspectedBy)
                             .SingleOrDefault();
 
-
             if (house == null)
             {
                 return NotFound();
             }
-            else
+
+            //Need to perform sorting according to order of house/elements. 
+            house.Categories = house.Categories.OrderBy(c => c.Order).ToList();
+            foreach (Category cat in house.Categories)
             {
-                return Ok(house);
+                cat.Features = cat.Features.OrderBy(f => f.Order).ToList();
             }
+
+            return Ok(house);
         }
 
         [HttpPost]
