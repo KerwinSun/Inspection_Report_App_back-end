@@ -56,7 +56,7 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetImage")]
         public IActionResult GetImage(long id)
         {
-            List<string> uriResults = _imageService.GetUriResultsForFeature(id, out HttpStatusCode outStatus);
+            List<string> uriResults = _imageService.GetUriResultsForFeature(id, out HttpStatusCode outStatus, HttpContext.User);
             switch (outStatus)
             {
                 case HttpStatusCode.NotFound:
@@ -65,6 +65,8 @@ namespace InspectionReport.Controllers
                     return NoContent();
                 case HttpStatusCode.OK:
                     return Ok(uriResults);
+                case HttpStatusCode.Unauthorized:
+                    return Unauthorized();
                 default:
                     throw new NotImplementedException();
             }
@@ -78,7 +80,7 @@ namespace InspectionReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> PostImage()
+        public IActionResult PostImage()
         {
             IFormCollection requestForm = HttpContext.Request.Form;
             IHeaderDictionary header = HttpContext.Request.Headers;
@@ -93,92 +95,19 @@ namespace InspectionReport.Controllers
                 return BadRequest("No feature-id found in the header.");
             }
 
-            // Get feature based on ID supplied in Header.
-            Feature feature = _context.Feature.Find(feature_id);
-            if (feature == null)
+            _imageService.PostImageForFeature(feature_id, requestForm?.Files, out HttpStatusCode statusCode);
+
+            switch (statusCode)
             {
-                return NotFound();
+                case HttpStatusCode.NotFound:
+                    return NotFound();
+                case HttpStatusCode.BadRequest:
+                    return BadRequest("No file found in form.");
+                case HttpStatusCode.NoContent:
+                    return NoContent();
+                default:
+                    throw new NotImplementedException();
             }
-
-            long house_id = GetHouseIdFromFeatureId(feature_id);
-            if (house_id == 0)
-            {
-                return NotFound();
-            }
-
-            // Containers on Azure are named "House" + house_id. E.g. House1 is the container
-            // for House with ID = 1.
-            string container_name = ContainerName + house_id;
-            var container = client.GetContainerReference(container_name);
-            await container.CreateIfNotExistsAsync();
-
-            // Check for any uploaded file  
-            if (requestForm.Files.Count > 0)
-            {
-                //Loop through uploaded files  
-                for (int i = 0; i < requestForm.Files.Count; i++)
-                {
-                    List<string> validTypes = new List<string>()
-                    {
-                        "image/png",
-                        "image/jpeg",
-                        "image/hevc",
-                        "image/heif",
-                        "image/heic"
-                    };
-
-                    IFormFile postedFile = requestForm.Files[i];
-                    // verify file is of correct type.
-                    if (validTypes.FindIndex(x => x.Equals(postedFile.ContentType,
-                            StringComparison.OrdinalIgnoreCase)) == -1)
-                    {
-                        Console.Write("Invalid file type");
-                        continue;
-                    }
-
-                    if (postedFile != null)
-                    {
-                        int fileNameStartLocation = postedFile.FileName.LastIndexOf("\\") + 1;
-                        string fileName = postedFile.FileName.Substring(fileNameStartLocation);
-
-                        CloudBlockBlob blockBlobImage = container.GetBlockBlobReference(fileName);
-
-                        Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US"); //need to change culture so that english is always appended.
-                        blockBlobImage.Metadata.Add("DateCreated", DateTime.UtcNow.ToLongDateString());
-                        blockBlobImage.Metadata.Add("TimeCreated", DateTime.UtcNow.ToLongTimeString());
-
-                        MemoryStream memoryStream = new MemoryStream();
-                        blockBlobImage.Properties.ContentType = postedFile.ContentType;
-                        MagickImage image = new MagickImage(postedFile.OpenReadStream());
-                        image.AutoOrient();
-
-                        await memoryStream.WriteAsync(image.ToByteArray(), 0, image.ToByteArray().Length);
-
-                        memoryStream.Position = 0;
-                        await blockBlobImage.UploadFromStreamAsync(memoryStream);
-
-                        // Check that media object doesn't already exist.
-                        Media existingMedia = _context.Media.Where(m => m.Feature == feature && m.MediaName == fileName)
-                            .SingleOrDefault();
-                        if (existingMedia == null)
-                        {
-                            Media media = new Media
-                            {
-                                Feature = feature,
-                                MediaName = fileName
-                            };
-                            _context.Media.Add(media);
-                            _context.SaveChanges();
-                        }
-                    }
-                }
-            }
-            else
-            {
-                return NoContent(); // No image uploaded.
-            }
-
-            return Ok();
         }
 
 
@@ -215,7 +144,7 @@ namespace InspectionReport.Controllers
             {
                 return NotFound();
             }
-            if(_authorizeService.AuthorizeUserForHouse(house_id, HttpContext.User))
+            if(!_authorizeService.AuthorizeUserForHouse(house_id, HttpContext.User))
             {
                 return Unauthorized();
             }
