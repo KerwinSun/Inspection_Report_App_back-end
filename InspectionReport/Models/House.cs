@@ -28,6 +28,7 @@ namespace InspectionReport.Models
         public Client SummonsedBy { get; set; }
         public string ConstructionType { get; set; }
         public string Comments { get; set; }
+        public string PrivateComments { get; set; }
         public string EstimateSummary { get; set; }
         public string RoomsSummary { get; set; }
         public AreaInspected AreaInspected { get; set; }
@@ -48,6 +49,7 @@ namespace InspectionReport.Models
             Comments = other.Comments;
             EstimateSummary = other.EstimateSummary;
             RoomsSummary = other.RoomsSummary;
+            PrivateComments = other.PrivateComments;
 
 
             //add all new HouseUser objects
