@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace InspectionReport.Services.Interfaces
 {
+    /// <summary>
+    /// Business logic to do with CRUD of images. 
+    /// </summary>
     public class ImageService : IImageService
     {
         private readonly ReportContext _context;
@@ -176,7 +179,7 @@ namespace InspectionReport.Services.Interfaces
                     Task uploadTask = blockBlobImage.UploadFromStreamAsync(memoryStream);
                     asyncTasks.Add(uploadTask);
 
-                    
+
                     // Check that media object doesn't already exist.
                     Media existingMedia = _context.Media
                         .Where(m => m.Feature == feature && m.MediaName == fileName)
@@ -297,11 +300,12 @@ namespace InspectionReport.Services.Interfaces
                 return 0;
             }
 
-            long CatId = feature.Category.Id;
-            long HouseId = _context.Categories.Where(x => x.Id == CatId)
+            long categoryId = feature.Category.Id;
+            long houseId = _context.Categories.Where(x => x.Id == categoryId)
                 .Include(h => h.House)
-                .SingleOrDefault().House.Id;
-            return HouseId;
+                .SingleOrDefault()
+                .House.Id;
+            return houseId;
         }
 
         /// <summary>

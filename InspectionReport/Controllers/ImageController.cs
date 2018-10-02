@@ -40,8 +40,8 @@ namespace InspectionReport.Controllers
             _context = context;
             _authorizeService = authorizeService;
             _imageService = imageService;
-            
-            String storageConnectionString =
+
+            string storageConnectionString =
                 "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
             client = storageAccount.CreateCloudBlobClient();
