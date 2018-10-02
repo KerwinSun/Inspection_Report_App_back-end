@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using InspectionReport.Services.Interfaces;
+using System.Net;
+using System.Globalization;
+using System.Threading;
 
 namespace InspectionReport.Controllers
 {
@@ -24,6 +27,7 @@ namespace InspectionReport.Controllers
 
         private readonly CloudBlobClient client;
         private readonly IAuthorizeService _authorizeService;
+        private readonly IImageService _imageService;
 
         /// <summary>
         /// The constructor initialises the Blob Strage and the context.
@@ -31,11 +35,13 @@ namespace InspectionReport.Controllers
         /// Authentication is complete.
         /// </summary>
         /// <param name="context"></param>
-        public ImageController(ReportContext context, IAuthorizeService authorizeService)
+        public ImageController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
         {
             _context = context;
             _authorizeService = authorizeService;
-            String storageConnectionString =
+            _imageService = imageService;
+
+            string storageConnectionString =
                 "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
             client = storageAccount.CreateCloudBlobClient();
@@ -48,36 +54,22 @@ namespace InspectionReport.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}", Name = "GetImage")]
-        public async Task<IActionResult> GetImage(long id)
+        public IActionResult GetImage(long id)
         {
-            ICollection<IActionResult> fileList = new List<IActionResult>();
-
-            Feature feature = _context.Feature.Find(id);
-            long house_id = GetHouseIdFromFeatureId(id);
-            if (house_id == 0)
+            List<string> uriResults = _imageService.GetUriResultsForFeature(id, out HttpStatusCode outStatus, HttpContext.User);
+            switch (outStatus)
             {
-                return NotFound();
+                case HttpStatusCode.NotFound:
+                    return NotFound();
+                case HttpStatusCode.NoContent:
+                    return NoContent();
+                case HttpStatusCode.OK:
+                    return Ok(uriResults);
+                case HttpStatusCode.Unauthorized:
+                    return Unauthorized();
+                default:
+                    throw new NotImplementedException();
             }
-
-            if (!_authorizeService.AuthorizeUserForHouse(house_id, HttpContext?.User))
-            {
-                return Unauthorized();
-            }
-
-            var container = client.GetContainerReference(ContainerName + house_id);
-            if (!await container.ExistsAsync())
-            {
-                return NoContent();
-            }
-
-            List<string> imageNames = new List<string>();
-            _context.Media.Where(m => m.Feature == feature).ToList().ForEach(m => imageNames.Add(m.MediaName));
-
-            List<string> UriResults = imageNames
-                .Select(imgName => GetBlobSASUri(container.GetBlockBlobReference(imgName)))
-                .ToList();
-
-            return Ok(UriResults);
         }
 
         /// <summary>
@@ -88,7 +80,7 @@ namespace InspectionReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> PostImage()
+        public IActionResult PostImage()
         {
             IFormCollection requestForm = HttpContext.Request.Form;
             IHeaderDictionary header = HttpContext.Request.Headers;
@@ -103,91 +95,19 @@ namespace InspectionReport.Controllers
                 return BadRequest("No feature-id found in the header.");
             }
 
-            // Get feature based on ID supplied in Header.
-            Feature feature = _context.Feature.Find(feature_id);
-            if (feature == null)
+            _imageService.PostImageForFeature(feature_id, requestForm?.Files, out HttpStatusCode statusCode);
+
+            switch (statusCode)
             {
-                return NotFound();
+                case HttpStatusCode.NotFound:
+                    return NotFound();
+                case HttpStatusCode.BadRequest:
+                    return BadRequest("No file found in form.");
+                case HttpStatusCode.NoContent:
+                    return NoContent();
+                default:
+                    throw new NotImplementedException();
             }
-
-            long house_id = GetHouseIdFromFeatureId(feature_id);
-            if (house_id == 0)
-            {
-                return NotFound();
-            }
-
-            // Containers on Azure are named "House" + house_id. E.g. House1 is the container
-            // for House with ID = 1.
-            string container_name = ContainerName + house_id;
-            var container = client.GetContainerReference(container_name);
-            await container.CreateIfNotExistsAsync();
-
-            // Check for any uploaded file  
-            if (requestForm.Files.Count > 0)
-            {
-                //Loop through uploaded files  
-                for (int i = 0; i < requestForm.Files.Count; i++)
-                {
-                    List<string> validTypes = new List<string>()
-                    {
-                        "image/png",
-                        "image/jpeg",
-                        "image/hevc",
-                        "image/heif",
-                        "image/heic"
-                    };
-
-                    IFormFile postedFile = requestForm.Files[i];
-                    // verify file is of correct type.
-                    if (validTypes.FindIndex(x => x.Equals(postedFile.ContentType,
-                            StringComparison.OrdinalIgnoreCase)) == -1)
-                    {
-                        Console.Write("Invalid file type");
-                        continue;
-                    }
-
-                    if (postedFile != null)
-                    {
-                        int fileNameStartLocation = postedFile.FileName.LastIndexOf("\\") + 1;
-                        string fileName = postedFile.FileName.Substring(fileNameStartLocation);
-
-                        CloudBlockBlob blockBlobImage = container.GetBlockBlobReference(fileName);
-
-                        blockBlobImage.Metadata.Add("DateCreated", DateTime.UtcNow.ToLongDateString());
-                        blockBlobImage.Metadata.Add("TimeCreated", DateTime.UtcNow.ToLongTimeString());
-
-                        MemoryStream memoryStream = new MemoryStream();
-                        blockBlobImage.Properties.ContentType = postedFile.ContentType;
-                        MagickImage image = new MagickImage(postedFile.OpenReadStream());
-                        image.AutoOrient();
-
-                        await memoryStream.WriteAsync(image.ToByteArray(), 0, image.ToByteArray().Length);
-
-                        memoryStream.Position = 0;
-                        await blockBlobImage.UploadFromStreamAsync(memoryStream);
-
-                        // Check that media object doesn't already exist.
-                        Media existingMedia = _context.Media.Where(m => m.Feature == feature && m.MediaName == fileName)
-                            .SingleOrDefault();
-                        if (existingMedia == null)
-                        {
-                            Media media = new Media
-                            {
-                                Feature = feature,
-                                MediaName = fileName
-                            };
-                            _context.Media.Add(media);
-                            _context.SaveChanges();
-                        }
-                    }
-                }
-            }
-            else
-            {
-                return NoContent(); // No image uploaded.
-            }
-
-            return Ok();
         }
 
 
@@ -202,114 +122,35 @@ namespace InspectionReport.Controllers
         /// <param name="id">feature-id</param>
         /// <returns>Task<IActionResult> for HTTP response</returns>
         [HttpDelete("{id}", Name = "DeleteImage")]
-        public async Task<IActionResult> DeleteImage(long id)
+        public IActionResult DeleteImage(long id)
         {
             // Get Image name in request
             IHeaderDictionary header = HttpContext.Request.Headers;
 
-            string image_name;
+            string imageName;
 
             if (header.ContainsKey("image-name"))
             {
-                image_name = header["image-name"];
+                imageName = header["image-name"];
             }
             else
             {
                 return BadRequest("No image-name found in the header.");
             }
 
-            
-            long house_id = this.GetHouseIdFromFeatureId(id);
-            if (house_id == 0)
+            _imageService.DeleteImageForFeature(id, imageName, out HttpStatusCode statusCode, HttpContext.User);
+
+            switch (statusCode)
             {
-                return NotFound();
+                case HttpStatusCode.NotFound:
+                    return NotFound();
+                case HttpStatusCode.Unauthorized:
+                    return Unauthorized();
+                case HttpStatusCode.NoContent:
+                    return NoContent();
+                default:
+                    throw new NotImplementedException();
             }
-            if(_authorizeService.AuthorizeUserForHouse(house_id, HttpContext.User))
-            {
-                return Unauthorized();
-            }
-
-            // Check if the container exists
-            var container = client.GetContainerReference(ContainerName + house_id);
-            if (!await container.ExistsAsync())
-            {
-                return NoContent();
-            }
-
-            // Remove the media CloudBlockBlob record
-            CloudBlockBlob image = container.GetBlockBlobReference(image_name);
-            await image.DeleteIfExistsAsync();
-
-            // Remove the media record from the media table 
-            IActionResult iActionResult = this.DeleteMediaFromTable(image_name, id);
-            if (iActionResult.GetType() == typeof(NotFoundResult))
-            {
-                return NotFound();
-            }
-
-            return NoContent();
-        }
-
-
-        /// <summary>
-        /// Delete the corresponding media record in the table if it exists.
-        /// </summary>
-        /// <param name="string image_name, long feature_id"></param>
-        /// <returns>IActionResult for HTTP responses</returns>
-        private IActionResult DeleteMediaFromTable(string image_name, long feature_id)
-        {
-            Media mediaToDelete = _context
-                .Media
-                .SingleOrDefault(m => m.MediaName == image_name && m.Feature.Id == feature_id);
-
-            if (mediaToDelete == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                _context.Media.Remove(mediaToDelete);
-                _context.SaveChanges();
-
-                return NoContent();
-            }
-        }
-
-        /// <summary>
-        /// Get HouseId corresponding to a feature.
-        /// </summary>
-        /// <param name="feature"></param>
-        /// <returns></returns>
-        private long GetHouseIdFromFeatureId(long id)
-        {
-            Feature feature = _context.Feature.Where(f => f.Id == id)
-                .Include(x => x.Category).SingleOrDefault();
-            if (feature == null)
-            {
-                return 0;
-            }
-
-            long CatId = feature.Category.Id;
-            long HouseId = _context.Categories.Where(x => x.Id == CatId)
-                .Include(h => h.House)
-                .SingleOrDefault().House.Id;
-            return HouseId;
-        }
-
-        /// <summary>
-        /// Method is used to retreive a unique SAS link for a particular blob.
-        /// Shared Access Blob Policy dictates the time period before the link expires
-        /// and Permissions can be set to enable read/ write/ list the blob.
-        /// </summary>
-        /// <param name="blob"></param>
-        /// <returns></returns>
-        private string GetBlobSASUri(CloudBlockBlob blob)
-        {
-            SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy();
-            sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddDays(1);
-            sasConstraints.Permissions = SharedAccessBlobPermissions.Read | SharedAccessBlobPermissions.List;
-            string sasContainerToken = blob.GetSharedAccessSignature(sasConstraints);
-            return blob.Uri.AbsoluteUri + sasContainerToken;
         }
     }
 }

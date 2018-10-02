@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace InspectionReport.Services
 {
+    /// <summary>
+    /// Business logic to do with authorization of users in different controllers
+    /// </summary>
     public class AuthorizeService : IAuthorizeService
     {
         private readonly ReportContext _context;

@@ -1,13 +1,20 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using DinkToPdf;
-using DinkToPdf.Contracts;
+using System.Threading.Tasks;
 using InspectionReport.Models;
 using InspectionReport.Services.Interfaces;
 using InspectionReport.Utility;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
+using PdfSharp.Drawing.Layout;
+using System.Net;
 
 namespace InspectionReport.Controllers
 {
@@ -16,22 +23,42 @@ namespace InspectionReport.Controllers
     public class ExportController : Controller
     {
         private readonly ReportContext _context;
-        private readonly IConverter _converter;
-        private readonly IAuthorizeService _authorizeService;
+        private ImageHandler _imageHandler;
+        private XFont _largeRegularFont;
+        private XFont _normalRegularFont;
+        private XFont _normalBoldFont;
+        private PdfDocument _document;
+        private PdfPage _page;
+        private XGraphics _gfx;
+        private const int initialY = 50;
+        private const int initialX = 50;
+        private int currentY = initialY;
+        private const int lineSpace = 25;
+        private XTextFormatter _tf;
+        private readonly IImageService _imageService;
 
-        public ExportController(ReportContext context, IConverter converter, IAuthorizeService authorizeService)
+        public ExportController(ReportContext context, IImageService imageService)
         {
             _context = context;
-            _converter = converter;
-            _authorizeService = authorizeService;
+            _imageService = imageService;
+            _imageHandler = new ImageHandler();
+            _largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
+            _normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
+            _normalBoldFont = new XFont("Arial", 13, XFontStyle.Bold);
+            _document = new PdfDocument();
+
+
         }
 
-        /// <summary>
-        /// Generate the PDF report for a specific house.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>byte[] for the PDF report file</returns>
-        private byte[] GeneratePDF(long id)
+        [HttpGet("{id}")]
+        public IActionResult GeneratePDF(long id)
+        {
+            FileResult file = CreatePDF(id);
+
+            return file ?? (IActionResult)NotFound();
+        }
+
+        private FileResult CreatePDF(long id)
         {
             House house = _context.House
                 .Where(h => h.Id == id)
@@ -63,59 +90,240 @@ namespace InspectionReport.Controllers
                 }
             }
 
-            GlobalSettings globalSettings = new GlobalSettings
+            CreateTitlePage(house, names);
+            CreateHousePages(house);
+            CreateImagePages(house);
+
+            string pdfFilename = "InspectionReport" + house.Id + ".pdf";
+
+            using (MemoryStream ms = new MemoryStream())
             {
-                ColorMode = ColorMode.Color,
-                Orientation = Orientation.Portrait,
-                PaperSize = PaperKind.A4,
-                Margins = new MarginSettings {Top = 10},
-                DocumentTitle = "Inspection PDF Report",
-            };
-
-            //TODO: 
-            //I strongly recommend this to be created as a service and be injected via DI. (Victor)
-            TemplateGenerator templateGenerator = new TemplateGenerator(_context, _authorizeService);
-
-
-            ObjectSettings objectSettings = new ObjectSettings
-            {
-                PagesCount = true,
-
-
-                HtmlContent = templateGenerator.Generate(house,
-                    names),
-
-                WebSettings =
-                {
-                    DefaultEncoding = "utf-8",
-                    UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "styles.css")
-                },
-                HeaderSettings = {FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true},
-                FooterSettings = {FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer"}
-            };
-
-            HtmlToPdfDocument pdf = new HtmlToPdfDocument
-            {
-                GlobalSettings = globalSettings,
-                Objects = {objectSettings}
-            };
-
-            byte[] file = _converter.Convert(pdf);
-
-            return file;
+                _document.Save(ms, false);
+                byte[] buffer = new byte[ms.Length];
+                ms.Seek(0, SeekOrigin.Begin);
+                ms.Flush();
+                ms.Read(buffer, 0, (int)ms.Length);
+                byte[] docBytes = ms.ToArray();
+                return File(docBytes, "application/pdf", pdfFilename);
+            }
         }
 
-        /// <summary>
-        /// Get the PDF report for a specific house.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>IActionResult for HTTP response</returns>
-        [HttpGet("{id}", Name = "GetPDF")]
-        public IActionResult GetPDF(long id)
+        private void CreateTitlePage(House house, string names)
         {
-            byte[] file = this.GeneratePDF(id);
+            _page = _document.AddPage();
+            _gfx = XGraphics.FromPdfPage(_page);
+            _tf = new XTextFormatter(_gfx);
+            _gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
+            currentY = 100;
+            WriteLine("Date of Inspection: ", _normalBoldFont, initialX);
+            WriteLine(house.InspectionDate.ToShortDateString(), _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Client Information", _normalBoldFont, initialX);
+            NewLine();
+            WriteLine("Summonsed By: ", _normalBoldFont, initialX);
+            WriteLine("summonsed by", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Inspected By: ", _normalBoldFont, initialX);
+            WriteLine(names, _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Contact Details", _normalBoldFont, initialX);
+            NewLine();
+            WriteLine("Home ph #: ", _normalBoldFont, initialX);
+            WriteLine("home phone number", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Mobile #: ", _normalBoldFont, initialX);
+            WriteLine("mobile number", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Address: ", _normalBoldFont, initialX);
+            WriteLine("client address", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Email Address: ", _normalBoldFont, initialX);
+            WriteLine("email address", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Real Estate & Agent: ", _normalBoldFont, initialX);
+            WriteLine("real estate & agent", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("House Description", _normalBoldFont, initialX);
+            NewLine();
+            WriteLine("Estimate Summary: ", _normalBoldFont, initialX);
+            WriteLine("estimate summary", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Rooms Summary: ", _normalBoldFont, initialX);
+            WriteLine("rooms summary", _normalRegularFont, initialX + 200);
+            NewLine();
+            WriteLine("Construction Types: ", _normalBoldFont, initialX);
+            WriteLine("construction type", _normalRegularFont, initialX + 200);
+            NewLine();
+            //XImage image = _imageHandler.FromURI(house.categories[0].);
+            //XImage image = _imageHandler.FromURI("https://camo.githubusercontent.com/556a7850bef41de27438eeebc4c1acbdc494d9c5/68747470733a2f2f692e696d6775722e636f6d2f687a3863486e712e706e67");
+            //double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+            //_gfx.DrawImage(image, initialX + 10, currentY, image.PixelWidth / scale, image.PixelHeight / scale);
+        }
 
-            return file == null ? (IActionResult) NotFound() : File(file, "application/pdf");
+        private void CreateHousePages(House house)
+        {
+            currentY = 50;
+            AddNewPage();
+            NewLine();
+
+            foreach (Category category in house.Categories)
+            {
+                _gfx.DrawRectangle(XBrushes.SlateGray, initialX, currentY - 15, _page.Width - 2 * initialX + 5, 25);
+                WriteLine(category.Name + " (Count: " + category.Count.ToString() + ")", _normalBoldFont, initialX);
+                DrawLine();
+                NewLine();
+                DrawFeatures(_gfx, category);
+            }
+        }
+
+        private void DrawFeatures(XGraphics _gfx, Category category)
+        {
+            foreach (Feature feature in category.Features)
+            {
+
+                WriteLine(feature.Name, _normalRegularFont, initialX);
+                WriteLine(feature.Comments, _normalRegularFont, initialX + 200, 220);
+                if (feature.Grade == 1)
+                {
+                    WriteLine("X", _normalRegularFont, initialX + 420);
+                }
+                else if (feature.Grade == 2)
+                {
+                    WriteLine("X", _normalRegularFont, initialX + 450);
+                }
+                else if (feature.Grade == 3)
+                {
+                    WriteLine("X", _normalRegularFont, initialX + 480);
+                }
+                DrawLine();
+                NewLine();
+            }
+        }
+
+        private void CreateImagePages(House house)
+        {
+            _page = _document.AddPage();
+            _gfx = XGraphics.FromPdfPage(_page);
+            _tf = new XTextFormatter(_gfx);
+            currentY = 50;
+            WriteLine("Images", _normalBoldFont, initialX);
+            NewLine();
+
+            foreach (Category category in house.Categories)
+            {
+                foreach (Feature feature in category.Features)
+                {
+                    List<Media> medias = _context.Media
+                        .Where(m => m.Feature == feature).ToList();
+                    if (medias != null && medias.Count != 0)
+                    {
+                        WriteLine(category.Name + " - " + feature.Name, _normalRegularFont, initialX);
+                    }
+
+                    List<string> URIResults = _imageService.GetUriResultsForFeature(feature.Id, out HttpStatusCode statusCode, HttpContext.User);
+                    if (statusCode != HttpStatusCode.OK)
+                    {
+                        //TODO: @CJ think about what happens when image cannot be get. 
+                        throw new NotImplementedException("Unexpected error, image cannot be found or is unauthorized.");
+                    }
+                    foreach (string URIResult in URIResults)
+                    {
+                        XImage image = _imageHandler.FromURI(URIResult.ToString());
+                        double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+                        _gfx.DrawImage(image, initialX + 10, currentY + 10, image.PixelWidth / scale, image.PixelHeight / scale);
+                    }
+                }
+            }
+        }
+
+        private void WriteLine(string stringToWrite, XFont font, int x, int textWidth)
+        {
+            if (currentY < 700)
+            {
+                _tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, currentY, textWidth, _page.Height), XStringFormats.TopLeft);
+            }
+            else
+            {
+                currentY = initialY;
+                AddNewPage();
+                NewLine();
+                _tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, currentY, textWidth, _page.Height), XStringFormats.TopLeft);
+            }
+        }
+
+        private void WriteLine(string stringToWrite, XFont font, int x)
+        {
+            if (currentY < 700)
+            {
+                _gfx.DrawString(stringToWrite, font, XBrushes.Black, x, currentY);
+            }
+            else
+            {
+                currentY = initialY;
+                AddNewPage();
+                NewLine();
+                _gfx.DrawString(stringToWrite, font, XBrushes.Black, x, currentY);
+            }
+        }
+        private void AddNewPage()
+        {
+            _page = _document.AddPage();
+            _gfx = XGraphics.FromPdfPage(_page);
+            _tf = new XTextFormatter(_gfx);
+            WriteLine("A", _normalBoldFont, initialX + 420);
+            WriteLine("B", _normalBoldFont, initialX + 450);
+            WriteLine("C", _normalBoldFont, initialX + 480);
+            _gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
+            _gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
+            _gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 10);
+            _gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 10);
+            _gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 10);
+            _gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 10);
+
+        }
+
+        private void DrawLine()
+        {
+            if (currentY < 700)
+            {
+                _gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 10);
+                _gfx.DrawLine(XPens.LightGray, initialX, currentY + 10, 460, currentY + 10);
+                _gfx.DrawLine(XPens.LightGray, initialX, currentY - 15, 460, currentY - 15);
+                _gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
+            }
+            else
+            {
+                currentY = initialY;
+                _page = _document.AddPage();
+                _gfx = XGraphics.FromPdfPage(_page);
+                _gfx.DrawLine(XPens.Black, 460, currentY - 15, 460, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 490, currentY - 15, 490, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 520, currentY - 15, 520, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 550, currentY - 15, 550, currentY + 10);
+                _gfx.DrawLine(XPens.LightGray, initialX, currentY + 10, 460, currentY + 10);
+                _gfx.DrawLine(XPens.LightGray, initialX, currentY - 15, 460, currentY - 15);
+                _gfx.DrawLine(XPens.Black, 460, currentY + 10, 550, currentY + 10);
+                _gfx.DrawLine(XPens.Black, 460, currentY - 15, 550, currentY - 15);
+            }
+        }
+
+        private void AddFooter()
+        {
+
+        }
+
+        private void NewLine()
+        {
+            currentY += lineSpace;
+        }
+
+        private double spaceWidth()
+        {
+            return _gfx.MeasureString("Hello World!", _normalRegularFont).Width;
         }
     }
 }

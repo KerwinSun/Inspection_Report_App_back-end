@@ -19,12 +19,12 @@ namespace InspectionReport.Controllers
     public class HouseController : Controller
     {
         private readonly ReportContext _context;
-        private readonly IAuthorizeService _authService;
+        private readonly IAuthorizeService _authorizeService;
 
-        public HouseController(ReportContext context, IAuthorizeService authService)
+        public HouseController(ReportContext context, IAuthorizeService authorizeService)
         {
             _context = context;
-            _authService = authService;
+            _authorizeService = authorizeService;
         }
 
         [HttpGet(Name = "GetAll")]
@@ -33,7 +33,7 @@ namespace InspectionReport.Controllers
             ICollection<House> houses = _context.House
                                     .Include(h => h.Categories)
                                         .ThenInclude(c => c.Features)
-                                    .ToList();            
+                                    .ToList();
             return Ok(houses);
         }
 
@@ -41,7 +41,7 @@ namespace InspectionReport.Controllers
         [HttpGet("{id}", Name = "GetHouse")]
         public IActionResult GetById(long id)
         {
-            if (!_authService.AuthorizeUserForHouse(id, HttpContext?.User))
+            if (!_authorizeService.AuthorizeUserForHouse(id, HttpContext.User))
             {
                 return Unauthorized();
             }
@@ -76,8 +76,7 @@ namespace InspectionReport.Controllers
                 return BadRequest();
             }
 
-            //Editing a house needs authorization.
-            if (house.Id != 0 && !_authService.AuthorizeUserForHouse(house.Id, HttpContext?.User))
+            if (house.Id != 0 && !_authorizeService.AuthorizeUserForHouse(house.Id, HttpContext.User))
             {
                 return Unauthorized();
             }
@@ -113,6 +112,11 @@ namespace InspectionReport.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
+            if (!_authorizeService.AuthorizeUserForHouse(id, HttpContext.User))
+            {
+                return Unauthorized();
+            }
+
             House house = _context.House.Find(id);
             if (house == null)
             {
