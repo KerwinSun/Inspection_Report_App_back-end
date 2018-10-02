@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using InspectionReport.Services.Interfaces;
+using System.Net;
+using System.Globalization;
+using System.Threading;
 
 namespace InspectionReport.Controllers
 {
@@ -24,6 +27,7 @@ namespace InspectionReport.Controllers
 
         private readonly CloudBlobClient client;
         private readonly IAuthorizeService _authorizeService;
+        private readonly IImageService _imageService;
 
         /// <summary>
         /// The constructor initialises the Blob Strage and the context.
@@ -31,10 +35,12 @@ namespace InspectionReport.Controllers
         /// Authentication is complete.
         /// </summary>
         /// <param name="context"></param>
-        public ImageController(ReportContext context, IAuthorizeService authorizeService)
+        public ImageController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
         {
             _context = context;
             _authorizeService = authorizeService;
+            _imageService = imageService;
+            
             String storageConnectionString =
                 "DefaultEndpointsProtocol=https;AccountName=reportpictures;AccountKey=3cxwdbIYl0MBEy0Aaa0TCuUmBZ3KHmBjT2bogu/IUTsU2VPhxPo38Vi/AKXy+tQB//VKTm0VQZ7ewUqJHZGDbQ==;EndpointSuffix=core.windows.net";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
@@ -48,36 +54,20 @@ namespace InspectionReport.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}", Name = "GetImage")]
-        public async Task<IActionResult> GetImage(long id)
+        public IActionResult GetImage(long id)
         {
-            ICollection<IActionResult> fileList = new List<IActionResult>();
-
-            Feature feature = _context.Feature.Find(id);
-            long house_id = GetHouseIdFromFeatureId(id);
-            if (house_id == 0)
+            List<string> uriResults = _imageService.GetUriResultsForFeature(id, out HttpStatusCode outStatus);
+            switch (outStatus)
             {
-                return NotFound();
+                case HttpStatusCode.NotFound:
+                    return NotFound();
+                case HttpStatusCode.NoContent:
+                    return NoContent();
+                case HttpStatusCode.OK:
+                    return Ok(uriResults);
+                default:
+                    throw new NotImplementedException();
             }
-
-            if (!_authorizeService.AuthorizeUserForHouse(house_id, HttpContext?.User))
-            {
-                return Unauthorized();
-            }
-
-            var container = client.GetContainerReference(ContainerName + house_id);
-            if (!await container.ExistsAsync())
-            {
-                return NoContent();
-            }
-
-            List<string> imageNames = new List<string>();
-            _context.Media.Where(m => m.Feature == feature).ToList().ForEach(m => imageNames.Add(m.MediaName));
-
-            List<string> UriResults = imageNames
-                .Select(imgName => GetBlobSASUri(container.GetBlockBlobReference(imgName)))
-                .ToList();
-
-            return Ok(UriResults);
         }
 
         /// <summary>
@@ -153,6 +143,7 @@ namespace InspectionReport.Controllers
 
                         CloudBlockBlob blockBlobImage = container.GetBlockBlobReference(fileName);
 
+                        Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US"); //need to change culture so that english is always appended.
                         blockBlobImage.Metadata.Add("DateCreated", DateTime.UtcNow.ToLongDateString());
                         blockBlobImage.Metadata.Add("TimeCreated", DateTime.UtcNow.ToLongTimeString());
 

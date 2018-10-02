@@ -35,11 +35,11 @@ namespace InspectionReport.Controllers
 		private const int lineSpace = 25;
 		private readonly IAuthorizeService _authorizeService;
 
-		public ExportController(ReportContext context, IAuthorizeService authorizeService)
+		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
 		{
 			_context = context;
 			_authorizeService = authorizeService;
-			_iController = new ImageController(_context, authorizeService);
+			_iController = new ImageController(_context, authorizeService, imageService);
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
@@ -239,18 +239,17 @@ namespace InspectionReport.Controllers
 					{
 						WriteLine(category.Name + " - " + feature.Name, _normalRegularFont, initialX);
 					}
-					OkObjectResult mediaQueryResult = _iController.GetImage(feature.Id).Result as OkObjectResult;
-					if (mediaQueryResult != null)
-					{
-						List<string> URIResults = mediaQueryResult.Value as List<string>;
-						foreach (string URIResult in URIResults)
-						{
-							XImage image = _imageHandler.FromURI(URIResult.ToString());
-							double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
-							_gfx.DrawImage(image, initialX + 10, currentY + 10, image.PixelWidth / scale, image.PixelHeight / scale);
-						}
-					}
-				}
+                    if (_iController.GetImage(feature.Id) is OkObjectResult mediaQueryResult)
+                    {
+                        List<string> URIResults = mediaQueryResult.Value as List<string>;
+                        foreach (string URIResult in URIResults)
+                        {
+                            XImage image = _imageHandler.FromURI(URIResult.ToString());
+                            double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+                            _gfx.DrawImage(image, initialX + 10, currentY + 10, image.PixelWidth / scale, image.PixelHeight / scale);
+                        }
+                    }
+                }
 			}
 		}
 
