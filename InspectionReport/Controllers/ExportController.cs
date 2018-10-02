@@ -113,7 +113,6 @@ namespace InspectionReport.Controllers
             _page = _document.AddPage();
             _gfx = XGraphics.FromPdfPage(_page);
             _tf = new XTextFormatter(_gfx);
-            //_tf.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
             _gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
             currentY = 100;
             WriteLine("Date of Inspection: ", _normalBoldFont, initialX);
@@ -156,9 +155,9 @@ namespace InspectionReport.Controllers
             WriteLine("construction type", _normalRegularFont, initialX + 200);
             NewLine();
             //XImage image = _imageHandler.FromURI(house.categories[0].);
-            XImage image = _imageHandler.FromURI("https://camo.githubusercontent.com/556a7850bef41de27438eeebc4c1acbdc494d9c5/68747470733a2f2f692e696d6775722e636f6d2f687a3863486e712e706e67");
-            double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
-            _gfx.DrawImage(image, initialX + 10, currentY, image.PixelWidth / scale, image.PixelHeight / scale);
+            //XImage image = _imageHandler.FromURI("https://camo.githubusercontent.com/556a7850bef41de27438eeebc4c1acbdc494d9c5/68747470733a2f2f692e696d6775722e636f6d2f687a3863486e712e706e67");
+            //double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+            //_gfx.DrawImage(image, initialX + 10, currentY, image.PixelWidth / scale, image.PixelHeight / scale);
         }
 
         private void CreateHousePages(House house)
@@ -183,7 +182,7 @@ namespace InspectionReport.Controllers
             {
 
                 WriteLine(feature.Name, _normalRegularFont, initialX);
-                WriteLine("Count Count Count Count Count Count Count Count Count Count Count Count Count CountCount Count Count Count Count Count Count Count", _normalRegularFont, initialX + 200, 220);
+                WriteLine(feature.Comments, _normalRegularFont, initialX + 200, 220);
                 if (feature.Grade == 1)
                 {
                     WriteLine("X", _normalRegularFont, initialX + 420);
