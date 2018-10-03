@@ -35,7 +35,7 @@ namespace InspectionReport
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("localhost", builder => builder
+                /*options.AddPolicy("localhost", builder => builder
                     .WithOrigins("http://localhost:3000")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
@@ -47,7 +47,15 @@ namespace InspectionReport
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()
+                );*/
+
+                options.AddPolicy("localhost", builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
                 );
+
             });
 
             services.Configure<CookiePolicyOptions>(options =>
