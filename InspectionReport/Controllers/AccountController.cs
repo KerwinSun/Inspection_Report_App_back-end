@@ -76,7 +76,7 @@ namespace InspectionReport.Controllers
             if (result.Succeeded)
             {
                 var currentUser = _context.User.Where(u => u.AppLoginUser == user).SingleOrDefault();
-                Request.HttpContext.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+                var head = Request.HttpContext.Response.Headers;
                 return Ok(currentUser);
             }
             else
