@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace InspectionReport.Utility
+{
+	public class ReportText
+	{
+		public string statementOfPolicy = 
+			@"SCOPE: The inspection and corresponding report are based on a limited visual inspection of the standard systems and components of the home. The purpose of the inspection is to identify major current defiencies that are visually identifiable at the time of the inspection.The report shall include: grounds, structure, exterior, roofs, plumbing, electrical, interior, and insulation/ventilation; the procedure for their inspection will be conducted in accordance with NZS 4306:2005. New Zealand Standard, Residential Property Inspection.
+
+LIMITATIONS: Any areas that are concealed, contained, inaccessible, or cannot be seen, due to walls, ceilings, floors, insulation, soils, vegetation, furniture, stored items, systems, appliances, vehicles, or any other object, will not be inspected or included in the report. The client agrees to assume all the risk, for any condition or problems that may be concealed at the time of the inspection. Nothing will be dismantled during the inspection, and there will be no destructive testing performed. Applicances and spa/pool equipment, special cycles or features are not inspected: none of the appliances or equipment will be dismantled, and no determination of their efficiency will be made.
+
+The client understands that the house inspector has a minimum of twenty years in the building industry. The report is not a guarrantee, warranty, or any form of insurance, and is not to be used as a substitute for a final walk through inspection.The report shall be considered the exclusive property of the client, and copies will not be issued to any parties without the permission of the client.The client agrees that the report shall not be given or sold to any other party, who is not directly involved with the process of the transaction.
+
+REASONABLE ACCESS: Resonable access is access that is safe, unobstructed and which has a minimum clearance of 450 x 450 mm opening access door that can be safely accessed from a 3.6m ladder and a minimum crawl space of 620 x 610 mm in the ceiling space and 500 x 400 mm opening access door and a minimum crawl space of 500mm vertical clearance for the sub floor area.Roofs area able to be safely accessed from a 3.6m ladder. (Or if the minimum clearance is not available, the area is within the inspector's unobstructed line of vision).
+
+ITEMS AND CONDITIONS EXCLUDED FROM THE REPORT INCLUDE: Building Codes, zoning, ordinance violations, geological stability, soil conditions structural, stability, engineering analysis, termites or other infestations, asbestos, formaldehyde, water or air contaminants of any kind, toxic moulds, rotting (non visual), electromagnetic radition , environmental hazards, apparasial of property value, repair estimates, detached buildings, sheds, underground condition of pool and spa bodies and related piping, items marked as not inspected within the report, private water systems, septic systems, saunas, specialized electronic controls of any kind, elevators, dumb waiters, water softener and purification systems, solar systems, internal system components, security systems, system adequacy or effciency, prediction of life expenctancy of any item or system, minor and/or cosmetic problems, latent or concealed defects.This report does not cover any buildings suffering from rotting homes, leaky and toxic mould situations, areas that the inspector believes to be a problem can only detect rotting of framing by invasive testing whixh means removing wall linings.This would not be done without the written consent of the owner. We will consider Weather Tightness, regardless of age; however it will not be measured against appendix A of the Standards or to E2/AS1 of the Building Code, Matrix and Evaluation, as this would be subject to a specialist report.
+
+DISPUTES AND LIMITATIONS OF LIABILITY: The client understands and agrees that any claim against the accuracy of the report, in the form of errors or omissons is limited to the failure of the part of the inspector to follow the New Zealand Standard; NZS 4306: 2005 Residential Property Inspection (a copy is held at our office for viewing if reuqired). The client agrees to notify the inspector of any dispute in written form, within ten days of discovery. The client further agrees that with the exception of emergency conditions, no repairs, replacements or alterations of the claimed discrepancy shall be made before the inspector can re-inspect the said item. Client understands and agrees that any failure to notify the inspector as stated above shall constitute a waiver of any and all claims for said failure to accurately report the condition in question. In the event of making a claim against Hitch Building Inspections, you need to contact our office immediatley and request a claim form.
+
+IMPORANT INFORMATION: You need to be aware that it is possible for problems in a house to be disguised to prevent detection. If you notice anything's that were not visible at the time of your visit and our inspection on the the day you should contact us immediatley to discuss.
+
+VENDOR INSPECTIONS: The vendor is required to notify the inspector if any existing conditions that you are aware of that have been an issue or may become a problem at the time of the inspection.
+
+CANCELLATION POLICY: If the inspection is cancelled up to 24 hours before the inspection is due to be undertaken, a fee of $100 will be charged. If the inspection is cancelled within a 24 hour period of the due date of the inspection, the full cost of the inspection will be charged. We reserve the right to apply this policy at our decresion.
+
+PAYMENT POLICY: Payment is due on delivery of the inspection report unless otherwise arranged. No statement or receipt will be issued. All costs associated with debt collection will be added to the value of the invoice. Interest will be added at 2% per month for overdue accounts.
+
+INSURERS DISCLAIMER:
+(a) This is a report of a visual only, non-invasive inspection of the areas of the building which were readily visible at the time of inspection. The inspection did not include any areas or components which were concealed or closed in behind finished surfaces (such as plumbing, drainage, heating, framing, ventilation, insulation or wiring) or which required the moving of anything which impeded access or limited visibility (such as floor coverings, furniture, appliances, personal property, vehicles, vegetation, debris or soil).
+
+(b) The inspection did not assess compliance with the NZ building code including the code's weathertightness requirements, or structural aspects.On request, specialist inspections can be arranged of weathertightness or structure or of any systems including electrical, plumbing, gas pre heating.
+
+As the purpose of the inspection was to assess the general condition of the building based on the limited visual inspection described in (a), this report may not identify all past, present or future defects. Descriptions in this report of systems or appliances relate to existence only and not adequacy or life.Any area or component of the building or any item or system not specifically identified in this report as having been inspected was excluded from the scope of the inspection";
+	}
+}

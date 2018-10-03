@@ -32,8 +32,10 @@ namespace InspectionReport.Controllers
 		private XGraphics _gfx;
 		private XTextFormatter _tf;
 		private readonly XFont _largeRegularFont;
-		private XFont _normalRegularFont;
-		private readonly XFont _normalBoldFont;
+		private readonly XFont _medRegularFont;
+		private readonly XFont _medBoldFont;
+		private readonly XFont _smallBoldFont;
+		private readonly XFont _smallRegularFont;
 		private const int _initialY = 50;
 		private const int _initialX = 50;
 		private int _currentY = _initialY;
@@ -45,19 +47,22 @@ namespace InspectionReport.Controllers
 		private readonly int _commentsWidth = 240;
 		private readonly int _labelWidth = 200;
 		private readonly int _valueWidth = 300;
+		private ReportText _text;
 
 		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
 		{
-			GlobalFontSettings.FontResolver = new FontResolver();
 			_context = context;
 			_imageService = imageService;
 			_authorizeService = authorizeService;
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
-			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
-			_normalBoldFont = new XFont("Arial", 13, XFontStyle.Bold);
+			_medRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
+			_medBoldFont = new XFont("Arial", 13, XFontStyle.Bold);
+			_smallRegularFont = new XFont("Arial", 7, XFontStyle.Regular);
+			_smallBoldFont = new XFont("Arial", 7, XFontStyle.Bold);
 			_document = new PdfDocument();
 			_color = new XSolidBrush(XColor.FromArgb(179, 204, 204));
+			_text = new ReportText();
 		}
 
 		[HttpGet("{id}")]
@@ -104,6 +109,8 @@ namespace InspectionReport.Controllers
 			CreateHousePages(house);
 			CreateCommentsPages(house);
 			CreateImagePages(house);
+			CreateStatementOfPolicyPage();
+			CreateCertificatePage(house);
 
 			string pdfFilename = "InspectionReport" + house.Id + ".pdf";
 
@@ -121,51 +128,51 @@ namespace InspectionReport.Controllers
 
 		private void CreateTitlePage(House house, string names)
 		{
-			Client client = house.SummonsedBy;
+			//Client client = house.SummonsedBy;
 			AddNewPage();
 			_gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
 			_currentY = 100;
-			WriteLine("Date of Inspection: ", _normalBoldFont, _initialX);
-			WriteLine(house.InspectionDate.ToShortDateString(), _normalRegularFont, _initialX + _labelWidth);
+			WriteLine("Date of Inspection: ", _medBoldFont, _initialX);
+			WriteLine(house.InspectionDate.ToShortDateString(), _medRegularFont, _initialX + _labelWidth);
 			NewLine();
-			WriteLine("Client Information", _normalBoldFont, _initialX);
+			WriteLine("Client Information", _medBoldFont, _initialX);
 			NewLine();
-			WriteLine("Summonsed By: ", _normalBoldFont, _initialX);
-			WriteLine("summonsed by", _normalRegularFont, _initialX + _labelWidth);
+			WriteLine("Summonsed By: ", _medBoldFont, _initialX);
+			WriteLine("summonsed by", _medRegularFont, _initialX + _labelWidth);
 			//WriteLine(client.Name, _normalRegularFont, _initialX + _labelWidth);
 			NewLine();
-			WriteLine("Inspected By: ", _normalBoldFont, _initialX);
-			WriteLine(names, _normalRegularFont, _initialX + _labelWidth);
+			WriteLine("Inspected By: ", _medBoldFont, _initialX);
+			WriteLine(names, _medRegularFont, _initialX + _labelWidth);
 			NewLine();
-			WriteLine("Contact Details", _normalBoldFont, _initialX);
+			WriteLine("Contact Details", _medBoldFont, _initialX);
 			NewLine();
-			WriteLine("Home ph #: ", _normalBoldFont, _initialX);
-			WriteLine("home phone number", _normalRegularFont, _initialX + _labelWidth);
+			WriteLine("Home ph #: ", _medBoldFont, _initialX);
+			WriteLine("home phone number", _medRegularFont, _initialX + _labelWidth);
 			//WriteLine(client.HomePhoneNumber, _normalRegularFont, _initialX + _labelWidth);
 			NewLine();
-			WriteLine("Mobile #: ", _normalBoldFont, _initialX);
-			WriteLine("mobile number", _normalRegularFont, _initialX + _labelWidth);
+			WriteLine("Mobile #: ", _medBoldFont, _initialX);
+			WriteLine("mobile number", _medRegularFont, _initialX + _labelWidth);
 			//WriteLine(client.MobilePhoneNumber, _normalRegularFont, _initialX + _labelWidth);
 			NewLine();
 			//WriteLine("Address: ", _normalBoldFont, _initialX);
 			//WriteLine(client.Address, _normalRegularFont, _initialX + _labelWidth);
 			//NewLine();
-			WriteLine("Email Address: ", _normalBoldFont, _initialX);
-			WriteLine("email address", _normalRegularFont, _initialX + _labelWidth);
+			WriteLine("Email Address: ", _medBoldFont, _initialX);
+			WriteLine("email address", _medRegularFont, _initialX + _labelWidth);
 			//WriteLine(client.EmailAddress, _normalRegularFont, _initialX + _labelWidth);
 			NewLine();
 			//WriteLine("Real Estate & Agent: ", _normalBoldFont, _initialX);
 			//WriteLine(client.RealEstate, _normalRegularFont, _initialX + _labelWidth);
 			//NewLine();
-			WriteLine("House Description", _normalBoldFont, _initialX);
+			WriteLine("House Description", _medBoldFont, _initialX);
 			NewLine();
-			WriteLine("Estimate Summary: ", _normalBoldFont, _initialX);
+			WriteLine("Estimate Summary: ", _medBoldFont, _initialX);
 			//WriteLine(house.EstimateSummary, _normalRegularFont, _initialX + _labelWidth, _valueWidth);
 			NewLine();
-			WriteLine("Rooms Summary: ", _normalBoldFont, _initialX);
+			WriteLine("Rooms Summary: ", _medBoldFont, _initialX);
 			//WriteLine(house.RoomsSummary, _normalRegularFont, _initialX + _labelWidth, _valueWidth);
 			NewLine();
-			WriteLine("Construction Types: ", _normalBoldFont, _initialX);
+			WriteLine("Construction Types: ", _medBoldFont, _initialX);
 			//WriteLine(house.ConstructionType, _normalRegularFont, _initialX + _labelWidth, _valueWidth);
 			NewLine();
 
@@ -198,17 +205,17 @@ namespace InspectionReport.Controllers
 			{
 				if (category.Name != "Overview")
 				{
-					double titleHeight = _gfx.MeasureString(category.Name, _normalBoldFont).Height;
+					double titleHeight = _gfx.MeasureString(category.Name, _medBoldFont).Height;
 					if (_currentY + titleHeight * 2 > 750)
 					{
 						AddNewHousePage();
 					}
-					WriteCategory(category.Name, _normalBoldFont, _initialX);
+					WriteCategory(category.Name, _medBoldFont, _initialX);
 					NewLine();
 					foreach (Feature feature in category.Features)
 					{
-						int nameLineSpace = (int)Math.Ceiling(GetTextHeight(feature.Name, _nameWidth) - 1);
-						int commentsLineSpace = (int)Math.Ceiling(GetTextHeight(feature.Comments, _commentsWidth) - 1);
+						int nameLineSpace = (int)Math.Ceiling(GetTextHeight(feature.Name, _medRegularFont, _nameWidth) - 1);
+						int commentsLineSpace = (int)Math.Ceiling(GetTextHeight(feature.Comments, _medRegularFont, _commentsWidth) - 1);
 						int largerLineSpace = nameLineSpace > commentsLineSpace ? nameLineSpace : commentsLineSpace;
 						NewRow(largerLineSpace + 16, feature);
 					}
@@ -219,15 +226,35 @@ namespace InspectionReport.Controllers
 		private void CreateCommentsPages(House house)
 		{
 			AddNewPage();
-			WriteCategory("General Comments", _normalBoldFont, _initialX);
+			WriteCategory("General Comments", _medBoldFont, _initialX);
 			NewLine();
-			//int commentsLineSpace = (int)Math.Ceiling(GetTextHeight(house.Comments, 500) - 1);
+			string comments = "";
+			if (house.Comments == null)
+			{
+				comments = "comments comments comments comments comments comments comments comments comments comments\n"
+					+ "comments comments comments comments comments comments comments comments comments comments "
+					+ "comments comments comments comments comments comments comments comments comments comments.\n\n"
+					+ "comments comments comments comments comments comments comments comments comments comments\n "
+					+ "comments comments comments comments comments comments comments comments comments comments "
+					+ "comments comments comments comments comments comments comments comments comments comments.\n";
+			}
+			else
+			{
+				comments = house.Comments;
+			}
+			string[] commentsArray = comments.Split("\n\n");
+			foreach (string comment in commentsArray)
+			{
+				string trimmedComment = comment.Trim();
+				int commentsLineSpace = (int)Math.Ceiling(GetTextHeight(trimmedComment, _medRegularFont, 500) - 1);
+				NewCommentRow(trimmedComment, commentsLineSpace);
+			}
 		}
 
 		private void CreateImagePages(House house)
 		{
 			AddNewPage();
-			WriteCategory("Images", _normalBoldFont, _initialX);
+			WriteCategory("Images", _medBoldFont, _initialX);
 			NewLine();
 			foreach (Category category in house.Categories)
 			{
@@ -236,7 +263,7 @@ namespace InspectionReport.Controllers
 					List<string> URIResults = _imageService.GetUriResultsForFeature(feature.Id, out HttpStatusCode statusCode, HttpContext.User);
 					if (URIResults != null && URIResults.Count != 0)
 					{
-						double titleHeight = _gfx.MeasureString(feature.Name, _normalBoldFont).Height;
+						double titleHeight = _gfx.MeasureString(feature.Name, _medBoldFont).Height;
 						XImage image = _imageHandler.FromURI(URIResults[0].ToString());
 						double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
 						int imageHeight = (int)Math.Ceiling(image.PixelHeight / scale);
@@ -244,7 +271,7 @@ namespace InspectionReport.Controllers
 						{
 							AddNewPage();
 						}
-						WriteLine(category.Name + " - " + feature.Name, _normalBoldFont, _initialX);
+						WriteLine(category.Name + " - " + feature.Name, _medBoldFont, _initialX);
 					}
 					if (statusCode != HttpStatusCode.OK)
 					{
@@ -263,10 +290,35 @@ namespace InspectionReport.Controllers
 			}
 		}
 
+		private void CreateStatementOfPolicyPage()
+		{
+			AddNewPage();
+			_gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
+			_currentY = 100;
+			string policyText = _text.statementOfPolicy;
+			string[] policyArray = policyText.Split("\r\n\r\n");
+			foreach (string policy in policyArray)
+			{
+				int policyLineSpace = (int)Math.Ceiling(GetTextHeight(policy, _smallRegularFont, 500) - 1);
+				NewPolicyRow(policy, policyLineSpace);
+			}
+		}
+
+		private void CreateCertificatePage(House house)
+		{
+
+		}
+
 		private void WriteLine(string stringToWrite, XFont font, int x, int textWidth)
 		{
 			double height = _gfx.MeasureString(stringToWrite, font).Height;
 			_tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, _currentY - height / 2, textWidth, _page.Height), XStringFormats.TopLeft);
+		}
+
+		private void WriteLine2(string stringToWrite, XFont font, int x, int textWidth)
+		{
+			double height = _gfx.MeasureString(stringToWrite, font).Height;
+			_tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, _currentY, textWidth, _page.Height), XStringFormats.TopLeft);
 		}
 
 		private void WriteLine(string stringToWrite, XFont font, int x)
@@ -287,11 +339,11 @@ namespace InspectionReport.Controllers
 			_pageNumber++;
 			_gfx = XGraphics.FromPdfPage(_page);
 			AddFooter();
-			_gfx.DrawString(_pageNumber.ToString(), _normalBoldFont, XBrushes.Black, 535, 795);
+			_gfx.DrawString(_pageNumber.ToString(), _medBoldFont, XBrushes.Black, 535, 795);
 			_tf = new XTextFormatter(_gfx);
-			WriteLine("A", _normalBoldFont, _initialX + 420);
-			WriteLine("B", _normalBoldFont, _initialX + 450);
-			WriteLine("C", _normalBoldFont, _initialX + 480);
+			WriteLine("A", _medBoldFont, _initialX + 420);
+			WriteLine("B", _medBoldFont, _initialX + 450);
+			WriteLine("C", _medBoldFont, _initialX + 480);
 			NewLine();
 		}
 
@@ -301,15 +353,15 @@ namespace InspectionReport.Controllers
 			_page = _document.AddPage();
 			_pageNumber++;
 			_gfx = XGraphics.FromPdfPage(_page);
-			_gfx.DrawString(_pageNumber.ToString(), _normalBoldFont, XBrushes.Black, 535, 795);
+			_gfx.DrawString(_pageNumber.ToString(), _medBoldFont, XBrushes.Black, 535, 795);
 			_tf = new XTextFormatter(_gfx);
 		}
 
 		private void AddFooter()
 		{
-			_gfx.DrawString("A - Good", _normalBoldFont, XBrushes.Black, 70, 765);
-			_gfx.DrawString("B - Will need attention soon", _normalBoldFont, XBrushes.Black, 70, 780);
-			_gfx.DrawString("C - Need immediate attention", _normalBoldFont, XBrushes.Black, 70, 795);
+			_gfx.DrawString("A - Good", _medBoldFont, XBrushes.Black, 70, 765);
+			_gfx.DrawString("B - Will need attention soon", _medBoldFont, XBrushes.Black, 70, 780);
+			_gfx.DrawString("C - Need immediate attention", _medBoldFont, XBrushes.Black, 70, 795);
 			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX, 750, 500, 50);
 		}
 
@@ -324,19 +376,19 @@ namespace InspectionReport.Controllers
 			{
 				AddNewHousePage();
 			}
-			WriteLine(feature.Name, _normalRegularFont, _initialX, _nameWidth);
-			WriteLine(feature.Comments, _normalRegularFont, _initialX + _nameWidth, _commentsWidth);
+			WriteLine(feature.Name, _medRegularFont, _initialX, _nameWidth);
+			WriteLine(feature.Comments, _medRegularFont, _initialX + _nameWidth, _commentsWidth);
 			if (feature.Grade == 1)
 			{
-				WriteLine("X", _normalRegularFont, _initialX + 420);
+				WriteLine("X", _medRegularFont, _initialX + 420);
 			}
 			else if (feature.Grade == 2)
 			{
-				WriteLine("X", _normalRegularFont, _initialX + 450);
+				WriteLine("X", _medRegularFont, _initialX + 450);
 			}
 			else if (feature.Grade == 3)
 			{
-				WriteLine("X", _normalRegularFont, _initialX + 480);
+				WriteLine("X", _medRegularFont, _initialX + 480);
 			}
 			_gfx.DrawRectangle(new XPen(XColors.LightGray), _initialX, _currentY - 15, 410, height);
 			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX + 410, _currentY - 15, 30, height);
@@ -355,10 +407,31 @@ namespace InspectionReport.Controllers
 			_currentY += height + 30;
 		}
 
-		private double GetTextHeight(string text, double rectWidth)
+		private void NewCommentRow(string text, int height)
 		{
-			double fontHeight = _normalRegularFont.GetHeight();
-			XSize measure = _gfx.MeasureString(text, _normalRegularFont);
+			if (_currentY + height > 750)
+			{
+				AddNewPage();
+			}
+			WriteLine(text, _medRegularFont, _initialX, 500);
+			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX, _currentY - 15, 500, height);
+			_currentY += height;
+		}
+
+		private void NewPolicyRow(string text, int height)
+		{
+			if (_currentY + height > 800)
+			{
+				AddNewPage();
+			}
+			WriteLine2(text, _smallRegularFont, _initialX, 500);
+			_currentY += height + 20;
+		}
+
+		private double GetTextHeight(string text, XFont font, double rectWidth)
+		{
+			double fontHeight = font.GetHeight();
+			XSize measure = _gfx.MeasureString(text, font);
 			double absoluteTextHeight = measure.Height;
 			double absoluteTextWidth = measure.Width;
 
