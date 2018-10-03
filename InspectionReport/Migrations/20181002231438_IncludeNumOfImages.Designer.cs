@@ -4,14 +4,16 @@ using InspectionReport.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace InspectionReport.Migrations
 {
     [DbContext(typeof(ReportContext))]
-    partial class TodoContextModelSnapshot : ModelSnapshot
+    [Migration("20181002231438_IncludeNumOfImages")]
+    partial class IncludeNumOfImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,8 +109,6 @@ namespace InspectionReport.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int>("Order");
-
                     b.HasKey("Id");
 
                     b.HasIndex("HouseId");
@@ -148,8 +148,6 @@ namespace InspectionReport.Migrations
                     b.Property<int?>("Grade");
 
                     b.Property<string>("Name");
-
-                    b.Property<int>("Order");
 
                     b.Property<int>("NumOfImages");
 

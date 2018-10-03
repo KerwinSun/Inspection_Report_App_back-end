@@ -108,7 +108,11 @@ namespace InspectionReport.Services.Interfaces
         public void PostImageForFeature(long featureId, IFormFileCollection files, out HttpStatusCode outStatusCode)
         {
             // Get feature based on ID supplied in Header.
-            Feature feature = _context.Feature.Find(featureId);
+            Feature feature = _context.Feature
+                .Where(f => f.Id == featureId)
+                .Include(f => f.ImageFileNames)
+                .SingleOrDefault();
+
             if (feature == null)
             {
                 outStatusCode = HttpStatusCode.NotFound;
@@ -191,6 +195,7 @@ namespace InspectionReport.Services.Interfaces
                             Feature = feature,
                             MediaName = fileName
                         };
+
                         _context.Media.Add(media);
                         _context.SaveChanges();
                     }
@@ -199,6 +204,7 @@ namespace InspectionReport.Services.Interfaces
 
             //Wait for all async tasks to finish.
             Task.WaitAll(asyncTasks.ToArray());
+            UpdateNumOfImages(feature);
 
             outStatusCode = HttpStatusCode.NoContent; //All creation was successful
             return;
@@ -217,7 +223,12 @@ namespace InspectionReport.Services.Interfaces
         public void DeleteImageForFeature(long featureId, string imageName, out HttpStatusCode outStatusCode, ClaimsPrincipal userClaim)
         {
             // Get feature based on ID supplied in Header.
-            Feature feature = _context.Feature.Find(featureId);
+            Feature feature = _context.Feature
+                .Where(f => f.Id == featureId)
+                .Include(f => f.ImageFileNames)
+                .SingleOrDefault();
+
+
             if (feature == null)
             {
                 outStatusCode = HttpStatusCode.NotFound;
@@ -256,6 +267,7 @@ namespace InspectionReport.Services.Interfaces
                 return;
             }
 
+            UpdateNumOfImages(feature);
             outStatusCode = HttpStatusCode.NoContent;
             return;
         }
@@ -324,6 +336,12 @@ namespace InspectionReport.Services.Interfaces
             };
             string sasContainerToken = blob.GetSharedAccessSignature(sasConstraints);
             return blob.Uri.AbsoluteUri + sasContainerToken;
+        }
+
+        private void UpdateNumOfImages(Feature feature)
+        {
+            feature.NumOfImages = feature.ImageFileNames.Count;
+            _context.SaveChanges();
         }
     }
 }
