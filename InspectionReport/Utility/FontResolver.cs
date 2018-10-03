@@ -40,7 +40,7 @@ namespace InspectionReport.Utility
 				}
 				else
 				{
-					return new FontResolverInfo("./Assets/arial.ttf");
+					return new FontResolverInfo("arial.ttf");
 				}
 			}
 			return null;

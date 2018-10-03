@@ -6,9 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\arial.ttf" />
-    <None Remove="Assets\arialbd.ttf" />
-    <None Remove="Assets\ariali.TTF" />
     <None Remove="Properties\PublishProfiles\InspectionReport20180815124100 - Web Deploy.pubxml" />
   </ItemGroup>
 
@@ -31,9 +28,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\arial.ttf" />
-    <EmbeddedResource Include="Assets\arialbd.ttf" />
-    <EmbeddedResource Include="Assets\ariali.TTF" />
+    <EmbeddedResource Include="arial.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="arialbd.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ariali.TTF">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
