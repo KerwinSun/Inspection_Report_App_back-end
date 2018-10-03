@@ -15,6 +15,7 @@ using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing.Layout;
 using System.Net;
+using PdfSharp.Fonts;
 
 namespace InspectionReport.Controllers
 {
@@ -47,6 +48,7 @@ namespace InspectionReport.Controllers
 
 		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
 		{
+			GlobalFontSettings.FontResolver = new FontResolver();
 			_context = context;
 			_imageService = imageService;
 			_authorizeService = authorizeService;
