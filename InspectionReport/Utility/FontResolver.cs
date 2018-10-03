@@ -28,15 +28,15 @@ namespace InspectionReport.Utility
 			{
 				if (isBold && isItalic)
 				{
-					return new FontResolverInfo("./Assets/arial.ttf");
+					return new FontResolverInfo("arial.ttf");
 				}
 				else if (isBold)
 				{
-					return new FontResolverInfo("./Assets/arialbd.ttf");
+					return new FontResolverInfo("arialbd.ttf");
 				}
 				else if (isItalic)
 				{
-					return new FontResolverInfo("./Assets/ariali.ttf");
+					return new FontResolverInfo("ariali.ttf");
 				}
 				else
 				{
