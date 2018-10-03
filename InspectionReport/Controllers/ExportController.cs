@@ -18,7 +18,7 @@ using System.Net;
 
 namespace InspectionReport.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/Export")]
     public class ExportController : Controller
     {

@@ -92,7 +92,8 @@ namespace InspectionReport
             // Injecting the PDF tool
             //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
-            services.AddTransient<IAuthorizeService, AuthorizeService>(); // Injecting the Authorize Service
+            //services.AddTransient<IAuthorizeService, AuthorizeService>(); // Injecting the Authorize Service
+            services.AddTransient<IAuthorizeService, MockAuthorizeService>(); //USE THIS ONLY TO BYPASS AUTHORIZATION.
             services.AddTransient<IImageService, ImageService>(); //Inject image service.
 
             services.AddIdentity<ApplicationUser, IdentityRole>()

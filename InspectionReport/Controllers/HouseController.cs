@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InspectionReport.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/House")]
     public class HouseController : Controller
     {
