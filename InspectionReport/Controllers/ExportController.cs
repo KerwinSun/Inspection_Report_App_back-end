@@ -18,12 +18,14 @@ using System.Net;
 
 namespace InspectionReport.Controllers
 {
+	//[Authorize]
 	[Route("api/Export")]
 	public class ExportController : Controller
 	{
 		private readonly ReportContext _context;
 		private ImageHandler _imageHandler;
 		private readonly IImageService _imageService;
+		private readonly IAuthorizeService _authorizeService;
 		private PdfDocument _document;
 		private PdfPage _page;
 		private XGraphics _gfx;
@@ -43,10 +45,11 @@ namespace InspectionReport.Controllers
 		private readonly int _labelWidth = 200;
 		private readonly int _valueWidth = 300;
 
-		public ExportController(ReportContext context, IImageService imageService)
+		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
 		{
 			_context = context;
 			_imageService = imageService;
+			_authorizeService = authorizeService;
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_normalRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
