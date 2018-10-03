@@ -1,8 +1,4 @@
 language: csharp
 solution: InspectionReport.sln
 
-deploy:
-  provider: azure_web_apps
-  site: InspectionReportService
-  skip_cleanup: true
-  verbose: true
+
