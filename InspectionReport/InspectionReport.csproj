@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\arial.ttf" />
+    <None Remove="Assets\arialbd.ttf" />
+    <None Remove="Assets\ariali.TTF" />
     <None Remove="Properties\PublishProfiles\InspectionReport20180815124100 - Web Deploy.pubxml" />
   </ItemGroup>
 
@@ -25,6 +28,12 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\arial.ttf" />
+    <EmbeddedResource Include="Assets\arialbd.ttf" />
+    <EmbeddedResource Include="Assets\ariali.TTF" />
   </ItemGroup>
 
 </Project>
