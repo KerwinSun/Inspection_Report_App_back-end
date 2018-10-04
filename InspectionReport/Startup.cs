@@ -16,6 +16,8 @@ using InspectionReport.Services.Interfaces;
 using InspectionReport.Utility;
 using System.IO;
 using PdfSharp.Fonts;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.CookiePolicy;
 
 namespace InspectionReport
 {
@@ -72,13 +74,21 @@ namespace InspectionReport
                     options => options.SerializerSettings.ReferenceLoopHandling =
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
-			/// TODO: Should put the connection string as an environment variable.
 
-			// Use SQL Database if in Azure, otherwise, use SQLite
-			// To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
-			// on both profiles in the launchSettings.json
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = false;
+                options.ExpireTimeSpan = TimeSpan.FromDays(5);
+                options.SlidingExpiration = true;
+            });
+            /// TODO: Should put the connection string as an environment variable.
 
-			if (_env.IsDevelopment())
+            // Use SQL Database if in Azure, otherwise, use SQLite
+            // To change the environment, and test the published Database on Azure, change the the ASPNETCORE_ENVIRONMENT
+            // on both profiles in the launchSettings.json
+
+            if (_env.IsDevelopment())
             {
                 var connection =
                     @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
@@ -120,13 +130,14 @@ namespace InspectionReport
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseHttpsRedirection();
             app.UseDeveloperExceptionPage(); // TODO: Remove once finished debugging.
             app.UseAuthentication();
+            app.UseCookiePolicy();
             app.UseCors("localhost");
             app.UseCors("deployment");
             app.UseMvc();
+
         }
     }
 }
