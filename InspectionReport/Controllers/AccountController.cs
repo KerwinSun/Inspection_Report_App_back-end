@@ -78,12 +78,6 @@ namespace InspectionReport.Controllers
             if (result.Succeeded)
             {
                 var currentUser = _context.User.Where(u => u.AppLoginUser == user).SingleOrDefault();
-                var headers = HttpContext.Response.Headers.ToList();
-                // Debug if cookie is returned correctly.
-                if (headers.Count > 3)
-                {
-                    currentUser.Name = headers[3].ToString();
-                }
                 return Ok(currentUser);
             }
             else

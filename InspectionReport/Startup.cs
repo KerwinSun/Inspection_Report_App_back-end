@@ -61,11 +61,6 @@ namespace InspectionReport
 
             });
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(
@@ -77,6 +72,7 @@ namespace InspectionReport
             {
                 // Cookie settings
                 options.Cookie.HttpOnly = false;
+                options.Cookie.SameSite = SameSiteMode.None;
                 options.ExpireTimeSpan = TimeSpan.FromDays(5);
                 options.SlidingExpiration = true;
             });
