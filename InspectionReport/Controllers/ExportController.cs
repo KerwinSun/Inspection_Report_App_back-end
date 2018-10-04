@@ -128,54 +128,73 @@ namespace InspectionReport.Controllers
 
 		private void CreateTitlePage(House house, string names)
 		{
-			//Client client = house.SummonsedBy;
 			AddNewPage();
 			_gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
 			_currentY = 100;
 			WriteLine("Date of Inspection: ", _medBoldFont, _initialX);
 			WriteLine(house.InspectionDate.ToShortDateString(), _medRegularFont, _initialX + _labelWidth);
 			NewLine();
-			WriteLine("Client Information", _medBoldFont, _initialX);
-			NewLine();
-			WriteLine("Summonsed By: ", _medBoldFont, _initialX);
-			WriteLine("summonsed by", _medRegularFont, _initialX + _labelWidth);
-			//WriteLine(client.Name, _normalRegularFont, _initialX + _labelWidth);
-			NewLine();
 			WriteLine("Inspected By: ", _medBoldFont, _initialX);
 			WriteLine(names, _medRegularFont, _initialX + _labelWidth);
 			NewLine();
-			WriteLine("Contact Details", _medBoldFont, _initialX);
-			NewLine();
-			WriteLine("Home ph #: ", _medBoldFont, _initialX);
-			WriteLine("home phone number", _medRegularFont, _initialX + _labelWidth);
-			//WriteLine(client.HomePhoneNumber, _normalRegularFont, _initialX + _labelWidth);
-			NewLine();
-			WriteLine("Mobile #: ", _medBoldFont, _initialX);
-			WriteLine("mobile number", _medRegularFont, _initialX + _labelWidth);
-			//WriteLine(client.MobilePhoneNumber, _normalRegularFont, _initialX + _labelWidth);
-			NewLine();
-			//WriteLine("Address: ", _normalBoldFont, _initialX);
-			//WriteLine(client.Address, _normalRegularFont, _initialX + _labelWidth);
-			//NewLine();
-			WriteLine("Email Address: ", _medBoldFont, _initialX);
-			WriteLine("email address", _medRegularFont, _initialX + _labelWidth);
-			//WriteLine(client.EmailAddress, _normalRegularFont, _initialX + _labelWidth);
-			NewLine();
-			//WriteLine("Real Estate & Agent: ", _normalBoldFont, _initialX);
-			//WriteLine(client.RealEstate, _normalRegularFont, _initialX + _labelWidth);
-			//NewLine();
-			WriteLine("House Description", _medBoldFont, _initialX);
-			NewLine();
-			WriteLine("Estimate Summary: ", _medBoldFont, _initialX);
-			//WriteLine(house.EstimateSummary, _normalRegularFont, _initialX + _labelWidth, _valueWidth);
-			NewLine();
-			WriteLine("Rooms Summary: ", _medBoldFont, _initialX);
-			//WriteLine(house.RoomsSummary, _normalRegularFont, _initialX + _labelWidth, _valueWidth);
-			NewLine();
-			WriteLine("Construction Types: ", _medBoldFont, _initialX);
-			//WriteLine(house.ConstructionType, _normalRegularFont, _initialX + _labelWidth, _valueWidth);
-			NewLine();
-
+			Client client = house.SummonsedBy;
+			if (client != null)
+			{
+				WriteLine("Client Information", _medBoldFont, _initialX);
+				NewLine();
+				WriteLine("Summonsed By: ", _medBoldFont, _initialX);
+				if (client.Name != null)
+				{
+					WriteLine(client.Name, _medRegularFont, _initialX + _labelWidth);
+				}
+				NewLine();
+				WriteLine("Contact Details", _medBoldFont, _initialX);
+				NewLine();
+				WriteLine("Home ph #: ", _medBoldFont, _initialX);
+				if (client.HomePhoneNumber != null)
+				{
+					WriteLine(client.HomePhoneNumber, _medRegularFont, _initialX + _labelWidth);
+				}
+				NewLine();
+				WriteLine("Mobile #: ", _medBoldFont, _initialX);
+				if (client.MobilePhoneNumber != null)
+				{
+					WriteLine("mobile number", _medRegularFont, _initialX + _labelWidth);
+				}
+				NewLine();
+				//WriteLine("Address: ", _normalBoldFont, _initialX);
+				//WriteLine(client.Address, _medRegularFont, _initialX + _labelWidth);
+				//NewLine();
+				WriteLine("Email Address: ", _medBoldFont, _initialX);
+				if (client.EmailAddress != null)
+				{
+					WriteLine(client.EmailAddress, _medRegularFont, _initialX + _labelWidth);
+				}
+				NewLine();
+				//WriteLine("Real Estate & Agent: ", _normalBoldFont, _initialX);
+				//WriteLine(client.RealEstate, _normalRegularFont, _initialX + _labelWidth);
+				//NewLine();
+				WriteLine("House Description", _medBoldFont, _initialX);
+				NewLine();
+				WriteLine("Estimate Summary: ", _medBoldFont, _initialX);
+				if (house.EstimateSummary != null)
+				{
+					WriteLine(house.EstimateSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
+				}
+				NewLine();
+				WriteLine("Rooms Summary: ", _medBoldFont, _initialX);
+				if (house.RoomsSummary != null)
+				{
+					WriteLine(house.RoomsSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
+				}
+				NewLine();
+				WriteLine("Construction Types: ", _medBoldFont, _initialX);
+				if (house.ConstructionType != null)
+				{
+					WriteLine(house.ConstructionType, _medRegularFont, _initialX + _labelWidth, _valueWidth);
+				}
+				NewLine();
+			}
 			foreach (Category category in house.Categories)
 			{
 				if (category.Name == "Overview")
@@ -188,8 +207,8 @@ namespace InspectionReport.Controllers
 							if (URIResults != null && URIResults.Count != 0)
 							{
 								XImage image = _imageHandler.FromURI(URIResults[0].ToString());
-								double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
-								_gfx.DrawImage(image, _initialX + 10, _currentY, image.PixelWidth / scale, image.PixelHeight / scale);
+								double scale = (image.PixelWidth / 500) >= 1 ? (image.PixelWidth / 500) : 1;
+								_gfx.DrawImage(image, _initialX, _currentY, image.PixelWidth / scale, image.PixelHeight / scale);
 							}
 						}
 					}
@@ -249,33 +268,39 @@ namespace InspectionReport.Controllers
 			NewLine();
 			foreach (Category category in house.Categories)
 			{
-				foreach (Feature feature in category.Features)
+				if (category.Name != "Overview")
 				{
-					List<string> URIResults = _imageService.GetUriResultsForFeature(feature.Id, out HttpStatusCode statusCode, HttpContext.User);
-					if (URIResults != null && URIResults.Count != 0)
+					foreach (Feature feature in category.Features)
 					{
-						double titleHeight = _gfx.MeasureString(feature.Name, _medBoldFont).Height;
-						XImage image = _imageHandler.FromURI(URIResults[0].ToString());
-						double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
-						int imageHeight = (int)Math.Ceiling(image.PixelHeight / scale);
-						if (_currentY + titleHeight + imageHeight > 750)
+						if (feature.Name != "General")
 						{
-							AddNewPage();
+							List<string> URIResults = _imageService.GetUriResultsForFeature(feature.Id, out HttpStatusCode statusCode, HttpContext.User);
+							if (URIResults != null && URIResults.Count != 0)
+							{
+								double titleHeight = _gfx.MeasureString(feature.Name, _medBoldFont).Height;
+								XImage image = _imageHandler.FromURI(URIResults[0].ToString());
+								double scale = (image.PixelWidth / 500) >= 1 ? (image.PixelWidth / 500) : 1;
+								int imageHeight = (int)Math.Ceiling(image.PixelHeight / scale);
+								if (_currentY + titleHeight + imageHeight > 750)
+								{
+									AddNewPage();
+								}
+								WriteLine(category.Name + " - " + feature.Name, _medBoldFont, _initialX);
+							}
+							if (statusCode != HttpStatusCode.OK)
+							{
+								//TODO: @CJ think about what happens when image cannot be get. 
+								throw new NotImplementedException("Unexpected error, image cannot be found or is unauthorized.");
+							}
+							foreach (string URIResult in URIResults)
+							{
+								XImage image = _imageHandler.FromURI(URIResult.ToString());
+								double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
+								int imageWidth = (int)Math.Ceiling(image.PixelWidth / scale);
+								int imageHeight = (int)Math.Ceiling(image.PixelHeight / scale);
+								NewImageRow(image, imageWidth, imageHeight + 10);
+							}
 						}
-						WriteLine(category.Name + " - " + feature.Name, _medBoldFont, _initialX);
-					}
-					if (statusCode != HttpStatusCode.OK)
-					{
-						//TODO: @CJ think about what happens when image cannot be get. 
-						throw new NotImplementedException("Unexpected error, image cannot be found or is unauthorized.");
-					}
-					foreach (string URIResult in URIResults)
-					{
-						XImage image = _imageHandler.FromURI(URIResult.ToString());
-						double scale = (image.PixelWidth / 450) >= 1 ? (image.PixelWidth / 450) : 1;
-						int imageWidth = (int)Math.Ceiling(image.PixelWidth / scale);
-						int imageHeight = (int)Math.Ceiling(image.PixelHeight / scale);
-						NewImageRow(image, imageWidth, imageHeight + 10);
 					}
 				}
 			}
@@ -405,8 +430,8 @@ namespace InspectionReport.Controllers
 				AddNewPage();
 			}
 			WriteLine(text, _medRegularFont, _initialX, 500);
-			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX, _currentY - 15, 500, height);
-			_currentY += height + 30;
+			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX, _currentY -15, 500, height + 15);
+			_currentY += height + 15;
 		}
 
 		private void NewPolicyRow(string text, int height)
