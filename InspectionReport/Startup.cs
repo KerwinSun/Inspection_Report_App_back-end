@@ -63,8 +63,6 @@ namespace InspectionReport
 
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
@@ -82,6 +80,7 @@ namespace InspectionReport
                 options.ExpireTimeSpan = TimeSpan.FromDays(5);
                 options.SlidingExpiration = true;
             });
+            
             /// TODO: Should put the connection string as an environment variable.
 
             // Use SQL Database if in Azure, otherwise, use SQLite
