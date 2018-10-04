@@ -14,6 +14,7 @@ Master branch: [![Build Status](https://travis-ci.com/Karim-C/Inspection_Report_
 ## Prerequisites
 * [.NET Core 2.1 Web API](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-2.1)
 * [Azure](https://azure.microsoft.com/en-us/)
+* [pdfsharp](http://www.pdfsharp.net/)
 
 Back-end is set up using .NET Core 2.1 Web API
 
