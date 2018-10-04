@@ -138,63 +138,88 @@ namespace InspectionReport.Controllers
 			WriteLine(names, _medRegularFont, _initialX + _labelWidth);
 			NewLine();
 			Client client = house.SummonsedBy;
-			if (client != null)
+			WriteLine("Client Information", _medBoldFont, _initialX);
+			NewLine();
+			WriteLine("Summonsed By: ", _medBoldFont, _initialX);
+			if (client != null && client.Name != null)
 			{
-				WriteLine("Client Information", _medBoldFont, _initialX);
-				NewLine();
-				WriteLine("Summonsed By: ", _medBoldFont, _initialX);
-				if (client.Name != null)
-				{
-					WriteLine(client.Name, _medRegularFont, _initialX + _labelWidth);
-				}
-				NewLine();
-				WriteLine("Contact Details", _medBoldFont, _initialX);
-				NewLine();
-				WriteLine("Home ph #: ", _medBoldFont, _initialX);
-				if (client.HomePhoneNumber != null)
-				{
-					WriteLine(client.HomePhoneNumber, _medRegularFont, _initialX + _labelWidth);
-				}
-				NewLine();
-				WriteLine("Mobile #: ", _medBoldFont, _initialX);
-				if (client.MobilePhoneNumber != null)
-				{
-					WriteLine("mobile number", _medRegularFont, _initialX + _labelWidth);
-				}
-				NewLine();
-				//WriteLine("Address: ", _normalBoldFont, _initialX);
-				//WriteLine(client.Address, _medRegularFont, _initialX + _labelWidth);
-				//NewLine();
-				WriteLine("Email Address: ", _medBoldFont, _initialX);
-				if (client.EmailAddress != null)
-				{
-					WriteLine(client.EmailAddress, _medRegularFont, _initialX + _labelWidth);
-				}
-				NewLine();
-				//WriteLine("Real Estate & Agent: ", _normalBoldFont, _initialX);
-				//WriteLine(client.RealEstate, _normalRegularFont, _initialX + _labelWidth);
-				//NewLine();
-				WriteLine("House Description", _medBoldFont, _initialX);
-				NewLine();
-				WriteLine("Estimate Summary: ", _medBoldFont, _initialX);
-				if (house.EstimateSummary != null)
-				{
-					WriteLine(house.EstimateSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
-				}
-				NewLine();
-				WriteLine("Rooms Summary: ", _medBoldFont, _initialX);
-				if (house.RoomsSummary != null)
-				{
-					WriteLine(house.RoomsSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
-				}
-				NewLine();
-				WriteLine("Construction Types: ", _medBoldFont, _initialX);
-				if (house.ConstructionType != null)
-				{
-					WriteLine(house.ConstructionType, _medRegularFont, _initialX + _labelWidth, _valueWidth);
-				}
-				NewLine();
+				WriteLine(client.Name, _medRegularFont, _initialX + _labelWidth);
 			}
+			else
+			{
+				WriteLine("Jake Miller", _medRegularFont, _initialX + _labelWidth);
+			}
+			NewLine();
+			WriteLine("Contact Details", _medBoldFont, _initialX);
+			NewLine();
+			WriteLine("Home ph #: ", _medBoldFont, _initialX);
+			if (client != null && client.HomePhoneNumber != null)
+			{
+				WriteLine(client.HomePhoneNumber, _medRegularFont, _initialX + _labelWidth);
+			}
+			else
+			{
+				WriteLine("091234567", _medRegularFont, _initialX + _labelWidth);
+			}
+			NewLine();
+			WriteLine("Mobile #: ", _medBoldFont, _initialX);
+			if (client != null && client.MobilePhoneNumber != null)
+			{
+				WriteLine(client.MobilePhoneNumber, _medRegularFont, _initialX + _labelWidth);
+			}
+			else
+			{
+				WriteLine("0211234567", _medRegularFont, _initialX + _labelWidth);
+			}
+			NewLine();
+			//WriteLine("Address: ", _normalBoldFont, _initialX);
+			//WriteLine(client.Address, _medRegularFont, _initialX + _labelWidth);
+			//NewLine();
+			WriteLine("Email Address: ", _medBoldFont, _initialX);
+			if (client != null && client.EmailAddress != null)
+			{
+				WriteLine(client.EmailAddress, _medRegularFont, _initialX + _labelWidth);
+			}
+			else
+			{
+				WriteLine("jake@gmail.com", _medRegularFont, _initialX + _labelWidth);
+			}
+			NewLine();
+			//WriteLine("Real Estate & Agent: ", _normalBoldFont, _initialX);
+			//WriteLine(client.RealEstate, _normalRegularFont, _initialX + _labelWidth);
+			//NewLine();
+			WriteLine("House Description", _medBoldFont, _initialX);
+			NewLine();
+			WriteLine("Estimate Summary: ", _medBoldFont, _initialX);
+			if (house.EstimateSummary != null)
+			{
+				WriteLine(house.EstimateSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
+			}
+			else
+			{
+				WriteLine("Built in early 2000", _medRegularFont, _initialX + _labelWidth, _valueWidth);
+			}
+			NewLine();
+			WriteLine("Rooms Summary: ", _medBoldFont, _initialX);
+			if (house.RoomsSummary != null)
+			{
+				WriteLine(house.RoomsSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
+			}
+			else
+			{
+				WriteLine("2 bedrooms 1 dining room", _medRegularFont, _initialX + _labelWidth, _valueWidth);
+			}
+			NewLine();
+			WriteLine("Construction Types: ", _medBoldFont, _initialX);
+			if (house.ConstructionType != null)
+			{
+				WriteLine(house.ConstructionType, _medRegularFont, _initialX + _labelWidth, _valueWidth);
+			}
+			else
+			{
+				WriteLine("Wood, old", _medRegularFont, _initialX + _labelWidth, _valueWidth);
+			}
+			NewLine();
 			foreach (Category category in house.Categories)
 			{
 				if (category.Name == "Overview")
@@ -208,7 +233,7 @@ namespace InspectionReport.Controllers
 							{
 								XImage image = _imageHandler.FromURI(URIResults[0].ToString());
 								double scale = (image.PixelWidth / 500) >= 1 ? (image.PixelWidth / 500) : 1;
-								_gfx.DrawImage(image, _initialX, _currentY, image.PixelWidth / scale, image.PixelHeight / scale);
+								_gfx.DrawImage(image, _initialX, _currentY, image.PixelWidth/scale, image.PixelHeight/scale);
 							}
 						}
 					}
