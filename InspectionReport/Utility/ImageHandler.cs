@@ -17,8 +17,7 @@ namespace InspectionReport.Utility
 			HttpWebRequest webRequest = (HttpWebRequest)HttpWebRequest.Create(uri);
 			webRequest.AllowWriteStreamBuffering = true;
 			WebResponse webResponse = webRequest.GetResponse();
-			Image image = Image.FromStream(webResponse.GetResponseStream());
-			XImage xImage = XImage.FromGdiPlusImage(image);
+			XImage xImage = XImage.FromStream(webResponse.GetResponseStream());
 			webResponse.Close();
 			return xImage;
 		}

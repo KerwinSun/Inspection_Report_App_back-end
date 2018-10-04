@@ -18,7 +18,7 @@ using System.Threading;
 
 namespace InspectionReport.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/Image")]
     public class ImageController : Controller
     {

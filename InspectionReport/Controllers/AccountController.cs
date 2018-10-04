@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InspectionReport.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/auth/[action]")]
     public class AccountController : Controller
     {

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace InspectionReport.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/User")]
     [ApiController]
     public class UserController : ControllerBase

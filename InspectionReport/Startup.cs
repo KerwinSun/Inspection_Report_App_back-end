@@ -15,6 +15,7 @@ using InspectionReport.Services;
 using InspectionReport.Services.Interfaces;
 using InspectionReport.Utility;
 using System.IO;
+using PdfSharp.Fonts;
 
 namespace InspectionReport
 {
@@ -89,10 +90,10 @@ namespace InspectionReport
                     options.UseSqlServer(Configuration.GetConnectionString("ProductionConnection")));
             }
 
-            // Injecting the PDF tool
-            //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+			GlobalFontSettings.FontResolver = new FontResolver();
 
-            services.AddTransient<IAuthorizeService, AuthorizeService>(); // Injecting the Authorize Service
+			//services.AddTransient<IAuthorizeService, AuthorizeService>(); // Injecting the Authorize Service
+			services.AddTransient<IAuthorizeService, MockAuthorizeService>(); //USE THIS ONLY TO BYPASS AUTHORIZATION.
             services.AddTransient<IImageService, ImageService>(); //Inject image service.
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
