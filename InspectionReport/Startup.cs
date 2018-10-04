@@ -17,6 +17,7 @@ using InspectionReport.Utility;
 using System.IO;
 using PdfSharp.Fonts;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.CookiePolicy;
 
 namespace InspectionReport
 {
@@ -74,7 +75,13 @@ namespace InspectionReport
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
 
-            services.AddAuthentication().AddCookie();
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = false;
+                options.ExpireTimeSpan = TimeSpan.FromDays(5);
+                options.SlidingExpiration = true;
+            });
             /// TODO: Should put the connection string as an environment variable.
 
             // Use SQL Database if in Azure, otherwise, use SQLite
@@ -126,9 +133,11 @@ namespace InspectionReport
             app.UseHttpsRedirection();
             app.UseDeveloperExceptionPage(); // TODO: Remove once finished debugging.
             app.UseAuthentication();
+            app.UseCookiePolicy();
             app.UseCors("localhost");
             app.UseCors("deployment");
             app.UseMvc();
+
         }
     }
 }
