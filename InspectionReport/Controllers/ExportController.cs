@@ -44,7 +44,7 @@ namespace InspectionReport.Controllers
 		private readonly XSolidBrush _color;
 		private int _pageNumber = 0;
 		private readonly int _nameWidth = 180;
-		private readonly int _commentsWidth = 240;
+		private readonly int _commentsWidth = 230;
 		private readonly int _labelWidth = 200;
 		private readonly int _valueWidth = 300;
 		private ReportText _text;
@@ -58,8 +58,8 @@ namespace InspectionReport.Controllers
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_medRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
 			_medBoldFont = new XFont("Arial", 13, XFontStyle.Bold);
-			_smallRegularFont = new XFont("Arial", 7, XFontStyle.Regular);
-			_smallBoldFont = new XFont("Arial", 7, XFontStyle.Bold);
+			_smallRegularFont = new XFont("Arial", 8, XFontStyle.Regular);
+			_smallBoldFont = new XFont("Arial", 8, XFontStyle.Bold);
 			_document = new PdfDocument();
 			_color = new XSolidBrush(XColor.FromArgb(179, 204, 204));
 			_text = new ReportText();
@@ -206,7 +206,7 @@ namespace InspectionReport.Controllers
 				if (category.Name != "Overview")
 				{
 					double titleHeight = _gfx.MeasureString(category.Name, _medBoldFont).Height;
-					if (_currentY + titleHeight * 2 > 750)
+					if (_currentY + titleHeight * 2 > 730)
 					{
 						AddNewHousePage();
 					}
@@ -229,16 +229,7 @@ namespace InspectionReport.Controllers
 			WriteCategory("General Comments", _medBoldFont, _initialX);
 			NewLine();
 			string comments = "";
-			if (house.Comments == null)
-			{
-				comments = "comments comments comments comments comments comments comments comments comments comments\n"
-					+ "comments comments comments comments comments comments comments comments comments comments "
-					+ "comments comments comments comments comments comments comments comments comments comments.\n\n"
-					+ "comments comments comments comments comments comments comments comments comments comments\n "
-					+ "comments comments comments comments comments comments comments comments comments comments "
-					+ "comments comments comments comments comments comments comments comments comments comments.\n";
-			}
-			else
+			if (house.Comments != null)
 			{
 				comments = house.Comments;
 			}
@@ -294,7 +285,7 @@ namespace InspectionReport.Controllers
 		{
 			AddNewPage();
 			_gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
-			_currentY = 100;
+			_currentY = 80;
 			string policyText = _text.statementOfPolicy;
 			string[] policyArray = policyText.Split("\r\n\r\n");
 			foreach (string policy in policyArray)
@@ -315,10 +306,9 @@ namespace InspectionReport.Controllers
 			_tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, _currentY - height / 2, textWidth, _page.Height), XStringFormats.TopLeft);
 		}
 
-		private void WriteLine2(string stringToWrite, XFont font, int x, int textWidth)
+		private void WriteLine(string stringToWrite, XFont font, int x, int textWidth, int textHeight)
 		{
-			double height = _gfx.MeasureString(stringToWrite, font).Height;
-			_tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, _currentY, textWidth, _page.Height), XStringFormats.TopLeft);
+			_tf.DrawString(stringToWrite, font, XBrushes.Black, new XRect(x, _currentY, textWidth, textHeight), XStringFormats.TopLeft);
 		}
 
 		private void WriteLine(string stringToWrite, XFont font, int x)
@@ -328,7 +318,7 @@ namespace InspectionReport.Controllers
 
 		private void WriteCategory(string stringToWrite, XFont font, int x)
 		{
-			_gfx.DrawRectangle(_color, _initialX, _currentY - 15, _page.Width - 2 * _initialX + 5, 25);
+			_gfx.DrawRectangle(_color, _initialX, _currentY - 15, 500, 25);
 			_gfx.DrawString(stringToWrite, font, XBrushes.Black, x, _currentY);
 		}
 
@@ -339,7 +329,7 @@ namespace InspectionReport.Controllers
 			_pageNumber++;
 			_gfx = XGraphics.FromPdfPage(_page);
 			AddFooter();
-			_gfx.DrawString(_pageNumber.ToString(), _medBoldFont, XBrushes.Black, 535, 795);
+			_gfx.DrawString(_pageNumber.ToString(), _medBoldFont, XBrushes.Black, 535, 775);
 			_tf = new XTextFormatter(_gfx);
 			WriteLine("A", _medBoldFont, _initialX + 420);
 			WriteLine("B", _medBoldFont, _initialX + 450);
@@ -353,16 +343,16 @@ namespace InspectionReport.Controllers
 			_page = _document.AddPage();
 			_pageNumber++;
 			_gfx = XGraphics.FromPdfPage(_page);
-			_gfx.DrawString(_pageNumber.ToString(), _medBoldFont, XBrushes.Black, 535, 795);
+			_gfx.DrawString(_pageNumber.ToString(), _medBoldFont, XBrushes.Black, 535, 775);
 			_tf = new XTextFormatter(_gfx);
 		}
 
 		private void AddFooter()
 		{
-			_gfx.DrawString("A - Good", _medBoldFont, XBrushes.Black, 70, 765);
-			_gfx.DrawString("B - Will need attention soon", _medBoldFont, XBrushes.Black, 70, 780);
-			_gfx.DrawString("C - Need immediate attention", _medBoldFont, XBrushes.Black, 70, 795);
-			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX, 750, 500, 50);
+			_gfx.DrawString("A - Good", _medBoldFont, XBrushes.Black, 70, 745);
+			_gfx.DrawString("B - Will need attention soon", _medBoldFont, XBrushes.Black, 70, 760);
+			_gfx.DrawString("C - Need immediate attention", _medBoldFont, XBrushes.Black, 70, 775);
+			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX, 730, 500, 50);
 		}
 
 		private void NewLine()
@@ -372,7 +362,7 @@ namespace InspectionReport.Controllers
 
 		private void NewRow(int height, Feature feature)
 		{
-			if (_currentY + height > 750)
+			if (_currentY + height > 720)
 			{
 				AddNewHousePage();
 			}
@@ -390,7 +380,8 @@ namespace InspectionReport.Controllers
 			{
 				WriteLine("X", _medRegularFont, _initialX + 480);
 			}
-			_gfx.DrawRectangle(new XPen(XColors.LightGray), _initialX, _currentY - 15, 410, height);
+			_gfx.DrawRectangle(new XPen(XColors.LightGray), _initialX, _currentY - 15, _nameWidth, height);
+			_gfx.DrawRectangle(new XPen(XColors.LightGray), _nameWidth + _initialX, _currentY - 15, _commentsWidth, height);
 			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX + 410, _currentY - 15, 30, height);
 			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX + 440, _currentY - 15, 30, height);
 			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX + 470, _currentY - 15, 30, height);
@@ -399,7 +390,7 @@ namespace InspectionReport.Controllers
 
 		private void NewImageRow(XImage image, int width, int height)
 		{
-			if (_currentY + height > 750)
+			if (_currentY + height > 720)
 			{
 				AddNewPage();
 			}
@@ -409,13 +400,13 @@ namespace InspectionReport.Controllers
 
 		private void NewCommentRow(string text, int height)
 		{
-			if (_currentY + height > 750)
+			if (_currentY + height > 720)
 			{
 				AddNewPage();
 			}
 			WriteLine(text, _medRegularFont, _initialX, 500);
 			_gfx.DrawRectangle(new XPen(XColors.Black), _initialX, _currentY - 15, 500, height);
-			_currentY += height;
+			_currentY += height + 30;
 		}
 
 		private void NewPolicyRow(string text, int height)
@@ -424,8 +415,8 @@ namespace InspectionReport.Controllers
 			{
 				AddNewPage();
 			}
-			WriteLine2(text, _smallRegularFont, _initialX, 500);
-			_currentY += height + 20;
+			WriteLine(text, _smallRegularFont, _initialX, 500, height);
+			_currentY += height + 7;
 		}
 
 		private double GetTextHeight(string text, XFont font, double rectWidth)
@@ -437,7 +428,7 @@ namespace InspectionReport.Controllers
 
 			if (absoluteTextWidth > rectWidth)
 			{
-				var linesToAdd = (int)Math.Ceiling(absoluteTextWidth / 100) - 1;
+				var linesToAdd = (int)Math.Ceiling(absoluteTextWidth / rectWidth) - 1;
 				return absoluteTextHeight + linesToAdd * (fontHeight);
 			}
 			return absoluteTextHeight;
