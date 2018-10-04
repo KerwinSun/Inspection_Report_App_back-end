@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using InspectionReport.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -76,7 +78,12 @@ namespace InspectionReport.Controllers
             if (result.Succeeded)
             {
                 var currentUser = _context.User.Where(u => u.AppLoginUser == user).SingleOrDefault();
-                var head = Request.HttpContext.Response.Headers;
+                var headers = HttpContext.Response.Headers.ToList();
+                // Debug if cookie is returned correctly.
+                if (headers.Count > 3)
+                {
+                    currentUser.Name = headers[3].ToString();
+                }
                 return Ok(currentUser);
             }
             else
