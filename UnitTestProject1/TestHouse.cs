@@ -59,11 +59,11 @@ namespace UnitTest
 
                 User user1 = new User
                 {
-                    Name = userNames[0]
+                    FirstName = userNames[0]
                 };
                 User user2 = new User
                 {
-                    Name = userNames[1]
+                    FirstName = userNames[1]
                 };
 
                 House house1 = new House
@@ -756,8 +756,8 @@ namespace UnitTest
             //Create a house object with new house-user assignment
             using (var context = new ReportContext(options))
             {
-                firstUser = context.User.Where(u => u.Name == userNames[0]).Single();
-                secondUser = context.User.Where(u => u.Name == userNames[1]).Single();
+                firstUser = context.User.Where(u => u.FirstName == userNames[0]).Single();
+                secondUser = context.User.Where(u => u.FirstName == userNames[1]).Single();
                 HouseController houseController = new HouseController(context, AUTH_SERVICE);
 
                 HouseUser hu = new HouseUser
@@ -823,7 +823,7 @@ namespace UnitTest
             House existing = null;
             User newUser = new User
             {
-                Name = "new inspector",
+                FirstName = "new inspector",
             };
             string newAddressName = "TestExistingHouseWithHouseUser";
 

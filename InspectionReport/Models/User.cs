@@ -17,7 +17,11 @@ namespace InspectionReport.Models
         }
 
         public long Id { get; set; }
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Password { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
         public ICollection<HouseUser> Inspected { get; set; }
         public ApplicationUser AppLoginUser { get; set; }
     }

@@ -31,7 +31,7 @@ namespace UnitTest
                 UserController userController = new UserController(context);
                 User newUser = new User
                 {
-                    Name = "Test User"
+                    FirstName = "Test User"
                 };
                 CreatedAtRouteResult returned = userController.CreateUser(newUser) as CreatedAtRouteResult;
 
@@ -44,7 +44,7 @@ namespace UnitTest
             using (var context = new ReportContext(options))
             {
                 Assert.AreEqual(1, context.User.Count());
-                Assert.AreEqual("Test User", context.User.Single().Name);
+                Assert.AreEqual("Test User", context.User.Single().FirstName);
             }
 
             //Create more users
@@ -53,7 +53,7 @@ namespace UnitTest
                 UserController userController = new UserController(context);
                 User newUser2 = new User
                 {
-                    Name = "Test User 2"
+                    FirstName = "Test User 2"
                 };
                 userController.CreateUser(newUser2);
             }
@@ -81,7 +81,7 @@ namespace UnitTest
                     UserController userController = new UserController(context);
                     User newUser = new User
                     {
-                        Name = "Test User"
+                        FirstName = "Test User"
                     };
                     userController.CreateUser(newUser);
                 }
@@ -114,7 +114,7 @@ namespace UnitTest
             //Set up the objects first.
             User user = new User
             {
-                Name = "Darius is a cat"
+                FirstName = "Darius is a cat"
             };
 
             string address1 = "21 Darius Road";
@@ -173,7 +173,7 @@ namespace UnitTest
                 Assert.AreEqual(200, result.StatusCode);
                 Assert.IsNotNull(userGot);
                 Assert.AreEqual(userId, userGot.Id);
-                Assert.AreEqual("Darius is a cat", user.Name);
+                Assert.AreEqual("Darius is a cat", user.FirstName);
 
                 //Should include houseUser
                 ICollection<HouseUser> houseUsers = userGot.Inspected;
