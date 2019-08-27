@@ -86,7 +86,7 @@ namespace InspectionReport
             if (_env.IsDevelopment())
             {
                 var connection =
-                    @"Server=(localdb)\mssqllocaldb;Database=InspectionReportDB;Trusted_Connection=True;ConnectRetryCount=0";
+                    @"Server=localhost;Database=InspectionReportDB;Trusted_Connection=False;ConnectRetryCount=0;User ID=sa;Password=Password1";
                 services.AddDbContext<ReportContext>(options => options.UseSqlServer(connection));
             }
             else
