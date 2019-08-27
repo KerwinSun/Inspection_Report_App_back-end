@@ -24,5 +24,15 @@ namespace InspectionReport.Models
         public string Email { get; set; }
         public ICollection<HouseUser> Inspected { get; set; }
         public ApplicationUser AppLoginUser { get; set; }
+        public void UpdateObjectFromOther(User other)
+        {
+            FirstName = other.FirstName;
+            LastName = other.LastName;
+            Email = other.Email;
+            Phone = other.Email;
+            Password = other.Email;
+        }
     }
+
+
 }

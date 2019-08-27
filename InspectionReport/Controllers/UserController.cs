@@ -44,18 +44,41 @@ namespace InspectionReport.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateUser([FromBody] User user)
+        public IActionResult CreateOrUpdateUser([FromBody] User editUser)
         {
-            if (user == null)
+            if (editUser == null)
             {
                 return BadRequest();
             }
+            var user = _context.User.FirstOrDefault(u => u.Id == editUser.Id);
 
-            _context.User.Add(user);
+            if (user != null)
+            {
+                user.UpdateObjectFromOther(editUser);
+            }
+            else
+            {
+                _context.User.Add(user);
+            }
+
             _context.SaveChanges();
 
             return CreatedAtRoute("GetUser", new { id = user.Id }, user);
         }
+
+        //[HttpPost]
+        //public IActionResult CreateUser([FromBody] User user)
+        //{
+        //    if (user == null)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.User.Add(user);
+        //    _context.SaveChanges();
+
+        //    return CreatedAtRoute("GetUser", new { id = user.Id }, user);
+        //}
 
 
     }
