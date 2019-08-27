@@ -33,7 +33,7 @@ namespace UnitTest
                 {
                     FirstName = "Test User"
                 };
-                CreatedAtRouteResult returned = userController.CreateUser(newUser) as CreatedAtRouteResult;
+                CreatedAtRouteResult returned = userController.CreateOrUpdateUser(newUser) as CreatedAtRouteResult;
 
                 //Check that the correct status code is returned.
                 Assert.IsNotNull(returned);
@@ -55,7 +55,7 @@ namespace UnitTest
                 {
                     FirstName = "Test User 2"
                 };
-                userController.CreateUser(newUser2);
+                userController.CreateOrUpdateUser(newUser2);
             }
 
             //Inspect both users are in
@@ -83,7 +83,7 @@ namespace UnitTest
                     {
                         FirstName = "Test User"
                     };
-                    userController.CreateUser(newUser);
+                    userController.CreateOrUpdateUser(newUser);
                 }
             }
 
