@@ -27,9 +27,14 @@ namespace InspectionReport.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "Password",
+                name: "AccountType",
                 table: "User",
                 nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+               name: "Password",
+               table: "User",
+               nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -48,6 +53,10 @@ namespace InspectionReport.Migrations
 
             migrationBuilder.DropColumn(
                 name: "Password",
+                table: "User");
+
+            migrationBuilder.DropColumn(
+                name: "AccountType",
                 table: "User");
 
             migrationBuilder.RenameColumn(

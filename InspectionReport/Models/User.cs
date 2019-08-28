@@ -22,6 +22,7 @@ namespace InspectionReport.Models
         public string Password { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
+        public string AccountType { get; set; }
         public ICollection<HouseUser> Inspected { get; set; }
         public ApplicationUser AppLoginUser { get; set; }
         public void UpdateObjectFromOther(User other)
@@ -29,8 +30,9 @@ namespace InspectionReport.Models
             FirstName = other.FirstName;
             LastName = other.LastName;
             Email = other.Email;
-            Phone = other.Email;
+            Phone = other.Phone;
             Password = other.Email;
+            AccountType = other.AccountType;
         }
     }
 

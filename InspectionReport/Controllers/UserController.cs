@@ -58,12 +58,12 @@ namespace InspectionReport.Controllers
             }
             else
             {
-                _context.User.Add(user);
+                _context.User.Add(editUser);
             }
 
             _context.SaveChanges();
 
-            return CreatedAtRoute("GetUser", new { id = user.Id }, user);
+            return CreatedAtRoute("GetUser", new { id = editUser.Id }, editUser);
         }
 
         //[HttpPost]
