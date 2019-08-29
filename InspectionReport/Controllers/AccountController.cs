@@ -31,6 +31,7 @@ namespace InspectionReport.Controllers
             _context = context;
         }
 
+/* 
         // GET: Dummy method to create a new user.
         [HttpGet]
         [AllowAnonymous]
@@ -48,7 +49,8 @@ namespace InspectionReport.Controllers
             {
                 User user = new User()
                 {
-                    Name = "Rob Kirkpatrick",
+                    FirstName = "Rob",
+                    LastName = "Kirkpatrick",
                     AppLoginUser = appUser
                 };
 
@@ -59,6 +61,34 @@ namespace InspectionReport.Controllers
                 return new string[] { appUser.Id, appUser.UserName };
             }
             return new string[] { "Not Created" };
+        }
+        */
+
+        // POST createAcc
+        [HttpPost]
+        [AllowAnonymous]
+        [ActionName("createAccount")]
+        public async Task<IActionResult> CreateUserAsync([FromBody] User user) {
+            
+            if (user == null) {
+                return BadRequest();
+            }
+            
+            ApplicationUser appUser = new ApplicationUser() {
+                UserName = user.Email,
+                Email = user.Email
+            };
+
+            user.AppLoginUser = appUser;
+
+            var result = await _userManager.CreateAsync(user.AppLoginUser, user.Password);
+            if (result.Succeeded) {
+                _context.User.Add(user);
+                _context.SaveChanges();
+                // return new string[] { user.AppLoginUser.Id, user.AppLoginUser.UserName};
+                return Content("User was created", "text/html");
+            }
+            return Content("User created failed", "text/html");
         }
 
         // POST api/login

@@ -17,8 +17,24 @@ namespace InspectionReport.Models
         }
 
         public long Id { get; set; }
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Password { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
+        public string AccountType { get; set; }
         public ICollection<HouseUser> Inspected { get; set; }
         public ApplicationUser AppLoginUser { get; set; }
+        public void UpdateObjectFromOther(User other)
+        {
+            FirstName = other.FirstName;
+            LastName = other.LastName;
+            Email = other.Email;
+            Phone = other.Phone;
+            Password = other.Email;
+            AccountType = other.AccountType;
+        }
     }
+
+
 }

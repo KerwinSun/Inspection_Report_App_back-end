@@ -97,11 +97,11 @@ namespace InspectionReport.Controllers
 
 				if (names == "")
 				{
-					names = names + user.Name;
+					names = names + user.FirstName + " " + user.LastName;
 				}
 				else
 				{
-					names = names + ", " + user.Name;
+					names = names + ", " + user.FirstName + " " + user.LastName;
 				}
 			}
 
