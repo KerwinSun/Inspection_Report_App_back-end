@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.AspNetCore.Mvc;
 using InspectionReport.Models;
 using Microsoft.AspNetCore.Authorization;
+using InspectionReport.Services;
 
 namespace InspectionReport.Controllers
 {
@@ -16,10 +16,12 @@ namespace InspectionReport.Controllers
     public class UserController : ControllerBase
     {
         private readonly ReportContext _context;
+        private readonly UserService _userService;
 
         public UserController(ReportContext context)
         {
             _context = context;
+            _userService = new UserService();
         }
 
         [HttpGet]
@@ -50,7 +52,9 @@ namespace InspectionReport.Controllers
             {
                 return BadRequest();
             }
-            var user = _context.User.FirstOrDefault(u => u.Id == editUser.Id);
+            
+            var user = _context.User.FirstOrDefault(u => u.Id == editUser.Id);  
+            editUser = _userService.UserCheck(editUser);
 
             if (user != null)
             {

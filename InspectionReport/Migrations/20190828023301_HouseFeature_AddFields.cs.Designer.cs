@@ -249,7 +249,7 @@ namespace InspectionReport.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AccountType");
+                    b.Property<int>("Type");
 
                     b.Property<string>("AppLoginUserId");
 

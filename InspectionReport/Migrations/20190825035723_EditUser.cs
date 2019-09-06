@@ -26,8 +26,8 @@ namespace InspectionReport.Migrations
                 table: "User",
                 nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "AccountType",
+            migrationBuilder.AddColumn<int>(
+                name: "Type",
                 table: "User",
                 nullable: true);
 
@@ -56,7 +56,7 @@ namespace InspectionReport.Migrations
                 table: "User");
 
             migrationBuilder.DropColumn(
-                name: "AccountType",
+                name: "Type",
                 table: "User");
 
             migrationBuilder.RenameColumn(
