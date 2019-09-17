@@ -33,6 +33,8 @@ namespace InspectionReport.Controllers
             ICollection<House> houses = _context.House
                                     .Include(h => h.Categories)
                                         .ThenInclude(c => c.Features)
+                                        .Include(h => h.InspectedBy)
+                                        .Include(h => h.SummonsedBy)
                                     .ToList();
             return Ok(houses);
         }
