@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using InspectionReport.Models;
+using InspectionReport.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ namespace InspectionReport.Controllers
         private UserManager<ApplicationUser> _userManager = null;
         private SignInManager<ApplicationUser> _signInManager = null;
         private ReportContext _context = null;
+        private readonly UserService _userService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -29,6 +31,7 @@ namespace InspectionReport.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _userService = new UserService();
         }
 
 /* 
@@ -83,6 +86,7 @@ namespace InspectionReport.Controllers
 
             var result = await _userManager.CreateAsync(user.AppLoginUser, user.Password);
             if (result.Succeeded) {
+                user = _userService.UserCheck(user);
                 _context.User.Add(user);
                 _context.SaveChanges();
                 // return new string[] { user.AppLoginUser.Id, user.AppLoginUser.UserName};
