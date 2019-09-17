@@ -27,7 +27,12 @@ namespace InspectionReport.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_context.User.ToList());
+            var users = _context.User.ToList();
+            foreach (User user in users){
+                user.Password = "";
+            }
+
+            return Ok(users);
         }
 
         [HttpGet("{id}", Name = "GetUser")]
