@@ -12,12 +12,31 @@ namespace InspectionReport.Services
 
         public User UserCheck(User user)
         {
-            if (!user.Type.HasValue){
-                user.Type = AccountType.Client;
+            if (!user.AccountType.HasValue){
+                user.AccountType = UserAccountType.Client;
             }
             
             return user;
         }
+
+        public List<UserDTO> DTOConvert(List<User> users)
+        {
+            List<UserDTO> userDTOList = new List<UserDTO>();
+            foreach (User user in users){
+                var userDTO = new UserDTO();
+                userDTO.UpdateObjectFromOther(user);
+
+                userDTOList.Add(userDTO);
+            }
+            return userDTOList;
+        }
+
+        //public UserDTO UserToUserDTO(User user)
+        //{
+        //    UserDTO userDTO{
+        //        var 
+        //    }
+        //}
         
     }
 }

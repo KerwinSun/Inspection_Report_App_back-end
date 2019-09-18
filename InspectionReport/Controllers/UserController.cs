@@ -28,11 +28,12 @@ namespace InspectionReport.Controllers
         public IActionResult GetAll()
         {
             var users = _context.User.ToList();
-            foreach (User user in users){
-                user.Password = "";
-            }
+            var returnUsers = _userService.DTOConvert(users);
+            //foreach (User user in users){
+            //    user.Password = "";
+            //}
 
-            return Ok(users);
+            return Ok(returnUsers);
         }
 
         [HttpGet("{id}", Name = "GetUser")]

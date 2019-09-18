@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace InspectionReport.Models
 {
-    public enum AccountType
+    public enum UserAccountType
     {
         Client = 0,
         Inspector = 1,

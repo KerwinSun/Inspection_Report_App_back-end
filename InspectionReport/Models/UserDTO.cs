@@ -9,9 +9,9 @@ namespace InspectionReport.Models
     /// <summary>
     /// A user is a inspector/ admin who can access inspection reports.
     /// </summary>
-    public class User
+    public class UserDTO
     {
-        public User ()
+        public UserDTO ()
         {
             Inspected = new List<HouseUser>();
         }
@@ -22,7 +22,7 @@ namespace InspectionReport.Models
         public string Password { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
-        public UserAccountType? AccountType { get; set; }
+        public string AccountType { get; set; }
         public ICollection<HouseUser> Inspected { get; set; }
         public ApplicationUser AppLoginUser { get; set; }
         public void UpdateObjectFromOther(User other)
@@ -31,7 +31,7 @@ namespace InspectionReport.Models
             LastName = other.LastName;
             Email = other.Email;
             Phone = other.Phone;
-            AccountType = other.AccountType;
+            AccountType = other.AccountType.ToString();
         }
     }
 
