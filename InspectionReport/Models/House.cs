@@ -51,7 +51,6 @@ namespace InspectionReport.Models
             RoomsSummary = other.RoomsSummary;
             PrivateComments = other.PrivateComments;
 
-
             //add all new HouseUser objects
             foreach (HouseUser hu in other.InspectedBy ?? Enumerable.Empty<HouseUser>())
             {
