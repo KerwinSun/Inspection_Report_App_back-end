@@ -120,6 +120,12 @@ namespace InspectionReport.Controllers
             string emailaddress = client.EmailAddress;
             string clientName = client.Name;
             EmailAddress clientEmail = new EmailAddress(clientName, emailaddress);
+            EmailAddress hitchEmail = new EmailAddress("Hitch Building Inspections", "hitchinspectionz@gmail.com");
+            EmailMessage emessage = new EmailMessage();
+            emessage.to = clientEmail;
+            emessage.from = hitchEmail;
+            emessage.subject = house.Address + " - Inspection Report"; 
+            emessage.content = "Your inspection has been completed";
 
 			using (MemoryStream ms = new MemoryStream())
 			{
