@@ -119,7 +119,7 @@ namespace InspectionReport.Controllers
             Client client = house.SummonsedBy;
             string emailaddress = client.EmailAddress;
             string clientName = client.Name;
-            EmailAddress clientEmail = new EmailAddress();
+            EmailAddress clientEmail = new EmailAddress(clientName, emailaddress);
 
 			using (MemoryStream ms = new MemoryStream())
 			{
