@@ -23,7 +23,7 @@ namespace InspectionReport.Controllers
         [HttpGet]
         public IActionResult sendEmail()
         {
-            EmailAddress clientEmail = new EmailAddress("William", "chao_mix@hotmail.com");
+            EmailAddress clientEmail = new EmailAddress("Client", "hitchinspectionz@gmail.com");
             EmailAddress hitchEmail = new EmailAddress("Hitch Building Inspections", "hitchinspectionz@gmail.com");
             EmailMessage emessage = new EmailMessage();
             emessage.to = clientEmail;

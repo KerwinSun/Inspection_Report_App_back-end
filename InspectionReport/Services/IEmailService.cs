@@ -32,7 +32,8 @@ namespace InspectionReport.Services
 
             message.Subject = emailMessage.subject;
             //We will say we are sending HTML. But there are options for plaintext etc.
-            message.Body = new TextPart("TextFormat.Html")
+            //message.Body = new TextPart("TextFormat.Html")
+            message.Body = new TextPart("html")
             {
                 Text = emailMessage.content
             };
