@@ -15,6 +15,11 @@ namespace InspectionReport.Controllers
     {
         private readonly IEmailService _mailer;
 
+        public EmailController(IEmailService eservice)
+        {
+            _mailer = eservice;
+        }
+
         [HttpGet]
         public IActionResult sendEmail()
         {
