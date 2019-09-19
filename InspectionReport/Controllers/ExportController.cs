@@ -21,7 +21,7 @@ using InspectionReport.Services;
 namespace InspectionReport.Controllers
 {
 	//[Authorize]
-	[Route("api/Export")]
+	[Route("api/Export[action]")]
 	public class ExportController : Controller
 	{
 		private readonly ReportContext _context;
@@ -69,8 +69,20 @@ namespace InspectionReport.Controllers
 		}
 
 		[HttpGet("{id}")]
-		public async Task<IActionResult> GeneratePDFAsync(long id)
+        [ActionName("")]
+        // api usage: /api/Export/{house.id}
+		public IActionResult GeneratePDF(long id)
 		{
+            byte[] data = CreatePDF(id);
+            string pdfFilename = "InspectionReport" + id + ".pdf";
+            return File(data, "application/pdf", pdfFilename) ?? (IActionResult)NotFound();
+		}
+
+        [HttpGet("{id}")]
+        [ActionName("/email")]
+        // api usage: /api/Export/email/{house.id}
+        public async Task<IActionResult> EmailPDFAsync(long id)
+        {
             House house = _context.House
                 .Where(h => h.Id == id)
                 .Include(h => h.SummonsedBy)
@@ -80,6 +92,7 @@ namespace InspectionReport.Controllers
             User client = _context.User
                 .Where(u => u.Email.Equals(cl.EmailAddress))
                 .FirstOrDefault();
+
             EmailAddress clientEmail = new EmailAddress(client.FirstName + " " + client.LastName, cl.EmailAddress);
             EmailMessage msg = new EmailMessage(clientEmail);
             msg.subject = "[Inspection Report] - " + house.Address;
@@ -92,11 +105,10 @@ namespace InspectionReport.Controllers
                 msg.fname = pdfFilename;
                 msg.file = data;
                 await _emailService.SendAsync(msg);
-                FileResult file = File(data, "application/pdf", pdfFilename);
-                return file;
+                return new OkResult();
             }
             return (IActionResult)NotFound();
-		}
+        }
 
 		private byte[] CreatePDF(long id)
 		{
