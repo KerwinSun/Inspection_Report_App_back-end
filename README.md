@@ -4,7 +4,7 @@
 This is the back-end API for Hitch Building Inspections Report Automation. The back-end manages the database (SQL), PDF generation, user management and automated email services.
 
 ## Build Status
-Master branch: [![Build Status](https://travis-ci.com/Karim-C/Inspection_Report_App_back-end.svg?token=aUW8TwnwNhqKCHbwaCXT&branch=master)](https://travis-ci.com/Karim-C/Inspection_Report_App_back-end)
+Master branch: [![Build Status](https://travis-ci.com/KerwinSun/Inspection_Report_App_back-end.png)](https://travis-ci.com/KerwinSun/Inspection_Report_App_back-end)
 
 ## Quick start
 1. Clone and set up the Visual Studio project
