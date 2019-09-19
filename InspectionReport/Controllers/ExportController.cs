@@ -16,17 +16,19 @@ using PdfSharp.Pdf;
 using PdfSharp.Drawing.Layout;
 using System.Net;
 using PdfSharp.Fonts;
+using InspectionReport.Services;
 
 namespace InspectionReport.Controllers
 {
 	//[Authorize]
-	[Route("api/Export")]
+	[Route("api/Export[action]")]
 	public class ExportController : Controller
 	{
 		private readonly ReportContext _context;
 		private ImageHandler _imageHandler;
 		private readonly IImageService _imageService;
 		private readonly IAuthorizeService _authorizeService;
+        private readonly IEmailService _emailService;
 		private PdfDocument _document;
 		private PdfPage _page;
 		private XGraphics _gfx;
@@ -49,11 +51,12 @@ namespace InspectionReport.Controllers
 		private readonly int _valueWidth = 300;
 		private ReportText _text;
 
-		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
+		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService, IEmailService emailService)
 		{
 			_context = context;
 			_imageService = imageService;
 			_authorizeService = authorizeService;
+            _emailService = emailService;
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_medRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
@@ -66,14 +69,48 @@ namespace InspectionReport.Controllers
 		}
 
 		[HttpGet("{id}")]
+        [ActionName("")]
+        // api usage: /api/Export/{house.id}
 		public IActionResult GeneratePDF(long id)
 		{
-			FileResult file = CreatePDF(id);
-
-			return file ?? (IActionResult)NotFound();
+            byte[] data = CreatePDF(id);
+            string pdfFilename = "InspectionReport" + id + ".pdf";
+            return File(data, "application/pdf", pdfFilename) ?? (IActionResult)NotFound();
 		}
 
-		private FileResult CreatePDF(long id)
+        [HttpGet("{id}")]
+        [ActionName("/email")]
+        // api usage: /api/Export/email/{house.id}
+        public async Task<IActionResult> EmailPDFAsync(long id)
+        {
+            House house = _context.House
+                .Where(h => h.Id == id)
+                .Include(h => h.SummonsedBy)
+                .SingleOrDefault();
+
+            Client cl = house.SummonsedBy;
+            User client = _context.User
+                .Where(u => u.Email.Equals(cl.EmailAddress))
+                .FirstOrDefault();
+
+            EmailAddress clientEmail = new EmailAddress(client.FirstName + " " + client.LastName, cl.EmailAddress);
+            EmailMessage msg = new EmailMessage(clientEmail);
+            msg.subject = "[Inspection Report] - " + house.Address;
+            msg.body = "Hello " + client.FirstName + " " + client.LastName + " your inspection request for " + house.Address + " is complete and the report has been attached.";
+            byte[] data = CreatePDF(id);
+            string pdfFilename = "InspectionReport" + house.Id + ".pdf";
+
+            if (data != null)
+            {
+                msg.fname = pdfFilename;
+                msg.file = data;
+                await _emailService.SendAsync(msg);
+                return new OkResult();
+            }
+            return (IActionResult)NotFound();
+        }
+
+		private byte[] CreatePDF(long id)
 		{
 			House house = _context.House
 				.Where(h => h.Id == id)
@@ -112,8 +149,6 @@ namespace InspectionReport.Controllers
 			CreateStatementOfPolicyPage();
 			CreateCertificatePage(house);
 
-			string pdfFilename = "InspectionReport" + house.Id + ".pdf";
-
 			using (MemoryStream ms = new MemoryStream())
 			{
 				_document.Save(ms, false);
@@ -121,8 +156,7 @@ namespace InspectionReport.Controllers
 				ms.Seek(0, SeekOrigin.Begin);
 				ms.Flush();
 				ms.Read(buffer, 0, (int)ms.Length);
-				byte[] docBytes = ms.ToArray();
-				return File(docBytes, "application/pdf", pdfFilename);
+				return ms.ToArray();
 			}
 		}
 
