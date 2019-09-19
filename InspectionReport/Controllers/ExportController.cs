@@ -69,13 +69,39 @@ namespace InspectionReport.Controllers
 		}
 
 		[HttpGet("{id}")]
-		public IActionResult GeneratePDF(long id)
+		public async Task<IActionResult> GeneratePDFAsync(long id)
 		{
-            FileResult file = CreatePDF(id);
-			return file ?? (IActionResult)NotFound();
+            House house = _context.House
+                .Where(h => h.Id == id)
+                .Include(h => h.Categories)
+                .ThenInclude(c => c.Features)
+                .Include(h => h.InspectedBy)
+                .SingleOrDefault();
+
+            Client client = house.SummonsedBy;
+            EmailAddress clientEmail = new EmailAddress(client.Name, client.EmailAddress);
+            EmailMessage msg = new EmailMessage(clientEmail)
+            {
+                subject = "[Inspection Report] - " + house.Address,
+                body = "Hello " + client.Name + " your inspection request for " + house.Address + " is complete and the report has been attached."
+            };
+
+            byte[] data = CreatePDF(id);
+            string pdfFilename = "InspectionReport" + house.Id + ".pdf";
+
+            if (data != null)
+            {
+                msg.fname = pdfFilename;
+                msg.file = data;
+                await _emailService.SendAsync(msg);
+                FileResult file = File(data, "application/pdf", pdfFilename);
+                return file;
+            }
+
+            return (IActionResult)NotFound();
 		}
 
-		private FileResult CreatePDF(long id)
+		private byte[] CreatePDF(long id)
 		{
 			House house = _context.House
 				.Where(h => h.Id == id)
@@ -114,16 +140,6 @@ namespace InspectionReport.Controllers
 			CreateStatementOfPolicyPage();
 			CreateCertificatePage(house);
 
-			string pdfFilename = "InspectionReport" + house.Id + ".pdf";
-            /*
-            Client client = house.SummonsedBy;
-            string emailaddress = client.EmailAddress;
-            string clientName = client.Name;
-            EmailAddress clientEmail = new EmailAddress(clientName, emailaddress);
-            EmailMessage emessage = new EmailMessage(clientEmail);
-            emessage.subject = house.Address + " - Inspection Report"; 
-            emessage.body = "Your inspection has been completed";
-            */
 			using (MemoryStream ms = new MemoryStream())
 			{
 				_document.Save(ms, false);
@@ -131,8 +147,7 @@ namespace InspectionReport.Controllers
 				ms.Seek(0, SeekOrigin.Begin);
 				ms.Flush();
 				ms.Read(buffer, 0, (int)ms.Length);
-				byte[] docBytes = ms.ToArray();
-				return File(docBytes, "application/pdf", pdfFilename);
+				return ms.ToArray();
 			}
 		}
 
