@@ -82,9 +82,9 @@ namespace InspectionReport.Controllers
 
             user.AppLoginUser = appUser;
 
-            var result = await _userManager.CreateAsync(user.AppLoginUser, HashService.ComputeSha256Hash(user.Password));
+            var result = await _userManager.CreateAsync(user.AppLoginUser, user.Password);
             if (result.Succeeded) {
-                user.Password = HashService.ComputeSha256Hash(user.Password);
+                user.Password = "";
                 _context.User.Add(user);
                 _context.SaveChanges();
                 // return new string[] { user.AppLoginUser.Id, user.AppLoginUser.UserName};
@@ -106,7 +106,7 @@ namespace InspectionReport.Controllers
                 return Unauthorized(); //Email not found.
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user, HashService.ComputeSha256Hash(model.Password), model.RememberMe, false);
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
             if (result.Succeeded)
             {
                 var currentUser = _context.User.Where(u => u.AppLoginUser == user).SingleOrDefault();
