@@ -73,19 +73,17 @@ namespace InspectionReport.Controllers
 		{
             House house = _context.House
                 .Where(h => h.Id == id)
-                .Include(h => h.Categories)
-                .ThenInclude(c => c.Features)
-                .Include(h => h.InspectedBy)
+                .Include(h => h.SummonsedBy)
                 .SingleOrDefault();
 
-            Client client = house.SummonsedBy;
-            EmailAddress clientEmail = new EmailAddress(client.Name, client.EmailAddress);
-            EmailMessage msg = new EmailMessage(clientEmail)
-            {
-                subject = "[Inspection Report] - " + house.Address,
-                body = "Hello " + client.Name + " your inspection request for " + house.Address + " is complete and the report has been attached."
-            };
-
+            Client cl = house.SummonsedBy;
+            User client = _context.User
+                .Where(u => u.Email.Equals(cl.EmailAddress))
+                .FirstOrDefault();
+            EmailAddress clientEmail = new EmailAddress(client.FirstName + " " + client.LastName, cl.EmailAddress);
+            EmailMessage msg = new EmailMessage(clientEmail);
+            msg.subject = "[Inspection Report] - " + house.Address;
+            msg.body = "Hello " + client.FirstName + " " + client.LastName + " your inspection request for " + house.Address + " is complete and the report has been attached.";
             byte[] data = CreatePDF(id);
             string pdfFilename = "InspectionReport" + house.Id + ".pdf";
 
@@ -97,7 +95,6 @@ namespace InspectionReport.Controllers
                 FileResult file = File(data, "application/pdf", pdfFilename);
                 return file;
             }
-
             return (IActionResult)NotFound();
 		}
 
