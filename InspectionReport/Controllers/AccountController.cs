@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using InspectionReport.Models;
+using InspectionReport.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -83,6 +84,7 @@ namespace InspectionReport.Controllers
 
             var result = await _userManager.CreateAsync(user.AppLoginUser, user.Password);
             if (result.Succeeded) {
+                user.Password = "";
                 _context.User.Add(user);
                 _context.SaveChanges();
                 // return new string[] { user.AppLoginUser.Id, user.AppLoginUser.UserName};
