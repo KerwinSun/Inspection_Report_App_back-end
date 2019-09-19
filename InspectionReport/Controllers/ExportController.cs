@@ -16,6 +16,7 @@ using PdfSharp.Pdf;
 using PdfSharp.Drawing.Layout;
 using System.Net;
 using PdfSharp.Fonts;
+using InspectionReport.Services;
 
 namespace InspectionReport.Controllers
 {
@@ -27,6 +28,7 @@ namespace InspectionReport.Controllers
 		private ImageHandler _imageHandler;
 		private readonly IImageService _imageService;
 		private readonly IAuthorizeService _authorizeService;
+        private readonly IEmailService _mailer;
 		private PdfDocument _document;
 		private PdfPage _page;
 		private XGraphics _gfx;
@@ -113,6 +115,17 @@ namespace InspectionReport.Controllers
 			CreateCertificatePage(house);
 
 			string pdfFilename = "InspectionReport" + house.Id + ".pdf";
+
+            Client client = house.SummonsedBy;
+            string emailaddress = client.EmailAddress;
+            string clientName = client.Name;
+            EmailAddress clientEmail = new EmailAddress(clientName, emailaddress);
+            EmailAddress hitchEmail = new EmailAddress("Hitch Building Inspections", "hitchinspectionz@gmail.com");
+            EmailMessage emessage = new EmailMessage();
+            emessage.to = clientEmail;
+            emessage.from = hitchEmail;
+            emessage.subject = house.Address + " - Inspection Report"; 
+            emessage.content = "Your inspection has been completed";
 
 			using (MemoryStream ms = new MemoryStream())
 			{
