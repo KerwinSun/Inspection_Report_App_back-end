@@ -31,39 +31,6 @@ namespace InspectionReport.Controllers
             _context = context;
         }
 
-/* 
-        // GET: Dummy method to create a new user.
-        [HttpGet]
-        [AllowAnonymous]
-        [ActionName("dummypost")]
-        public async Task<IEnumerable<string>> CreateUserAsync()
-        {
-            ApplicationUser appUser = new ApplicationUser()
-            {
-                UserName = "rob",
-                Email = "rob@rob.com"
-            };
-
-            var result = await _userManager.CreateAsync(appUser, "Test123!");
-            if (result.Succeeded)
-            {
-                User user = new User()
-                {
-                    FirstName = "Rob",
-                    LastName = "Kirkpatrick",
-                    AppLoginUser = appUser
-                };
-
-                user.AppLoginUser = appUser;
-
-                _context.User.Add(user);
-
-                return new string[] { appUser.Id, appUser.UserName };
-            }
-            return new string[] { "Not Created" };
-        }
-        */
-
         // POST createAcc
         [HttpPost]
         [AllowAnonymous]

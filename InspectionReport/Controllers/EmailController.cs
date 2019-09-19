@@ -9,29 +9,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InspectionReport.Controllers
 {
-    [Route("api/emailTest")]
+    [Route("api/email/[action]")]
     [ApiController]
     public class EmailController : ControllerBase
     {
-        private readonly IEmailService _mailer;
+        private readonly IEmailService _emailService;
 
-        public EmailController(IEmailService eservice)
+        public EmailController(IEmailService emailService)
         {
-            _mailer = eservice;
+            _emailService = emailService;
         }
 
         [HttpGet]
-        public IActionResult sendEmail()
+        [ActionName("testMsg")]
+        public async Task<IActionResult> sendTextMessage()
         {
-            EmailAddress clientEmail = new EmailAddress("Client", "hitchinspectionz@gmail.com");
-            EmailAddress hitchEmail = new EmailAddress("Hitch Building Inspections", "hitchinspectionz@gmail.com");
-            EmailMessage emessage = new EmailMessage();
-            emessage.to = clientEmail;
-            emessage.from = hitchEmail;
-            emessage.subject = "Test - Inspection Report";
-            emessage.content = "Your inspection has been completed";
-            _mailer.Send(emessage);
-            return Ok();
+            EmailAddress toEmail = new EmailAddress("Client", "hitchinspectionz@gmail.com");
+            EmailMessage msg = new EmailMessage(toEmail);
+            msg.subject = "Test - Inspection Report";
+            msg.body = "Hello world your inspection has been completed";
+            await _emailService.SendAsync(msg);
+            return new OkResult();
         }
+
     }
 }

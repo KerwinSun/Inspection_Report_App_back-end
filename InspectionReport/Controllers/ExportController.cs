@@ -28,7 +28,7 @@ namespace InspectionReport.Controllers
 		private ImageHandler _imageHandler;
 		private readonly IImageService _imageService;
 		private readonly IAuthorizeService _authorizeService;
-        private readonly IEmailService _mailer;
+        private readonly IEmailService _emailService;
 		private PdfDocument _document;
 		private PdfPage _page;
 		private XGraphics _gfx;
@@ -51,11 +51,12 @@ namespace InspectionReport.Controllers
 		private readonly int _valueWidth = 300;
 		private ReportText _text;
 
-		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService)
+		public ExportController(ReportContext context, IAuthorizeService authorizeService, IImageService imageService, IEmailService emailService)
 		{
 			_context = context;
 			_imageService = imageService;
 			_authorizeService = authorizeService;
+            _emailService = emailService;
 			_imageHandler = new ImageHandler();
 			_largeRegularFont = new XFont("Arial", 20, XFontStyle.Bold);
 			_medRegularFont = new XFont("Arial", 13, XFontStyle.Regular);
@@ -70,8 +71,7 @@ namespace InspectionReport.Controllers
 		[HttpGet("{id}")]
 		public IActionResult GeneratePDF(long id)
 		{
-			FileResult file = CreatePDF(id);
-
+            FileResult file = CreatePDF(id);
 			return file ?? (IActionResult)NotFound();
 		}
 
@@ -115,18 +115,15 @@ namespace InspectionReport.Controllers
 			CreateCertificatePage(house);
 
 			string pdfFilename = "InspectionReport" + house.Id + ".pdf";
-
+            /*
             Client client = house.SummonsedBy;
             string emailaddress = client.EmailAddress;
             string clientName = client.Name;
             EmailAddress clientEmail = new EmailAddress(clientName, emailaddress);
-            EmailAddress hitchEmail = new EmailAddress("Hitch Building Inspections", "hitchinspectionz@gmail.com");
-            EmailMessage emessage = new EmailMessage();
-            emessage.to = clientEmail;
-            emessage.from = hitchEmail;
+            EmailMessage emessage = new EmailMessage(clientEmail);
             emessage.subject = house.Address + " - Inspection Report"; 
-            emessage.content = "Your inspection has been completed";
-
+            emessage.body = "Your inspection has been completed";
+            */
 			using (MemoryStream ms = new MemoryStream())
 			{
 				_document.Save(ms, false);
