@@ -31,39 +31,6 @@ namespace InspectionReport.Controllers
             _context = context;
         }
 
-/* 
-        // GET: Dummy method to create a new user.
-        [HttpGet]
-        [AllowAnonymous]
-        [ActionName("dummypost")]
-        public async Task<IEnumerable<string>> CreateUserAsync()
-        {
-            ApplicationUser appUser = new ApplicationUser()
-            {
-                UserName = "rob",
-                Email = "rob@rob.com"
-            };
-
-            var result = await _userManager.CreateAsync(appUser, "Test123!");
-            if (result.Succeeded)
-            {
-                User user = new User()
-                {
-                    FirstName = "Rob",
-                    LastName = "Kirkpatrick",
-                    AppLoginUser = appUser
-                };
-
-                user.AppLoginUser = appUser;
-
-                _context.User.Add(user);
-
-                return new string[] { appUser.Id, appUser.UserName };
-            }
-            return new string[] { "Not Created" };
-        }
-        */
-
         // POST createAcc
         [HttpPost]
         [AllowAnonymous]
@@ -89,6 +56,25 @@ namespace InspectionReport.Controllers
                 return Content("User was created", "text/html");
             }
             return Content("User created failed", "text/html");
+        }
+
+        [HttpPost]
+        [ActionName("changePw")]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] LoginModel editUser)
+        {
+            ApplicationUser appUser = await _userManager.FindByEmailAsync(editUser.Email);
+            if (appUser != null)
+            {
+                appUser.PasswordHash = _userManager.PasswordHasher.HashPassword(appUser, editUser.Password);
+                var result = await _userManager.UpdateAsync(appUser);
+                if(!result.Succeeded)
+                {
+                    return BadRequest();
+                }
+                return Ok();
+            } else {
+                return BadRequest();
+            }
         }
 
         // POST api/login

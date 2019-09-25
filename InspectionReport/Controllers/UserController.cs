@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using InspectionReport.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace InspectionReport.Controllers
 {
@@ -15,11 +16,13 @@ namespace InspectionReport.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private UserManager<ApplicationUser> _userManager = null;
         private readonly ReportContext _context;
 
-        public UserController(ReportContext context)
+        public UserController(ReportContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -49,7 +52,7 @@ namespace InspectionReport.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateOrUpdateUser([FromBody] User editUser)
+        public async System.Threading.Tasks.Task<IActionResult> CreateOrUpdateUserAsync([FromBody] User editUser)
         {
             if (editUser == null)
             {
@@ -63,7 +66,8 @@ namespace InspectionReport.Controllers
             }
             else
             {
-                _context.User.Add(editUser);
+                // _context.User.Add(editUser);
+                return NotFound();
             }
 
             _context.SaveChanges();
