@@ -16,13 +16,11 @@ namespace InspectionReport.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private UserManager<ApplicationUser> _userManager = null;
         private readonly ReportContext _context;
 
-        public UserController(ReportContext context, UserManager<ApplicationUser> userManager)
+        public UserController(ReportContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
         [HttpGet]
@@ -52,7 +50,7 @@ namespace InspectionReport.Controllers
         }
 
         [HttpPost]
-        public async System.Threading.Tasks.Task<IActionResult> CreateOrUpdateUserAsync([FromBody] User editUser)
+        public IActionResult CreateOrUpdateUser([FromBody] User editUser)
         {
             if (editUser == null)
             {

@@ -14,6 +14,7 @@ namespace InspectionReport.Models
         public User ()
         {
             Inspected = new List<HouseUser>();
+            isDisabled = false;
         }
 
         public long Id { get; set; }
@@ -23,6 +24,7 @@ namespace InspectionReport.Models
         public string Phone { get; set; }
         public string Email { get; set; }
         public string AccountType { get; set; }
+        public Boolean isDisabled { get; set; }
         public ICollection<HouseUser> Inspected { get; set; }
         public ApplicationUser AppLoginUser { get; set; }
         public void UpdateObjectFromOther(User other)

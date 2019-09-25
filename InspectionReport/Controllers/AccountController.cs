@@ -79,6 +79,25 @@ namespace InspectionReport.Controllers
             }
         }
 
+        /*
+         * Disables/enables account
+         */
+        [HttpPost]
+        [ActionName("disable")]
+        public async Task<IActionResult> DisableAccAsync([FromBody] User _user)
+        {
+            User user = _context.User.FirstOrDefault(u => u.Id == _user.Id);
+            if (user == null)
+            {
+                return NotFound();
+            } else
+            {
+                user.isDisabled = !user.isDisabled;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+        }
+
         // POST api/login
         [HttpPost]
         [AllowAnonymous]
@@ -86,6 +105,16 @@ namespace InspectionReport.Controllers
         public async Task<IActionResult> SignIn([FromBody]LoginModel model)
         {
             // Get user and check credentials
+            User _user = _context.User.FirstOrDefault(u => u.Email == model.Email);
+            if (_user == null)
+            {
+                return Unauthorized();
+            }
+            else if (_user.isDisabled)
+            {
+                return Content("Disabled","text/html");
+            }
+
             ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
@@ -102,6 +131,7 @@ namespace InspectionReport.Controllers
             {
                 return Unauthorized();
             }
+            
         }
 
         // POST api/<controller>
