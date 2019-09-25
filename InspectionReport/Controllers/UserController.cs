@@ -75,20 +75,5 @@ namespace InspectionReport.Controllers
             return CreatedAtRoute("GetUser", new { id = editUser.Id }, editUser);
         }
 
-        //[HttpPost]
-        //public IActionResult CreateUser([FromBody] User user)
-        //{
-        //    if (user == null)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.User.Add(user);
-        //    _context.SaveChanges();
-
-        //    return CreatedAtRoute("GetUser", new { id = user.Id }, user);
-        //}
-
-
     }
 }

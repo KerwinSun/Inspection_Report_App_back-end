@@ -31,7 +31,6 @@ namespace InspectionReport.Models
             LastName = other.LastName;
             Email = other.Email;
             Phone = other.Phone;
-            Password = "";
             AccountType = other.AccountType;
         }
     }

@@ -68,6 +68,9 @@ namespace InspectionReport
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
 
+            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
+            services.AddTransient<IEmailService, EmailService>();
+
             services.ConfigureApplicationCookie(options =>
             {
                 // Cookie settings
