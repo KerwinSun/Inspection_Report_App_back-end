@@ -60,6 +60,22 @@ namespace InspectionReport.Controllers
             return Content("User created failed", "text/html");
         }
 
+        // POST checkAcc
+        [HttpPost]
+        [AllowAnonymous]
+        [ActionName("checkAcc")]
+        public async Task<IActionResult> CheckAccAsync([FromBody]LoginModel model)
+        {
+            ApplicationUser u = await _userManager.FindByEmailAsync(model.Email);
+            if(u == null)
+            {
+                return Ok();
+            } else
+            {
+                return new ConflictResult();
+            }
+        }
+
         // POST api/login
         [HttpPost]
         [AllowAnonymous]
