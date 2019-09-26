@@ -163,65 +163,82 @@ namespace InspectionReport.Controllers
 		private void CreateTitlePage(House house, string names)
 		{
 			AddNewPage();
+			
+			// Title
 			_gfx.DrawString("Hitch Building Inspections", _largeRegularFont, XBrushes.Blue, new XRect(0, 25, _page.Width, _page.Height), XStringFormats.TopCenter);
 			_currentY = 100;
+			
+			// Date of Inspection
 			WriteLine("Date of Inspection: ", _medBoldFont, _initialX);
 			WriteLine(house.InspectionDate.ToShortDateString(), _medRegularFont, _initialX + _labelWidth);
 			NewLine();
+
+			// Inspected By
 			WriteLine("Inspected By: ", _medBoldFont, _initialX);
 			WriteLine(names, _medRegularFont, _initialX + _labelWidth);
 			NewLine();
-			Client client = house.SummonsedBy;
+
+			// Inspection Address
+			WriteLine("Inspection Address: ", _medBoldFont, _initialX);
+			WriteLine(house.Address, _medRegularFont, _initialX + _labelWidth);
+			NewLine();
+
+			Client cl = house.SummonsedBy;
+			User client = _context.User
+                .Where(u => u.Email.Equals(cl.EmailAddress))
+                .FirstOrDefault();
+
 			if (client != null)
 			{
 				WriteLine("Client Information", _medBoldFont, _initialX);
 				NewLine();
-				WriteLine("Summonsed By: ", _medBoldFont, _initialX);
-				if (client.Name != null)
+
+				// Client name
+				WriteLine("Name: ", _medBoldFont, _initialX);
+				string clientName = client.FirstName + " " + client.LastName;
+				if (clientName != null)
 				{
-					WriteLine(client.Name, _medRegularFont, _initialX + _labelWidth);
+					WriteLine(clientName, _medRegularFont, _initialX + _labelWidth);
 				}
 				NewLine();
-				WriteLine("Contact Details", _medBoldFont, _initialX);
-				NewLine();
-				WriteLine("Home ph #: ", _medBoldFont, _initialX);
-				if (client.HomePhoneNumber != null)
+				
+				// Client phone number
+				WriteLine("Phone #: ", _medBoldFont, _initialX);
+				if (client.Phone != null)
 				{
-					WriteLine(client.HomePhoneNumber, _medRegularFont, _initialX + _labelWidth);
+					WriteLine(client.Phone, _medRegularFont, _initialX + _labelWidth);
 				}
 				NewLine();
-				WriteLine("Mobile #: ", _medBoldFont, _initialX);
-				if (client.MobilePhoneNumber != null)
-				{
-					WriteLine("mobile number", _medRegularFont, _initialX + _labelWidth);
-				}
-				NewLine();
-				//WriteLine("Address: ", _normalBoldFont, _initialX);
-				//WriteLine(client.Address, _medRegularFont, _initialX + _labelWidth);
-				//NewLine();
+
+				// Client email address
 				WriteLine("Email Address: ", _medBoldFont, _initialX);
-				if (client.EmailAddress != null)
+				if (client.Email != null)
 				{
-					WriteLine(client.EmailAddress, _medRegularFont, _initialX + _labelWidth);
+					WriteLine(client.Email, _medRegularFont, _initialX + _labelWidth);
 				}
 				NewLine();
+				
 				//WriteLine("Real Estate & Agent: ", _normalBoldFont, _initialX);
 				//WriteLine(client.RealEstate, _normalRegularFont, _initialX + _labelWidth);
 				//NewLine();
+
 				WriteLine("House Description", _medBoldFont, _initialX);
 				NewLine();
+
 				WriteLine("Estimate Summary: ", _medBoldFont, _initialX);
 				if (house.EstimateSummary != null)
 				{
 					WriteLine(house.EstimateSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
 				}
 				NewLine();
+
 				WriteLine("Rooms Summary: ", _medBoldFont, _initialX);
 				if (house.RoomsSummary != null)
 				{
 					WriteLine(house.RoomsSummary, _medRegularFont, _initialX + _labelWidth, _valueWidth);
 				}
 				NewLine();
+				
 				WriteLine("Construction Types: ", _medBoldFont, _initialX);
 				if (house.ConstructionType != null)
 				{
