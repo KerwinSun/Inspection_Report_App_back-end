@@ -117,6 +117,7 @@ namespace InspectionReport.Controllers
 				.Include(h => h.Categories)
 				.ThenInclude(c => c.Features)
 				.Include(h => h.InspectedBy)
+                .Include(h => h.SummonsedBy)
 				.SingleOrDefault();
 
 			if (house == null)
