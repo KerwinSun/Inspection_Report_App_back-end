@@ -68,12 +68,15 @@ namespace InspectionReport.Controllers
         public async Task<IActionResult> CheckAccAsync([FromBody]LoginModel model)
         {
             ApplicationUser u = await _userManager.FindByEmailAsync(model.Email);
-            if(u == null)
+            if (u == null)
             {
                 return Ok();
-            } else
+            }
+            else
             {
                 return new ConflictResult();
+            }
+        }
 
         [HttpPost]
         [ActionName("changePw")]
