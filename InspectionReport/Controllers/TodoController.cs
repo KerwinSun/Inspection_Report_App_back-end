@@ -40,6 +40,7 @@ namespace InspectionReport.Controllers
         }
 
         [HttpGet("{id}", Name = "GetTodo")]
+        [AllowAnonymous]
         public IActionResult GetById(long id)
         {
             var item = _context.TodoItems.Find(id);

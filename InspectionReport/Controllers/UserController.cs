@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using InspectionReport.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace InspectionReport.Controllers
 {
@@ -63,7 +64,8 @@ namespace InspectionReport.Controllers
             }
             else
             {
-                _context.User.Add(editUser);
+                // _context.User.Add(editUser);
+                return NotFound();
             }
 
             _context.SaveChanges();
