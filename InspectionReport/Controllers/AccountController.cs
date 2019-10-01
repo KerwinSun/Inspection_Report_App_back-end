@@ -60,6 +60,7 @@ namespace InspectionReport.Controllers
             return Content("User created failed", "text/html");
         }
 
+
         // POST checkAcc
         [HttpPost]
         [AllowAnonymous]
@@ -73,6 +74,43 @@ namespace InspectionReport.Controllers
             } else
             {
                 return new ConflictResult();
+
+        [HttpPost]
+        [ActionName("changePw")]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] LoginModel editUser)
+        {
+            ApplicationUser appUser = await _userManager.FindByEmailAsync(editUser.Email);
+            if (appUser != null)
+            {
+                appUser.PasswordHash = _userManager.PasswordHasher.HashPassword(appUser, editUser.Password);
+                var result = await _userManager.UpdateAsync(appUser);
+                if(!result.Succeeded)
+                {
+                    return BadRequest();
+                }
+                return Ok();
+            } else {
+                return BadRequest();
+            }
+        }
+
+        /*
+         * Disables/enables account
+         */
+        [HttpPost]
+        [ActionName("disable")]
+        public async Task<IActionResult> DisableAccAsync([FromBody] User _user)
+        {
+            User user = _context.User.FirstOrDefault(u => u.Id == _user.Id);
+            if (user == null)
+            {
+                return NotFound();
+            } else
+            {
+                user.isDisabled = !user.isDisabled;
+                await _context.SaveChangesAsync();
+                return Ok();
+
             }
         }
 
@@ -83,6 +121,16 @@ namespace InspectionReport.Controllers
         public async Task<IActionResult> SignIn([FromBody]LoginModel model)
         {
             // Get user and check credentials
+            User _user = _context.User.FirstOrDefault(u => u.Email == model.Email);
+            if (_user == null)
+            {
+                return Unauthorized();
+            }
+            else if (_user.isDisabled)
+            {
+                return Content("Disabled","text/html");
+            }
+
             ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
@@ -99,6 +147,7 @@ namespace InspectionReport.Controllers
             {
                 return Unauthorized();
             }
+            
         }
 
         // POST api/<controller>
