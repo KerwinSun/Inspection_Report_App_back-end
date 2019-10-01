@@ -60,6 +60,21 @@ namespace InspectionReport.Controllers
             return Content("User created failed", "text/html");
         }
 
+
+        // POST checkAcc
+        [HttpPost]
+        [AllowAnonymous]
+        [ActionName("checkAcc")]
+        public async Task<IActionResult> CheckAccAsync([FromBody]LoginModel model)
+        {
+            ApplicationUser u = await _userManager.FindByEmailAsync(model.Email);
+            if(u == null)
+            {
+                return Ok();
+            } else
+            {
+                return new ConflictResult();
+
         [HttpPost]
         [ActionName("changePw")]
         public async Task<IActionResult> ChangePasswordAsync([FromBody] LoginModel editUser)
@@ -95,6 +110,7 @@ namespace InspectionReport.Controllers
                 user.isDisabled = !user.isDisabled;
                 await _context.SaveChangesAsync();
                 return Ok();
+
             }
         }
 
