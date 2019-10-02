@@ -341,8 +341,9 @@ namespace InspectionReport.Controllers
 							}
 							if (statusCode != HttpStatusCode.OK)
 							{
-								//TODO: @CJ think about what happens when image cannot be get. 
-								throw new NotImplementedException("Unexpected error, image cannot be found or is unauthorized.");
+                                //TODO: @CJ think about what happens when image cannot be get. 
+                                //throw new NotImplementedException("Unexpected error, image cannot be found or is unauthorized.");
+                                return; // S K I P images
 							}
 							foreach (string URIResult in URIResults)
 							{
