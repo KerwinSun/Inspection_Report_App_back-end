@@ -18,7 +18,7 @@ namespace InspectionReport.Models
         public House ()
         {
             InspectedBy = new List<HouseUser>();
-            Categories = new List<Category>();
+            Categories = new List<T>();
         }
 
         public long Id { get; set; }
@@ -38,7 +38,7 @@ namespace InspectionReport.Models
         [JsonConverter(typeof(ESDateTimeConverter))]
         public DateTime InspectionDate { get; set; }
         [InverseProperty("House")]
-        public ICollection<Category> Categories { get; set; }
+        public ICollection<T> Categories { get; set; }
 
         public void UpdateObjectFromOther (House other)
         {
@@ -65,9 +65,9 @@ namespace InspectionReport.Models
             }
 
             //Update all "existing" categories
-            foreach (Category category in Categories)
+            foreach (T category in Categories)
             {
-                Category otherCategory = other.Categories.Where(c => c.Id == category.Id).SingleOrDefault();
+                T otherCategory = other.Categories.Where(c => c.Id == category.Id).SingleOrDefault();
                 if (otherCategory == null)
                 {
                     //Perhaps the other category is deleted, so no longer in new house?
@@ -80,8 +80,8 @@ namespace InspectionReport.Models
             }
 
             //Create all new categories.
-            ICollection<Category> newCategories = other.Categories.Where(c => c.Id == 0).ToList();
-            foreach (Category newCategory in newCategories)
+            ICollection<T> newCategories = other.Categories.Where(c => c.Id == 0).ToList();
+            foreach (T newCategory in newCategories)
             {
                 Categories.Add(newCategory);
             }

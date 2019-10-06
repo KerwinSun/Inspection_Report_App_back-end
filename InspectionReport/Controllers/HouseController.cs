@@ -62,7 +62,7 @@ namespace InspectionReport.Controllers
 
             //Need to perform sorting according to order of house/elements. 
             house.Categories = house.Categories.OrderBy(c => c.Order).ToList();
-            foreach (Category cat in house.Categories)
+            foreach (T cat in house.Categories)
             {
                 cat.Features = cat.Features.OrderBy(f => f.Order).ToList();
             }
@@ -71,7 +71,7 @@ namespace InspectionReport.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateOrUpdateHouse([FromBody] House house)
+        public IActionResult CreateOrUpdateHouse([FromBody] House house, [FromBody]dynamic value)
         {
             if (house == null)
             {

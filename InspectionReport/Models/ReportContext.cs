@@ -24,7 +24,7 @@ namespace InspectionReport.Models
 
         public DbSet<HouseUser> HouseUser { get; set; }
 
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<T> Categories { get; set; }
 
         public DbSet<Feature> Feature { get; set; }
 
@@ -38,7 +38,7 @@ namespace InspectionReport.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Category>()
+            modelBuilder.Entity<T>()
                 .HasOne(p => p.House)
                 .WithMany(b => b.Categories)
                 .OnDelete(DeleteBehavior.Cascade);

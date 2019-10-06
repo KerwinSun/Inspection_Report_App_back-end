@@ -11,9 +11,9 @@ namespace InspectionReport.Models
     /// E.g. Kitchen, Rooms, Garden etc. I.e. Anything inside
     /// or outside the house. 
     /// </summary>
-    public class Category : IUpdatable<Category>
+    public class T : IUpdatable<T>
     {
-        public Category ()
+        public T ()
         {
             Features = new List<Feature>();
         }
@@ -26,7 +26,7 @@ namespace InspectionReport.Models
         public House House { get; set; }
 
         public ICollection<Feature> Features { get; set; }
-        public void UpdateObjectFromOther(Category other)
+        public void UpdateObjectFromOther(T other)
         {
             Name = other.Name;
             Count = other.Count;

@@ -247,7 +247,7 @@ namespace InspectionReport.Controllers
 				}
 				NewLine();
 			}
-			foreach (Category category in house.Categories)
+			foreach (T category in house.Categories)
 			{
 				if (category.Name == "Overview")
 				{
@@ -272,7 +272,7 @@ namespace InspectionReport.Controllers
 		private void CreateHousePages(House house)
 		{
 			AddNewHousePage();
-			foreach (Category category in house.Categories)
+			foreach (T category in house.Categories)
 			{
 				if (category.Name != "Overview")
 				{
@@ -318,7 +318,7 @@ namespace InspectionReport.Controllers
 			AddNewPage();
 			WriteCategory("Images", _medBoldFont, _initialX);
 			NewLine();
-			foreach (Category category in house.Categories)
+			foreach (T category in house.Categories)
 			{
 				if (category.Name != "Overview")
 				{

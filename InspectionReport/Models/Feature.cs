@@ -19,7 +19,7 @@ namespace InspectionReport.Models
         public string Name { get; set; }
         public string Comments { get; set; }
         public int Order { get; set; }
-        public Category Category { get; set; }
+        public T Category { get; set; }
 
         public int NumOfImages { get; set; }
         public ICollection<Media> ImageFileNames { get; set; }
